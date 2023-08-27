@@ -1,0 +1,6 @@
+wait 30
+select dropdown "One"
+type textbox "my-text"
+click submitButton
+wait 10
+asserttxt message "Received!" 

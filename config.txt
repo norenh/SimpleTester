@@ -1,0 +1,4 @@
+message id "message"
+textbox name "my-text"
+submitButton cssSelector "button"
+dropdown name "my-select"
