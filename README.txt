@@ -3,7 +3,7 @@ SimpleTester is a quickly hacked together Selenium Webdriver wrapper that takes
 configuration file with unique names for the selectors is included.
 The idea is to have a simple scriptable webdriver for a specific webpage by
 having a config file definining the selectors needed for a specific element and 
-interacticting with them by these unique names.
+interacting with them by these unique names.
 If a selector changes you should only need to change the config file and you 
 can have multiple different scripts interacting with the same webpage, reusing
 the same config file.
@@ -45,6 +45,17 @@ waitfor ELEMENTNAME
 wait INTEGER
 finish
 --
+
+Statements in script does the following:
+
+find - returns true if element is found
+asserttxt - do getText() on element and check against "text"
+assertval  - do getValue() on element and check against "value"
+click - click() on element
+type -  sendKeys("text") on element
+waitfor - does a find, up until 100 times until element is found
+wait - just sleeps INTEGER*0.1s
+finish - closes the driver and the browser
 
 Both files ignores lines without content or lines starting with '#'.
 
