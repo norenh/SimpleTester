@@ -41,6 +41,7 @@ public class SimpleTester {
     private static FileReader script_file;
     private static boolean script_done = false;
     private static EnumStmt stmt;
+    private static EnumBy enumby;
     private enum EnumStmt {
 	FIND,
 	SELECT,
@@ -51,6 +52,16 @@ public class SimpleTester {
 	WAITFOR,
 	WAIT,
 	FINISH;
+    }
+
+    private enum EnumBy {
+	ID,
+	NAME,
+	CSSSELECTOR,
+	TAGNAME,
+	CLASSNAME,
+	LINKTEXT,
+	XPATH;
     }
     
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
@@ -65,14 +76,14 @@ public class SimpleTester {
 	    put("finish",    stmt.FINISH);
 	}};
 
-    private final static HashMap<String, Integer> by_names = new HashMap<String, Integer>() {{
-	    put("id",          0);
-	    put("name",        1);
-	    put("cssSelector", 2);
-	    put("tagName",     3);
-	    put("className",   4);
-	    put("linkText",    5);
-	    put("xpath",       6);
+    private final static HashMap<String, EnumBy> by_names = new HashMap<String, EnumBy>() {{
+	    put("id",          enumby.ID);
+	    put("name",        enumby.NAME);
+	    put("cssSelector", enumby.CSSSELECTOR);
+	    put("tagName",     enumby.TAGNAME);
+	    put("className",   enumby.CLASSNAME);
+	    put("linkText",    enumby.LINKTEXT);
+	    put("xpath",       enumby.XPATH);
 	}};
 
     private static void takeScreenshot(String pathname) {
@@ -107,7 +118,7 @@ public class SimpleTester {
 		    if(index2 == -1)
 			return false;
 		    String by_string = curr_line.substring(index1+1, index2);
-		    Integer ret = by_names.get(by_string);
+		    EnumBy ret = by_names.get(by_string);
 		    if(ret == null)
 			return false;
 		    index1 = index2+1;
@@ -116,26 +127,26 @@ public class SimpleTester {
 			return false;
 		    String selector = curr_line.substring(index1+1, index2);
 		    By by;
-		    switch(ret.intValue()) {
-		    case 0:
+		    switch(ret) {
+		    case ID:
 			by = By.id(selector);
 			break;
-		    case 1:
+		    case NAME:
 			by = By.name(selector);
 			break;
-		    case 2:
+		    case CSSSELECTOR:
 			by = By.cssSelector​(selector);
 			break;
-		    case 3:
+		    case TAGNAME:
 			by = By.tagName(selector);
 			break;
-		    case 4:
+		    case CLASSNAME:
 			by = By.className(selector);
 			break;
-		    case 5:
+		    case LINKTEXT:
 			by = By.linkText(selector);
 			break;
-		    case 6:
+		    case XPATH:
 			by = By.xpath(selector);
 			break;
 		    default:
