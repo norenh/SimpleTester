@@ -15,6 +15,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.Keys;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -27,9 +28,6 @@ import java.util.Scanner;
 import java.nio.file.StandardCopyOption;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.Capabilities;
-
-// javac -cp "selenium-java-4.11.0/*:selenium-java-4.11.0/lib/*" SimpleTester.java
-// java -cp "selenium-java-4.11.0/*:selenium-java-4.11.0/lib/*:." SimpleTester
 
 public class SimpleTester {
     
@@ -49,6 +47,7 @@ public class SimpleTester {
 	ASSERTVAL,
 	CLICK,
 	TYPE,
+	TYPECLR,
 	WAITFOR,
 	WAIT,
 	FINISH;
@@ -71,6 +70,7 @@ public class SimpleTester {
 	    put("assertval", stmt.ASSERTVAL);
 	    put("click",     stmt.CLICK);
 	    put("type",      stmt.TYPE);
+	    put("typeclr",   stmt.TYPECLR);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("wait",      stmt.WAIT);
 	    put("finish",    stmt.FINISH);
@@ -297,6 +297,14 @@ public class SimpleTester {
 	    findElement(list);
 	    curr_element.sendKeys(s);
 	    return true;
+	case TYPECLR:
+	    if(novalidate)
+		return true;
+	    findElement(list);
+	    curr_element.sendKeys(Keys.CONTROL + "a");
+	    curr_element.sendKeys(Keys.DELETE);
+	    curr_element.sendKeys(s);
+	    return true;
 	case ASSERTTXT:
 	    if(novalidate)
 		return true;
@@ -340,9 +348,8 @@ public class SimpleTester {
 	    if(novalidate)
 		System.out.println("FAIL: "+linenr+":"+curr_line);
 	    else {
-		
 		System.out.println("FAIL: Error parsing script file "+e.toString());
-		e.printStackTrace(System.out);
+		//e.printStackTrace(System.out);
 	    }
 	    System.exit(2);
 	}
@@ -356,56 +363,58 @@ public class SimpleTester {
 	}
 	String cfgfile = args[0];
 	String url = args[1];
-	String sfile = args[2];
+	String sfile = "";
 
 	System.out.println("INFO: Using Config "+cfgfile);
 	System.out.println("INFO: Using URL: "+url);
-	System.out.println("INFO: Using Script: "+sfile);
 
 	try {
+	    // read in and parse config file
 	    config_file = new FileReader(cfgfile);
-	    script_file = new FileReader(sfile);
+	    
+	    if(!parseConfig()) {
+		System.out.println("FAIL: Unable to parse config file "+cfgfile+":"+linenr);
+		System.exit(2);
+	    }
+	    config_file.close();
+	    
+	    // read in and parse script files
+	    for(int i=2; i < args.length; i++) {
+		sfile = args[i];
+		System.out.println("INFO: Using Script: "+sfile);
+		script_file = new FileReader(sfile);
+
+		if(!parseScript(true)) {
+		    System.out.println("FAIL: Unable to parse script file "+sfile+":"+linenr);
+		    System.exit(2);
+		}
+		script_file.close();
+	    }
 	}
 	catch(Exception e) {
 	    System.out.println("FAIL: Unable to open file "+e.toString());
 	    System.exit(2);
 	}
-	if(!parseConfig()) {
-	    System.out.println("FAIL: Unable to parse config file "+cfgfile+":"+linenr);
-	    System.exit(2);
-	}
-	
-	if(!parseScript(true)) {
-	    System.out.println("FAIL: Unable to parse script file "+sfile+":"+linenr);
-	    System.exit(2);
-	}
-	try {
-	    config_file.close();
-	    script_file.close();
-	    script_file = new FileReader(sfile);
-	}
-	catch(Exception e) {
-	    System.out.println("FAIL: Unable to open script file "+e.toString());
-	    e.printStackTrace(System.out);
-	    System.exit(2);
-	}
-	
+
 	curr_driver = new ChromeDriver();
 	curr_driver.get(url);
 	//String title = curr_driver.getTitle();
 	//System.out.println(title);
 
 	try {
-	    if(parseScript(false)) {
-		System.out.println("SUCCESS: "+sfile);
+	    for(int i=2; i < args.length; i++) {
+		sfile = args[i];
+		script_file = new FileReader(sfile);
+		if(!parseScript(false)) {
+		    System.out.println("FAIL: "+sfile+":"+linenr);
+		    takeScreenshot(sfile+".png");
+		}
+		script_file.close();
 	    }
-	    else {
-		System.out.println("FAIL: "+sfile+":"+linenr);
-		takeScreenshot(sfile+".png");
-	    }
+	    System.out.println("SUCCESS: "+sfile);
 	}
 	catch(Exception e) {
-	    e.printStackTrace(System.out);
+	    //e.printStackTrace(System.out);
 	    System.out.println(e.toString());
 	    System.out.println("FAIL: Running "+sfile+":"+linenr);
 	    System.exit(2);

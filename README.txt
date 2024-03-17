@@ -16,7 +16,7 @@ to automate data-entries.
 The requirements to build is:
 
 Java (unknown version, should work with JDK 8)
-Selenium Webdriver 4.11.0
+Selenium Webdriver 4.18.1
 Chrome Browser
 Linux terminal to use the included script files (write your own for windows)
 
@@ -53,6 +53,7 @@ asserttxt - do getText() on element and check against "text"
 assertval  - do getValue() on element and check against "value"
 click - click() on element
 type -  sendKeys("text") on element
+typeclr - Sends CTRL+a+DEL before sendKeys("text")
 waitfor - does a find, up until 100 times until element is found
 wait - just sleeps INTEGER*0.1s
 finish - closes the driver and the browser
@@ -75,13 +76,10 @@ click submitButton
 wait 10
 asserttxt message "Received!" 
 $ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt
-INFO: Google Chrome 115.0.5790.170
+INFO: Google Chrome 122.0.6261.94 
 INFO: Using Config config.txt
 INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
 INFO: Using Script: script.txt
-SLF4J: No SLF4J providers were found.
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See https://www.slf4j.org/codes.html#noProviders for further details.
 SUCCESS: script.txt
 $
 
