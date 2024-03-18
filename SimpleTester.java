@@ -99,11 +99,12 @@ public class SimpleTester {
 
     
     private static int linenr = 0;
+    private static String curr_line = "";
     private static boolean parseConfig() {
 	BufferedReader buffer = new BufferedReader(config_file);
 	linenr = 0;
 	try {
-	    String curr_line = buffer.readLine();
+	    curr_line = buffer.readLine();
 	    while(curr_line != null) {
 		linenr++;
 		curr_line = curr_line.trim();
@@ -188,7 +189,7 @@ public class SimpleTester {
 	return true;
     }
 
-    private static boolean runStatement(boolean novalidate, String curr_line) {
+    private static boolean runStatement(boolean novalidate) {
 	int index1 = curr_line.indexOf(' ');
 	if(index1 == -1)
 	    return false;
@@ -326,7 +327,6 @@ public class SimpleTester {
     
     private static boolean parseScript(boolean novalidate) {
 	BufferedReader buffer = new BufferedReader(script_file);
-	String curr_line = "";
 	linenr = 0;
 	try {
 	    curr_line = buffer.readLine();
@@ -339,19 +339,13 @@ public class SimpleTester {
 		    curr_line = buffer.readLine();
 		    continue;
 		}
-		if(!runStatement(novalidate, curr_line))
+		if(!runStatement(novalidate))
 		    return false;
 		curr_line = buffer.readLine();
 	    }
 	}
 	catch(Exception e) {
-	    if(novalidate)
-		System.out.println("FAIL: "+linenr+":"+curr_line);
-	    else {
-		System.out.println("FAIL: Error parsing script file "+e.toString());
-		//e.printStackTrace(System.out);
-	    }
-	    System.exit(2);
+	    return false;
 	}
 	return true;
     }
@@ -373,7 +367,7 @@ public class SimpleTester {
 	    config_file = new FileReader(cfgfile);
 	    
 	    if(!parseConfig()) {
-		System.out.println("FAIL: Unable to parse config file "+cfgfile+":"+linenr);
+		System.out.println("FAIL: Unable to parse config file "+cfgfile+":"+linenr+":"+curr_line);
 		System.exit(2);
 	    }
 	    config_file.close();
@@ -385,7 +379,7 @@ public class SimpleTester {
 		script_file = new FileReader(sfile);
 
 		if(!parseScript(true)) {
-		    System.out.println("FAIL: Unable to parse script file "+sfile+":"+linenr);
+		    System.out.println("FAIL: Unable to parse script file "+sfile+":"+linenr+":"+curr_line);
 		    System.exit(2);
 		}
 		script_file.close();
@@ -406,8 +400,11 @@ public class SimpleTester {
 		sfile = args[i];
 		script_file = new FileReader(sfile);
 		if(!parseScript(false)) {
-		    System.out.println("FAIL: "+sfile+":"+linenr);
+		    System.out.println("FAIL: "+sfile+":"+linenr+":"+curr_line);
 		    takeScreenshot(sfile+".png");
+		    script_file.close();
+		    curr_driver.quit();
+		    System.exit(1);
 		}
 		script_file.close();
 	    }
@@ -416,7 +413,7 @@ public class SimpleTester {
 	catch(Exception e) {
 	    //e.printStackTrace(System.out);
 	    System.out.println(e.toString());
-	    System.out.println("FAIL: Running "+sfile+":"+linenr);
+	    System.out.println("FAIL: Running "+sfile+":"+linenr+":"+curr_line);
 	    System.exit(2);
 	}
 	curr_driver.quit();

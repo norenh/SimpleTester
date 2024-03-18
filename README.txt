@@ -15,7 +15,7 @@ to automate data-entries.
 
 The requirements to build is:
 
-Java (unknown version, should work with JDK 8)
+Java (unknown version, should work with JDK 17 for latest selenium)
 Selenium Webdriver 4.18.1
 Chrome Browser
 Linux terminal to use the included script files (write your own for windows)
@@ -82,4 +82,13 @@ INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
 INFO: Using Script: script.txt
 SUCCESS: script.txt
 $
+
+Example FAIL with multiple scripts (here, reusing the same one):
+./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt script.txt
+INFO: Google Chrome 122.0.6261.94 
+INFO: Using Config config.txt
+INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
+INFO: Using Script: script.txt
+INFO: Using Script: script.txt
+FAIL: script.txt:2:select dropdown "One"
 
