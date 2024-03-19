@@ -38,7 +38,8 @@ The script supports the following statements for now:
 find ELEMENTNAME
 select ELEMENTNAME "dropdownoption"
 asserttxt ELEMENTNAME "text"
-assertval ELEMENTNAME "value"
+assertatr ELEMENTNAME "attribute" "value"
+assertcss ELEMENTNAME "property" "value"
 click ELEMENTNAME
 type ELEMENTNAME "text"
 waitfor ELEMENTNAME
@@ -50,7 +51,8 @@ Statements in script does the following:
 
 find - returns true if element is found
 asserttxt - do getText() on element and check against "text"
-assertval  - do getValue() on element and check against "value"
+assertatr  - do getAttribute on "attribute" of element compare against "value"
+assertcss - do getCssValue on "property" of element compare against "value" 
 click - click() on element
 type -  sendKeys("text") on element
 typeclr - Sends CTRL+a+DEL before sendKeys("text")

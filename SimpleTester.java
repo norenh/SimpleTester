@@ -44,7 +44,8 @@ public class SimpleTester {
 	FIND,
 	SELECT,
 	ASSERTTXT,
-	ASSERTVAL,
+	ASSERTATR,
+	ASSERTCSS,
 	CLICK,
 	TYPE,
 	TYPECLR,
@@ -67,7 +68,8 @@ public class SimpleTester {
 	    put("find",      stmt.FIND);
 	    put("select",    stmt.SELECT);
 	    put("asserttxt", stmt.ASSERTTXT);
-	    put("assertval", stmt.ASSERTVAL);
+	    put("assertatr", stmt.ASSERTATR);
+	    put("assertcss", stmt.ASSERTCSS);
 	    put("click",     stmt.CLICK);
 	    put("type",      stmt.TYPE);
 	    put("typeclr",   stmt.TYPECLR);
@@ -276,6 +278,8 @@ public class SimpleTester {
 	if(index2 == -1)
 	    index2 = curr_line.length();
 	String arg3 = curr_line.substring(index1, index2);
+	
+	// just make sure the 3rd arg starts and ends with quotation marks, take everything in between
 	if(arg3.length() < 3 || arg3.charAt(0) != '"' || arg3.charAt(arg3.length()-1) != '"') {
 	    return false;
 	}
@@ -312,16 +316,40 @@ public class SimpleTester {
 	    findElement(list);
 	    ret = curr_element.getText();
 	    return ret.equals(s);
-	case ASSERTVAL:
+	default:
+	    break;
+	}
+
+	// 3 arguments (we already know it starts and stops with quotation marks, find two more
+	index2 = curr_line.indexOf("\" \"", index1);
+	if(index2 == -1)
+	    index2 = curr_line.length();
+	String s1 = curr_line.substring (index1+1,index2);
+	if(s1 == null || s1.length() < 1)
+	    return false;
+	//System.out.println("Statement1: "+s1);
+	String s2 = curr_line.substring(index2+3,curr_line.length()-1);
+	if(s2 == null || s2.length() < 1)
+	    return false;
+	//System.out.println("Statement2: "+s2);
+	
+	switch(st) {
+	case ASSERTATR:
 	    if(novalidate)
 		return true;
 	    findElement(list);
-	    ret = curr_element.getAttribute("value");
-	    return ret.equals(s);
+	    ret = curr_element.getAttribute(s1);
+	    return ret.equals(s2);
+	case ASSERTCSS:
+	    if(novalidate)
+		return true;
+	    findElement(list);
+	    ret = curr_element.getCssValue(s1);
+	    return ret.equals(s2);
 	default:
-	    return false;
+	    break;
 	}
-	//return true;
+	return false;
     }
 
     
