@@ -1,6 +1,11 @@
-wait 30
+waitfor dropdown
 select dropdown "One"
 type textbox "my-text"
 click submitButton
-wait 10
+waitfor !dropdown
+waitfor message
+
+# assert for success!
 asserttxt message "Received!" 
+assertatr message "class" "lead"
+assertcss message "font-size" "20px"

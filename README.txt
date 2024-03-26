@@ -56,7 +56,7 @@ assertcss - do getCssValue on "property" of element compare against "value"
 click - click() on element
 type -  sendKeys("text") on element
 typeclr - Sends CTRL+a+DEL before sendKeys("text")
-waitfor - does a find, up until 100 times until element is found
+waitfor - wait until element is found for up to 20s
 wait - just sleeps INTEGER*0.1s
 finish - closes the driver and the browser
 
@@ -70,27 +70,30 @@ message id "message"
 textbox name "my-text"
 submitButton cssSelector "button"
 dropdown name "my-select"
-$ cat script.txt 
-wait 30
+$ cat script.txt
+waitfor dropdown
 select dropdown "One"
 type textbox "my-text"
 click submitButton
-wait 10
+waitfor !dropdown
+waitfor message
 asserttxt message "Received!" 
-$ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt
+
+assertatr message "class" "lead"
+assertcss message "font-size" "20px"
+$ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt 
 INFO: Google Chrome 122.0.6261.94 
 INFO: Using Config config.txt
 INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
 INFO: Using Script: script.txt
 SUCCESS: script.txt
-$
 
-Example FAIL with multiple scripts (here, reusing the same one):
-./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt script.txt
+#Example FAIL with multiple scripts (here, reusing the same one):
+$ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt script.txt
 INFO: Google Chrome 122.0.6261.94 
 INFO: Using Config config.txt
 INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
 INFO: Using Script: script.txt
 INFO: Using Script: script.txt
-FAIL: script.txt:2:select dropdown "One"
+FAIL: script.txt:1:waitfor dropdown
 

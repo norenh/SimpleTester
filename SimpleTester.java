@@ -257,6 +257,9 @@ public class SimpleTester {
 		    if(not_sel)
 			return true;
 		}
+		try {
+		    Thread.sleep(200);  // try every 200ms for 20s
+		} catch(InterruptedException e) {}
 	    }
 	    return false;
 	case CLICK:
@@ -372,7 +375,11 @@ public class SimpleTester {
 		curr_line = buffer.readLine();
 	    }
 	}
+	catch(NoSuchElementException e) {
+	    return false;
+	}
 	catch(Exception e) {
+	    System.out.println("ERROR: "+e.toString());
 	    return false;
 	}
 	return true;
@@ -447,5 +454,4 @@ public class SimpleTester {
 	curr_driver.quit();
 	System.exit(0);
     }
-
 }
