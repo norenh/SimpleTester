@@ -12,7 +12,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.remote.NoSuchDriverException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.Keys;
@@ -62,6 +67,14 @@ public class SimpleTester {
 	CLASSNAME,
 	LINKTEXT,
 	XPATH;
+    }
+
+    private enum enumDriver {
+	CHROME,
+	FIREFOX,
+	EDGE,
+	SAFARI,
+	UNDEFINED;
     }
     
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
@@ -390,8 +403,31 @@ public class SimpleTester {
 	    System.out.println("Usage: ./run.sh <configfile> <URL> <script>");
 	    System.exit(1);
 	}
-	String cfgfile = args[0];
-	String url = args[1];
+	enumDriver edrive = enumDriver.CHROME;
+	int argi = 0;
+	boolean headless = false;
+	if(args[argi].equals("-h")) {
+	    headless = true;
+	    argi++;
+	}
+	if(args[argi].equals("-b")) {
+	    argi++;
+	    if(args[argi].equals("firefox"))
+		edrive = enumDriver.FIREFOX;
+	    else if(args[argi].equals("chrome"))
+		edrive = enumDriver.CHROME;
+	    else if(args[argi].equals("safari"))
+		edrive = enumDriver.SAFARI;
+	    else if(args[argi].equals("edge"))
+		edrive = enumDriver.EDGE;
+	    else {
+		System.out.println("Unsupported driver: "+args[argi]);
+		System.exit(1);
+	    }
+	    argi++;
+	}
+	String cfgfile = args[argi];
+	String url = args[argi+1];
 	String sfile = "";
 
 	System.out.println("INFO: Using Config "+cfgfile);
@@ -408,7 +444,7 @@ public class SimpleTester {
 	    config_file.close();
 	    
 	    // read in and parse script files
-	    for(int i=2; i < args.length; i++) {
+	    for(int i=argi+2; i < args.length; i++) {
 		sfile = args[i];
 		System.out.println("INFO: Using Script: "+sfile);
 		script_file = new FileReader(sfile);
@@ -424,14 +460,39 @@ public class SimpleTester {
 	    System.out.println("FAIL: Unable to open file "+e.toString());
 	    System.exit(2);
 	}
-
-	curr_driver = new ChromeDriver();
+	try {
+	    switch(edrive) {
+	    case CHROME:
+		if(headless) {
+		    ChromeOptions options = new ChromeOptions();
+		    options.addArguments("--headless=new");
+		    curr_driver = new ChromeDriver(options);
+		}
+		else
+		    curr_driver = new ChromeDriver();
+		break;
+	    case FIREFOX:
+		curr_driver = new FirefoxDriver();
+		break;
+	    case SAFARI:
+		curr_driver = new SafariDriver();
+		break;
+	    case EDGE:
+		curr_driver = new EdgeDriver();
+	    default:
+		System.out.println("Unsupported driver");
+		System.exit(1);
+	    }
+	} catch(NoSuchDriverException e) {
+	    System.out.println("ERROR: Is the browser installed?");
+	    System.exit(1);
+	}
 	curr_driver.get(url);
 	//String title = curr_driver.getTitle();
 	//System.out.println(title);
 
 	try {
-	    for(int i=2; i < args.length; i++) {
+	    for(int i=argi+2; i < args.length; i++) {
 		sfile = args[i];
 		script_file = new FileReader(sfile);
 		if(!parseScript(false)) {
