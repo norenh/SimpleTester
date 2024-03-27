@@ -21,18 +21,19 @@ import org.openqa.selenium.remote.NoSuchDriverException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.Keys;
-
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.io.File;
-import java.nio.file.Files;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.util.Scanner;
-import java.nio.file.StandardCopyOption;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.Capabilities;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.Files;
 
 public class SimpleTester {
     
@@ -45,6 +46,7 @@ public class SimpleTester {
     private static boolean script_done = false;
     private static EnumStmt stmt;
     private static EnumBy enumby;
+    private static boolean isMac = false;
     private enum EnumStmt {
 	FIND,
 	SELECT,
@@ -54,6 +56,7 @@ public class SimpleTester {
 	CLICK,
 	TYPE,
 	TYPECLR,
+	WAITFORATR,
 	WAITFOR,
 	WAIT,
 	FINISH;
@@ -86,6 +89,7 @@ public class SimpleTester {
 	    put("click",     stmt.CLICK);
 	    put("type",      stmt.TYPE);
 	    put("typeclr",   stmt.TYPECLR);
+	    put("waitforatr",stmt.WAITFORATR);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("wait",      stmt.WAIT);
 	    put("finish",    stmt.FINISH);
@@ -115,6 +119,12 @@ public class SimpleTester {
     
     private static int linenr = 0;
     private static String curr_line = "";
+    private static void sleep(int x) {
+	try {
+	    Thread.sleep(x);
+	} catch(InterruptedException e) {}
+    }
+    
     private static boolean parseConfig() {
 	BufferedReader buffer = new BufferedReader(config_file);
 	linenr = 0;
@@ -254,7 +264,7 @@ public class SimpleTester {
 		return false;
 	    if(!novalidate) {
 		int x = tmp.intValue();
-		try { Thread.sleep(x*100); } catch(Exception e) {}
+		sleep(x*100);
 	    }
 	    return true;
 	case WAITFOR:
@@ -270,9 +280,7 @@ public class SimpleTester {
 		    if(not_sel)
 			return true;
 		}
-		try {
-		    Thread.sleep(200);  // try every 200ms for 20s
-		} catch(InterruptedException e) {}
+		sleep(200); // try every 200ms for 20s
 	    }
 	    return false;
 	case CLICK:
@@ -322,8 +330,14 @@ public class SimpleTester {
 	    if(novalidate)
 		return true;
 	    findElement(list);
-	    curr_element.sendKeys(Keys.CONTROL + "a");
-	    curr_element.sendKeys(Keys.DELETE);
+	    if(isMac) {
+		curr_element.sendKeys(Keys.COMMAND + "a");
+		curr_element.sendKeys(Keys.BACK_SPACE);
+	    }
+	    else {
+		curr_element.sendKeys(Keys.CONTROL + "a");
+		curr_element.sendKeys(Keys.DELETE);
+	    }
 	    curr_element.sendKeys(s);
 	    return true;
 	case ASSERTTXT:
@@ -362,6 +376,17 @@ public class SimpleTester {
 	    findElement(list);
 	    ret = curr_element.getCssValue(s1);
 	    return ret.equals(s2);
+	case WAITFORATR:
+	    if(novalidate)
+		return true;
+	    for(int i=0;i<100;i++) {
+		findElement(list);
+		ret = curr_element.getAttribute(s1);
+		if(ret.equals(s2))
+		    return true;
+		sleep(200);
+	    }
+	    return false;
 	default:
 	    break;
 	}
@@ -406,6 +431,12 @@ public class SimpleTester {
 	enumDriver edrive = enumDriver.CHROME;
 	int argi = 0;
 	boolean headless = false;
+	{
+	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+	    if((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
+		isMac = true;
+	    }
+	}
 	if(args[argi].equals("-h")) {
 	    headless = true;
 	    argi++;
@@ -466,6 +497,7 @@ public class SimpleTester {
 		if(headless) {
 		    ChromeOptions options = new ChromeOptions();
 		    options.addArguments("--headless=new");
+		    options.addArguments("--window-size=1920,1080");
 		    curr_driver = new ChromeDriver(options);
 		}
 		else
