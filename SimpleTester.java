@@ -57,6 +57,7 @@ public class SimpleTester {
 	TYPE,
 	TYPECLR,
 	WAITFORATR,
+	WAITFORTXT,
 	WAITFOR,
 	WAIT,
 	FINISH;
@@ -90,6 +91,7 @@ public class SimpleTester {
 	    put("type",      stmt.TYPE);
 	    put("typeclr",   stmt.TYPECLR);
 	    put("waitforatr",stmt.WAITFORATR);
+	    put("waitfortxt",stmt.WAITFORTXT);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("wait",      stmt.WAIT);
 	    put("finish",    stmt.FINISH);
@@ -346,6 +348,17 @@ public class SimpleTester {
 	    findElement(list);
 	    ret = curr_element.getText();
 	    return ret.equals(s);
+	case WAITFORTXT:
+	    if(novalidate)
+		return true;
+	    for(int i=0;i<100;i++) {
+		findElement(list);
+		ret = curr_element.getText();
+		if(ret.equals(s))
+		    return true;
+		sleep(200);
+	    }
+	    return false;
 	default:
 	    break;
 	}
