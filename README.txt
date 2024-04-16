@@ -41,8 +41,12 @@ asserttxt ELEMENTNAME "text"
 assertatr ELEMENTNAME "attribute" "value"
 assertcss ELEMENTNAME "property" "value"
 click ELEMENTNAME
+dwaitfor INTEGER [!]ELEMENTNAME
 type ELEMENTNAME "text"
-waitfor ELEMENTNAME
+typeclr ELEMENTNAME "text"
+waitforatr ELEMENTNAME "attribute" "value"
+waitfortxt ELEMENTNAME "text"
+waitfor [!]ELEMENTNAME
 wait INTEGER
 finish
 --
@@ -50,12 +54,16 @@ finish
 Statements in script does the following:
 
 find - returns true if element is found
+select - selects a element in a dropdown
 asserttxt - do getText() on element and check against "text"
 assertatr  - do getAttribute on "attribute" of element compare against "value"
 assertcss - do getCssValue on "property" of element compare against "value" 
 click - click() on element
+dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
 type -  sendKeys("text") on element
 typeclr - Sends CTRL+a+DEL before sendKeys("text")
+waitforatr - wait until element is found and has "attribute" set to "value"
+waitfortxt - wait until element is found and has text set to "text"
 waitfor - wait until element is found for up to 20s
 wait - just sleeps INTEGER*0.1s
 finish - closes the driver and the browser

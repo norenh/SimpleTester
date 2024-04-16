@@ -47,6 +47,8 @@ public class SimpleTester {
     private static EnumStmt stmt;
     private static EnumBy enumby;
     private static boolean isMac = false;
+    private static int linenr = 0;
+    private static String curr_line = "";
     private enum EnumStmt {
 	FIND,
 	SELECT,
@@ -54,6 +56,7 @@ public class SimpleTester {
 	ASSERTATR,
 	ASSERTCSS,
 	CLICK,
+	DWAITFOR,
 	TYPE,
 	TYPECLR,
 	WAITFORATR,
@@ -88,6 +91,7 @@ public class SimpleTester {
 	    put("assertatr", stmt.ASSERTATR);
 	    put("assertcss", stmt.ASSERTCSS);
 	    put("click",     stmt.CLICK);
+	    put("dwaitfor",  stmt.DWAITFOR);
 	    put("type",      stmt.TYPE);
 	    put("typeclr",   stmt.TYPECLR);
 	    put("waitforatr",stmt.WAITFORATR);
@@ -118,9 +122,6 @@ public class SimpleTester {
 	}
     }
 
-    
-    private static int linenr = 0;
-    private static String curr_line = "";
     private static void sleep(int x) {
 	try {
 	    Thread.sleep(x);
@@ -148,16 +149,21 @@ public class SimpleTester {
 		selectors.put(statement,l);
 		while(true) {
 		    int index2 = curr_line.indexOf(' ', index1+1);
-		    if(index2 == -1)
+		    if(index2 == -1) {
+			System.out.println("ERROR: Unexpected EOL, did you miss a keyword?");
 			return false;
+		    }
 		    String by_string = curr_line.substring(index1+1, index2);
 		    EnumBy ret = by_names.get(by_string);
-		    if(ret == null)
+		    if(ret == null) {
+			System.out.println("ERROR: \""+by_string+"\" not a valid Locator");
 			return false;
+		    }
 		    index1 = index2+1;
 		    index2 = curr_line.indexOf('"', index1+1);
-		    if(index2 == -1)
+		    if(index2 == -1) {
 			return false;
+		    }
 		    String selector = curr_line.substring(index1+1, index2);
 		    By by;
 		    switch(ret) {
@@ -206,208 +212,265 @@ public class SimpleTester {
 	return true;
     }
 
-    private static boolean findElement(ArrayList<By> s) {
+    private static void findElement(ArrayList<By> s) {
 	curr_element = curr_driver.findElement(s.get(0));
 	for (int i = 1; i < s.size(); i++) {
 	    if(curr_element == null)
-		return false;
+		return;
 	    curr_element = curr_element.findElement(s.get(i));
 	}
-	return true;
     }
 
-    private static boolean runStatement(boolean novalidate) {
-	int index1 = curr_line.indexOf(' ');
-	if(index1 == -1)
-	    return false;
-	String statement = curr_line.substring(0,index1);
-	EnumStmt st = statements.get(statement);
-	if(st == null)
-	    return false;
+    private static int currPos;
+    private static boolean notSel = false;
 
-	// 0 argument
-	switch(st) {
-	case FINISH:
-	    script_done = true;
-	    return true;
-	default:
-	    break;
+    private static class ParsingException extends Exception {
+	public ParsingException(String message) {
+	    super(message);
 	}
-	//System.out.println("Statement: "+statement);
-	// more arguments
-	int index2 = index1+1;
-	index2 = curr_line.indexOf(' ', index2);
+    }
+
+    private static EnumStmt readStmt() throws ParsingException {
+	currPos = curr_line.indexOf(' ');
+	if(currPos == -1) {
+	    currPos = curr_line.length();
+	}
+	return statements.get(curr_line.substring(0,currPos));
+    }
+
+    private static int readInt() throws ParsingException {
+	currPos++;
+	if(currPos >= curr_line.length())
+	    throw new ParsingException("Expected INTEGER");
+	int index2 = curr_line.indexOf(' ', currPos);
 	if(index2 == -1)
 	    index2 = curr_line.length();
-	String selector = curr_line.substring(index1+1, index2);
-	boolean not_sel = false;
-	ArrayList<By> list = null;
+	Integer tmp = Integer.valueOf(curr_line.substring(currPos, index2));
+	if(tmp == null) {
+	    throw new ParsingException(curr_line.substring(currPos, index2)+" is not a number!");
+	}
+	currPos = index2;
+	return tmp.intValue();
+    }
+
+    private static ArrayList<By> readSel(boolean neg) throws ParsingException {
+	currPos++;
+	if(currPos >= curr_line.length())
+	    throw new ParsingException("Expected ELEMENTNAME");
+	int index2 = curr_line.indexOf(' ', currPos);
+	if(index2 == -1)
+	    index2 = curr_line.length();
+	
+	String selector = curr_line.substring(currPos, index2);
+	currPos = index2;
 	if(selector.charAt(0) == '!') {
 	    if(selector.length() == 1)
-		return false;
+		throw new ParsingException("No ELEMENTNAME defined!");
+	    if(!neg)
+		throw new ParsingException("Unexpected Negation!");
+	    notSel = true;
 	    selector = selector.substring(1,selector.length());
-	    not_sel = true;
 	}
-	if(st != stmt.WAIT) {
-	    //System.out.println("!wait");
-	    list = selectors.get(selector);
-	    if(list == null)
-		return false;
-	}
-	//System.out.println("Statement: "+selector);
-	// 1 argument
-	switch(st) {
-	case FIND:
-	case WAIT:
-	    if(not_sel)
-		return false;
-	    Integer tmp = Integer.valueOf(selector);
-	    if(tmp == null)
-		return false;
-	    if(!novalidate) {
-		int x = tmp.intValue();
-		sleep(x*100);
-	    }
-	    return true;
-	case WAITFOR:
-	    if(novalidate)
-		return true;
-	    for(int i=0; i<100; i++) {
-		try {
-		    findElement(list);
-		    if(!not_sel)
-			return true;
-		}
-		catch(NoSuchElementException e) {
-		    if(not_sel)
-			return true;
-		}
-		sleep(200); // try every 200ms for 20s
-	    }
-	    return false;
-	case CLICK:
-	    if(not_sel)
-		return false;
-	    if(novalidate)
-		return true;
-	    findElement(list);
-	    curr_element.click();
-	    //System.out.println(curr_element.toString());
-	    return true;
-	default:
-	    break;
-	}
+	else
+	    notSel = false;
 
-	// 2 arguments
-	index1 = index2+1;
-	index2 = curr_line.indexOf(' ', index1);
-	if(index2 == -1)
-	    index2 = curr_line.length();
-	String arg3 = curr_line.substring(index1, index2);
-	
-	// just make sure the 3rd arg starts and ends with quotation marks, take everything in between
-	if(arg3.length() < 3 || arg3.charAt(0) != '"' || arg3.charAt(arg3.length()-1) != '"') {
-	    return false;
+	//System.out.println("Selector:"+notSel+":"+selector);
+	ArrayList<By> list = null;
+	list = selectors.get(selector);
+	if(list == null)
+	    throw new ParsingException(selector+" is not a ELEMENTNAME!");
+	return list;
+    }
+
+    private static String readString() throws ParsingException {
+	currPos++;
+	if(currPos >= curr_line.length())
+	    throw new ParsingException("Expected String");
+	if(curr_line.charAt(currPos) != '"') {
+	    throw new ParsingException("Expected starting '\"'-character!");
 	}
-	String s = arg3.substring(1,arg3.length()-1);
-	if(s == null || s.length() < 1)
-	    return false;
-	//System.out.println("Statement: "+s);
+	currPos++;  // eat the quotation mark
+	int index2 = curr_line.indexOf('"', currPos);
+	if(index2 == -1) {
+	    throw new ParsingException("Expected ending '\"'-character!");
+	}
+	String s = curr_line.substring(currPos, index2);
+	if(s == null || s.length() < 1) {
+	    throw new ParsingException("Empty string!");
+	}
+	currPos=index2+1;
+	//System.out.println("String: "+s);
+	return s;
+    }
+    
+    
+    private static boolean runStatement(boolean novalidate) {
+	ArrayList<By> list = null;
+	String s1;
+	String s2;
 	String ret;
-	switch(st) {
-	case SELECT:
-	    if(novalidate)
+	int x;
+	try {
+	    EnumStmt st = readStmt();
+	    int index1 = currPos;
+	    switch(st) {
+	    case FINISH:
+		script_done = true;
 		return true;
-	    findElement(list);
-	    Select dropdown = new Select(curr_element);
-	    dropdown.selectByVisibleText(s);
-	    return true;
-	case TYPE:
-	    if(novalidate)
+	    case WAIT:
+		x = readInt();
+		if(!novalidate) {
+		    sleep(x*100);
+		}
 		return true;
-	    findElement(list);
-	    curr_element.sendKeys(s);
-	    return true;
-	case TYPECLR:
-	    if(novalidate)
+	    case FIND:
+	    case WAITFOR:
+		list = readSel(true);
+		if(novalidate)
+		    return true;
+		
+		for(int i=0; i<100; i++) {
+		    try {
+			findElement(list);
+			if(!notSel)
+			    return true;
+		    }
+		    catch(NoSuchElementException e) {
+			if(notSel)
+			    return true;
+		    }
+		    sleep(200); // try every 200ms for 20s
+		}
+		return false;
+	    case DWAITFOR:
+		x = readInt();
+		if(!novalidate) {
+		    sleep(x*100);
+		}
+		list = readSel(true);
+		if(novalidate)
+		    return true;
+		
+		for(int i=0; i<100; i++) {
+		    try {
+			findElement(list);
+			if(!notSel)
+			    return true;
+		    }
+		    catch(NoSuchElementException e) {
+			if(notSel)
+			    return true;
+		    }
+		    sleep(200); // try every 200ms for 20s
+		}
+		return false;
+	    case CLICK:
+		list = readSel(false);
+		if(novalidate)
+		    return true;
+		findElement(list);
+		curr_element.click();
+		//System.out.println(curr_element.toString());
 		return true;
-	    findElement(list);
-	    if(isMac) {
-		curr_element.sendKeys(Keys.COMMAND + "a");
-		curr_element.sendKeys(Keys.BACK_SPACE);
-	    }
-	    else {
-		curr_element.sendKeys(Keys.CONTROL + "a");
-		curr_element.sendKeys(Keys.DELETE);
-	    }
-	    curr_element.sendKeys(s);
-	    return true;
-	case ASSERTTXT:
-	    if(novalidate)
+	    case SELECT:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		Select dropdown = new Select(curr_element);
+		dropdown.selectByVisibleText(s1);
 		return true;
-	    findElement(list);
-	    ret = curr_element.getText();
-	    return ret.equals(s);
-	case WAITFORTXT:
-	    if(novalidate)
+	    case TYPE:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		curr_element.sendKeys(s1);
 		return true;
-	    for(int i=0;i<100;i++) {
+	    case TYPECLR:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		if(isMac) {
+		    curr_element.sendKeys(Keys.COMMAND + "a");
+		    curr_element.sendKeys(Keys.BACK_SPACE);
+		}
+		else {
+		    curr_element.sendKeys(Keys.CONTROL + "a");
+		    curr_element.sendKeys(Keys.DELETE);
+		}
+		curr_element.sendKeys(s1);
+		return true;
+	    case ASSERTTXT:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
 		findElement(list);
 		ret = curr_element.getText();
-		if(ret.equals(s))
+		return ret.equals(s1);
+	    case WAITFORTXT:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
 		    return true;
-		sleep(200);
-	    }
-	    return false;
-	default:
-	    break;
-	}
-
-	// 3 arguments (we already know it starts and stops with quotation marks, find two more
-	index2 = curr_line.indexOf("\" \"", index1);
-	if(index2 == -1)
-	    index2 = curr_line.length();
-	String s1 = curr_line.substring (index1+1,index2);
-	if(s1 == null || s1.length() < 1)
-	    return false;
-	//System.out.println("Statement1: "+s1);
-	String s2 = curr_line.substring(index2+3,curr_line.length()-1);
-	if(s2 == null || s2.length() < 1)
-	    return false;
-	//System.out.println("Statement2: "+s2);
-	
-	switch(st) {
-	case ASSERTATR:
-	    if(novalidate)
-		return true;
-	    findElement(list);
-	    ret = curr_element.getAttribute(s1);
-	    return ret.equals(s2);
-	case ASSERTCSS:
-	    if(novalidate)
-		return true;
-	    findElement(list);
-	    ret = curr_element.getCssValue(s1);
-	    return ret.equals(s2);
-	case WAITFORATR:
-	    if(novalidate)
-		return true;
-	    for(int i=0;i<100;i++) {
+		for(int i=0;i<100;i++) {
+		    findElement(list);
+		    ret = curr_element.getText();
+		    if(ret.equals(s1))
+			return true;
+		    sleep(200);
+		}
+		return false;
+	    case ASSERTATR:
+		list = readSel(false);
+		s1 = readString();
+		s2 = readString();
+		if(novalidate)
+		    return true;
 		findElement(list);
 		ret = curr_element.getAttribute(s1);
-		if(ret.equals(s2))
+		return ret.equals(s2);
+	    case ASSERTCSS:
+		list = readSel(false);
+		s1 = readString();
+		s2 = readString();
+		if(novalidate)
 		    return true;
-		sleep(200);
+		findElement(list);
+		ret = curr_element.getCssValue(s1);
+		return ret.equals(s2);
+	    case WAITFORATR:
+		list = readSel(false);
+		s1 = readString();
+		s2 = readString();
+		if(novalidate)
+		    return true;
+		for(int i=0;i<100;i++) {
+		    findElement(list);
+		    ret = curr_element.getAttribute(s1);
+		    if(ret.equals(s2))
+			return true;
+		    sleep(200);
+		}
+		return false;
+	    default:
+		break;
 	    }
-	    return false;
-	default:
-	    break;
+	}
+	catch(ParsingException e) {
+	    System.out.println("ERROR: "+e.toString());
 	}
 	return false;
     }
 
     
     private static boolean parseScript(boolean novalidate) {
+	script_done = false;
 	BufferedReader buffer = new BufferedReader(script_file);
 	linenr = 0;
 	try {
@@ -421,8 +484,9 @@ public class SimpleTester {
 		    curr_line = buffer.readLine();
 		    continue;
 		}
-		if(!runStatement(novalidate))
+		if(!runStatement(novalidate)) {
 		    return false;
+		}
 		curr_line = buffer.readLine();
 	    }
 	}
