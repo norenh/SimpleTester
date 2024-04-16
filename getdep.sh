@@ -1,4 +1,5 @@
-wget https://github.com/SeleniumHQ/selenium/releases/download/selenium-4.19.0/selenium-java-4.19.1.zip
-unzip selenium-java-4.19.1.zip -d selenium-java-4.19.1
-chmod u+w selenium-java-4.19.1/*-sources.jar
-rm selenium-java-4.19.1/*-sources.jar
+. stenv.sh
+wget "https://github.com/SeleniumHQ/selenium/releases/download/selenium-${SELENIUM_BASE_VERSION}/selenium-java-${SELENIUM_VERSION}.zip"
+unzip "selenium-java-${SELENIUM_VERSION}.zip" -d "selenium-java-${SELENIUM_VERSION}"
+chmod u+w selenium-java-${SELENIUM_VERSION}/*-sources.jar
+rm selenium-java-${SELENIUM_VERSION}/*-sources.jar

@@ -1,1 +1,7 @@
-javac -cp "slf4j-nop.jar:selenium-java-4.19.1/*:selenium-java-4.19.1/lib/*" -Xlint:unchecked SimpleTester.java
+. stenv.sh
+
+if [ -z ${JAVA_HOME} ]; then
+  javac -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:selenium-java-${SELENIUM_VERSION}/lib/*" -Xlint:unchecked SimpleTester.java
+else
+  ${JAVA_HOME}/bin/javac -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:selenium-java-${SELENIUM_VERSION}/lib/*" -Xlint:unchecked SimpleTester.java
+fi
