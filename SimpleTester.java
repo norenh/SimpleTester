@@ -145,6 +145,10 @@ public class SimpleTester {
 		if(index1 == -1)
 		    return false;
 		String statement = curr_line.substring(0,index1);
+		if(selectors.containsKey(statement)) {
+		    System.out.println("ERROR: Duplicate statement ("+statement+")?");
+		    return false;
+		}
 		ArrayList<By> l = new ArrayList<By>();
 		selectors.put(statement,l);
 		while(true) {
@@ -235,7 +239,11 @@ public class SimpleTester {
 	if(currPos == -1) {
 	    currPos = curr_line.length();
 	}
-	return statements.get(curr_line.substring(0,currPos));
+	EnumStmt st = statements.get(curr_line.substring(0,currPos));
+	if(st == null) {
+	    throw new ParsingException(curr_line.substring(0, currPos)+" is not a statement!");
+	}
+	return st;
     }
 
     private static int readInt() throws ParsingException {
@@ -412,7 +420,11 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getText();
-		return ret.equals(s1);
+		if(!ret.equals(s1)) {
+		    System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+s1+"\"");
+		    return false;
+		}
+		return true;
 	    case WAITFORTXT:
 		list = readSel(false);
 		s1 = readString();
@@ -434,7 +446,11 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getAttribute(s1);
-		return ret.equals(s2);
+		if(!ret.equals(s2)) {
+		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+		    return false;
+		}
+		return true;
 	    case ASSERTCSS:
 		list = readSel(false);
 		s1 = readString();
@@ -443,7 +459,11 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getCssValue(s1);
-		return ret.equals(s2);
+		if(!ret.equals(s2)) {
+		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+		    return false;
+		}
+		return true;
 	    case WAITFORATR:
 		list = readSel(false);
 		s1 = readString();
