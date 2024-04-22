@@ -679,12 +679,12 @@ public class SimpleTester {
 		System.out.println("INFO: SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
 	    }
 	    script_nr--;
-	    System.out.println("SUCCESS "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
+	    System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
 	}
 	catch(Exception e) {
 	    //e.printStackTrace(System.out);
 	    System.out.println(e.toString());
-	    System.out.println("FAIL Running "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
+	    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
 	    System.exit(2);
 	}
 
