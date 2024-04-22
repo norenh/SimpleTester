@@ -50,19 +50,23 @@ public class SimpleTester {
     private static int linenr = 0;
     private static String curr_line = "";
     private enum EnumStmt {
-	FIND,
-	SELECT,
-	ASSERTTXT,
 	ASSERTATR,
 	ASSERTCSS,
+	ASSERTTXT,
 	CLICK,
 	DWAITFOR,
+	FIND,
+	PRINTATR,
+	PRINTCSS,
+	PRINTTXT,
+	SCREENSHOT,
+	SELECT,
 	TYPE,
 	TYPECLR,
+	WAIT,
+	WAITFOR,
 	WAITFORATR,
 	WAITFORTXT,
-	WAITFOR,
-	WAIT,
 	FINISH;
     }
 
@@ -85,19 +89,23 @@ public class SimpleTester {
     }
     
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
-	    put("find",      stmt.FIND);
-	    put("select",    stmt.SELECT);
-	    put("asserttxt", stmt.ASSERTTXT);
 	    put("assertatr", stmt.ASSERTATR);
 	    put("assertcss", stmt.ASSERTCSS);
+	    put("asserttxt", stmt.ASSERTTXT);
 	    put("click",     stmt.CLICK);
 	    put("dwaitfor",  stmt.DWAITFOR);
+	    put("find",      stmt.FIND);
+	    put("printatr",  stmt.PRINTATR);
+	    put("printcss",  stmt.PRINTCSS);
+	    put("printtxt",  stmt.PRINTTXT);
+	    put("screenshot",stmt.SCREENSHOT);
+	    put("select",    stmt.SELECT);
 	    put("type",      stmt.TYPE);
 	    put("typeclr",   stmt.TYPECLR);
+	    put("wait",      stmt.WAIT);
+	    put("waitfor",   stmt.WAITFOR);
 	    put("waitforatr",stmt.WAITFORATR);
 	    put("waitfortxt",stmt.WAITFORTXT);
-	    put("waitfor",   stmt.WAITFOR);
-	    put("wait",      stmt.WAIT);
 	    put("finish",    stmt.FINISH);
 	}};
 
@@ -380,6 +388,39 @@ public class SimpleTester {
 		curr_element.click();
 		//System.out.println(curr_element.toString());
 		return true;
+	    case PRINTATR:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getAttribute(s1);
+		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		return true;
+	    case PRINTCSS:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getCssValue(s1);
+		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		return true;
+	    case PRINTTXT:
+		list = readSel(false);
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getText();
+		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		return true;
+	    case SCREENSHOT:
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		takeScreenshot(s1);
+		System.out.println("INFO: Screenshot taken \""+s1+"\"");
+		return true;
 	    case SELECT:
 		list = readSel(false);
 		s1 = readString();
@@ -635,17 +676,18 @@ public class SimpleTester {
 		    System.exit(1);
 		}
 		script_file.close();
-		System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
+		System.out.println("INFO: SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
 	    }
 	    script_nr--;
-	    System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
+	    System.out.println("SUCCESS "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
 	}
 	catch(Exception e) {
 	    //e.printStackTrace(System.out);
 	    System.out.println(e.toString());
-	    System.out.println("FAIL: Running "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
+	    System.out.println("FAIL Running "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
 	    System.exit(2);
 	}
+
 	curr_driver.quit();
 	System.exit(0);
     }
