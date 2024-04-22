@@ -620,25 +620,30 @@ public class SimpleTester {
 	//String title = curr_driver.getTitle();
 	//System.out.println(title);
 
+
+	int nr_of_scripts = args.length-2;
+	int script_nr = 1;
 	try {
-	    for(int i=argi+2; i < args.length; i++) {
-		sfile = args[i];
+	    for(script_nr=1; script_nr <= nr_of_scripts; script_nr++) {
+		sfile = args[script_nr+argi+1];
 		script_file = new FileReader(sfile);
 		if(!parseScript(false)) {
-		    System.out.println("FAIL: "+sfile+":"+linenr+":"+curr_line);
+		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
 		    takeScreenshot(sfile+".png");
 		    script_file.close();
 		    curr_driver.quit();
 		    System.exit(1);
 		}
 		script_file.close();
+		System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
 	    }
-	    System.out.println("SUCCESS: "+sfile);
+	    script_nr--;
+	    System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
 	}
 	catch(Exception e) {
 	    //e.printStackTrace(System.out);
 	    System.out.println(e.toString());
-	    System.out.println("FAIL: Running "+sfile+":"+linenr+":"+curr_line);
+	    System.out.println("FAIL: Running "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
 	    System.exit(2);
 	}
 	curr_driver.quit();
