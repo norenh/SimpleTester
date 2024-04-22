@@ -460,7 +460,7 @@ public class SimpleTester {
 		findElement(list);
 		ret = curr_element.getCssValue(s1);
 		if(!ret.equals(s2)) {
-		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+		    System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
 		    return false;
 		}
 		return true;
