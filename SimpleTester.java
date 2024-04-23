@@ -50,12 +50,12 @@ public class SimpleTester {
     private static int linenr = 0;
     private static String curr_line = "";
     private enum EnumStmt {
+	ASSERT,
 	ASSERTATR,
 	ASSERTCSS,
 	ASSERTTXT,
 	CLICK,
 	DWAITFOR,
-	FIND,
 	PRINTATR,
 	PRINTCSS,
 	PRINTTXT,
@@ -89,12 +89,12 @@ public class SimpleTester {
     }
     
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
+	    put("assert",    stmt.ASSERT);
 	    put("assertatr", stmt.ASSERTATR);
 	    put("assertcss", stmt.ASSERTCSS);
 	    put("asserttxt", stmt.ASSERTTXT);
 	    put("click",     stmt.CLICK);
 	    put("dwaitfor",  stmt.DWAITFOR);
-	    put("find",      stmt.FIND);
 	    put("printatr",  stmt.PRINTATR);
 	    put("printcss",  stmt.PRINTCSS);
 	    put("printtxt",  stmt.PRINTTXT);
@@ -330,16 +330,30 @@ public class SimpleTester {
 	    EnumStmt st = readStmt();
 	    int index1 = currPos;
 	    switch(st) {
+	    case ASSERT:
+		list = readSel(true);
+		if(novalidate)
+		    return true;
+
+		try {
+		    findElement(list);
+		    if(!notSel)
+			return true;
+		}
+		catch(NoSuchElementException e) {
+		    if(notSel)
+			return true;
+		}
+		return false;
 	    case FINISH:
 		script_done = true;
-		return true;
+		return true;		
 	    case WAIT:
 		x = readInt();
 		if(!novalidate) {
 		    sleep(x*100);
 		}
 		return true;
-	    case FIND:
 	    case WAITFOR:
 		list = readSel(true);
 		if(novalidate)

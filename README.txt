@@ -35,7 +35,7 @@ name, followed by one or more selectors that each have a type and a text.
 
 The script supports the following statements for now:
 --
-find ELEMENTNAME
+assert ELEMENTNAME
 select ELEMENTNAME "dropdownoption"
 asserttxt ELEMENTNAME "text"
 assertatr ELEMENTNAME "attribute" "value"
@@ -53,7 +53,7 @@ finish
 
 Statements in script does the following:
 
-find - returns true if element is found
+assert - returns true if element is found
 select - selects a element in a dropdown
 asserttxt - do getText() on element and check against "text"
 assertatr  - do getAttribute on "attribute" of element compare against "value"
