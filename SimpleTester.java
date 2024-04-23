@@ -311,8 +311,8 @@ public class SimpleTester {
 	    throw new ParsingException("Expected ending '\"'-character!");
 	}
 	String s = curr_line.substring(currPos, index2);
-	if(s == null || s.length() < 1) {
-	    throw new ParsingException("Empty string!");
+	if(s == null) {
+	    throw new ParsingException("Impossible string!");
 	}
 	currPos=index2+1;
 	//System.out.println("String: "+s);
