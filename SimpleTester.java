@@ -28,6 +28,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileReader;
@@ -242,6 +244,58 @@ public class SimpleTester {
 	}
     }
 
+    static class StrOrRegex {
+	private String str;
+	private Pattern pat;
+	private boolean type = true; // true = str, false = pat
+	public StrOrRegex()  throws ParsingException {
+	    currPos++;
+	    if(currPos >= curr_line.length())
+		throw new ParsingException("Expected String");
+
+	    if(curr_line.charAt(currPos) == '%') {
+		currPos++;  // eat the quotation mark
+		int index2 = curr_line.lastIndexOf('%', curr_line.length()-1);
+		if(index2 == -1 || index2 <= currPos) {
+		    throw new ParsingException("Expected ending '%'-character!");
+		}
+		String s = curr_line.substring(currPos, index2);
+		pat = Pattern.compile(s);
+		str = s;
+		currPos=index2+1;
+		type = false;
+		return;
+	    }
+	    if(curr_line.charAt(currPos) != '"') {
+		throw new ParsingException("Expected starting '\"'-character!");
+	    }
+	    currPos++;  // eat the quotation mark
+	    int index2 = curr_line.indexOf('"', currPos);
+	    if(index2 == -1) {
+		throw new ParsingException("Expected ending '\"'-character!");
+	    }
+	    String s = curr_line.substring(currPos, index2);
+	    if(s == null) {
+		throw new ParsingException("Impossible string!");
+	    }
+	    currPos=index2+1;
+	    //System.out.println("String: "+s);
+	    str = s;
+	}
+	public boolean matches(String s) {
+	    if(type)
+		return str.equals(s);
+	    else {
+		Matcher m = pat.matcher(s);
+		return m.matches();
+	    }
+	}
+
+	public String toString() {
+	    return str;
+	}
+    }
+
     private static EnumStmt readStmt() throws ParsingException {
 	currPos = curr_line.indexOf(' ');
 	if(currPos == -1) {
@@ -325,6 +379,7 @@ public class SimpleTester {
 	String s1;
 	String s2;
 	String ret;
+	StrOrRegex sor;
 	int x;
 	try {
 	    EnumStmt st = readStmt();
@@ -470,25 +525,25 @@ public class SimpleTester {
 		return true;
 	    case ASSERTTXT:
 		list = readSel(false);
-		s1 = readString();
+		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
 		findElement(list);
 		ret = curr_element.getText();
-		if(!ret.equals(s1)) {
-		    System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+s1+"\"");
+		if(!sor.matches(ret)) {
+		    System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
 		    return false;
 		}
 		return true;
 	    case WAITFORTXT:
 		list = readSel(false);
-		s1 = readString();
+		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
 		for(int i=0;i<100;i++) {
 		    findElement(list);
 		    ret = curr_element.getText();
-		    if(ret.equals(s1))
+		    if(!sor.matches(ret))
 			return true;
 		    sleep(200);
 		}
