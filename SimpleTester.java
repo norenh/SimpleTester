@@ -15,6 +15,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.remote.NoSuchDriverException;
@@ -711,7 +712,13 @@ public class SimpleTester {
 		    curr_driver = new ChromeDriver();
 		break;
 	    case FIREFOX:
-		curr_driver = new FirefoxDriver();
+		if(headless) {
+		    FirefoxOptions options = new FirefoxOptions();
+		    options.addArguments("-headless");
+		    curr_driver = new FirefoxDriver(options);
+		}
+		else
+		    curr_driver = new FirefoxDriver();
 		break;
 	    case SAFARI:
 		curr_driver = new SafariDriver();
@@ -730,8 +737,7 @@ public class SimpleTester {
 	//String title = curr_driver.getTitle();
 	//System.out.println(title);
 
-
-	int nr_of_scripts = args.length-2;
+	int nr_of_scripts = args.length-argi-2;
 	int script_nr = 1;
 	try {
 	    for(script_nr=1; script_nr <= nr_of_scripts; script_nr++) {
