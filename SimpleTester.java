@@ -24,6 +24,8 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.Rectangle;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -37,6 +39,11 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.Files;
+
+// for validation only
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathExpressionException;
 
 public class SimpleTester {
     
@@ -58,6 +65,7 @@ public class SimpleTester {
 	ASSERTCSS,
 	ASSERTTXT,
 	CLICK,
+	DRAWBOX,
 	DWAITFOR,
 	PRINTATR,
 	PRINTCSS,
@@ -97,6 +105,7 @@ public class SimpleTester {
 	    put("assertcss", stmt.ASSERTCSS);
 	    put("asserttxt", stmt.ASSERTTXT);
 	    put("click",     stmt.CLICK);
+	    put("drawbox",   stmt.DRAWBOX);
 	    put("dwaitfor",  stmt.DWAITFOR);
 	    put("printatr",  stmt.PRINTATR);
 	    put("printcss",  stmt.PRINTCSS);
@@ -180,6 +189,7 @@ public class SimpleTester {
 			return false;
 		    }
 		    String selector = curr_line.substring(index1+1, index2);
+		    XPathFactory xpathFactory = XPathFactory.newInstance();
 		    By by;
 		    switch(ret) {
 		    case ID:
@@ -201,6 +211,15 @@ public class SimpleTester {
 			by = By.linkText(selector);
 			break;
 		    case XPATH:
+			try {
+			    // try to compile it, we do not use this
+			    // only for validating it is a proper XPath
+			    xpathFactory.newXPath().compile(selector);
+			}
+			catch(XPathExpressionException e) {
+			    System.out.println("ERROR: Invalid Xpath: "+selector);
+			    return false;
+			}
 			by = By.xpath(selector);
 			break;
 		    default:
@@ -218,7 +237,6 @@ public class SimpleTester {
 		curr_line = buffer.readLine();
 	    }
 	    buffer.close();
-
 	}
 	catch(Exception e) {
 	    System.out.println("FAIL: Error parsing config file "+e.toString());
@@ -428,6 +446,41 @@ public class SimpleTester {
 		    sleep(200); // try every 200ms for 20s
 		}
 		return false;
+	    case DRAWBOX:
+		list = readSel(false);
+	        x = readInt();
+		if(x < 0)
+		    return false;
+		if(novalidate)
+		    return true;
+		findElement(list);
+		{
+		    // get dimensions of element
+		    Rectangle rect = curr_element.getRect();
+		    int topLeftX = rect.getX();
+		    int topLeftY = rect.getY();
+		    int height = rect.getHeight()-(x*2);
+		    int width = rect.getWidth()-(x*2);
+		    if(height < 1 || width < 1) {
+			System.out.println("INFO: Offset*2 > width or height");
+			return false;
+		    }
+		    //System.out.println("X: "+topLeftX+" Y: "+topLeftY);
+		    //System.out.println("height: "+height+" width: "+width);
+
+		    Actions painter = new Actions(curr_driver);
+
+		    painter.moveToLocation(topLeftX+x, topLeftY+x)
+			.clickAndHold()
+			.perform();
+		    painter.moveByOffset(width-x,0).perform();
+		    painter.moveByOffset(0,height-x).perform();
+		    painter.moveByOffset(-width+x,0).perform();
+		    painter.moveByOffset(0,-height+x).perform();
+		    painter.moveByOffset(width-x,height-x).perform();
+		    painter.release().perform();
+		}
+		return true;
 	    case DWAITFOR:
 		x = readInt();
 		if(!novalidate) {
@@ -633,12 +686,13 @@ public class SimpleTester {
 
     public static void main(String[] args) {
 	if(args.length < 3) {
-	    System.out.println("Usage: ./run.sh <configfile> <URL> <script>");
+	    System.out.println("Usage: ./run.sh [-h] [-p] [-b [firefox|chrome|safari|edge]] <configfile> <URL> <script>");
 	    System.exit(1);
 	}
 	enumDriver edrive = enumDriver.CHROME;
 	int argi = 0;
 	boolean headless = false;
+	boolean stay_open = false;
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 	    if((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
@@ -647,6 +701,13 @@ public class SimpleTester {
 	}
 	if(args[argi].equals("-h")) {
 	    headless = true;
+	    stay_open = false;
+	    argi++;
+	}
+	if(args[argi].equals("-p")) {
+	    if(!headless) {
+		stay_open = true;
+	    }
 	    argi++;
 	}
 	if(args[argi].equals("-b")) {
@@ -762,8 +823,9 @@ public class SimpleTester {
 	    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
 	    System.exit(2);
 	}
-
-	curr_driver.quit();
+	if(!stay_open || headless) {
+	    curr_driver.quit();
+	}
 	System.exit(0);
     }
 }

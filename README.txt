@@ -27,6 +27,12 @@ or use the included getdep.sh-script to grab and remove the included src-files
 Build the program with "build.sh" (or the content of it, adapted for your OS)
 Run it with "run.sh"
 
+Arguments supported are:
+
+ -h for running in headless mode (only firefox and chrome supported)
+ -p for browser window persistance after script finishes. In headless mode, does nothing
+ -b [firefox|chrome|safari|edge] sets the browser to use
+
 The config-file should have the following structure:
 ELEMENTNAME [[id|name|cssSelector|tagName|className|linkTest|xpath] "string"]+
 
@@ -36,12 +42,17 @@ name, followed by one or more selectors that each have a type and a text.
 The script supports the following statements for now:
 --
 assert ELEMENTNAME
-select ELEMENTNAME "dropdownoption"
 asserttxt ELEMENTNAME "text"
 assertatr ELEMENTNAME "attribute" "value"
 assertcss ELEMENTNAME "property" "value"
 click ELEMENTNAME
+drawbox ELEMENTNAME "offset"
 dwaitfor INTEGER [!]ELEMENTNAME
+printatr ELEMENTNAME "attribute"
+printcss ELEMENTNAME "property"
+printtxt ELEMENTNAME
+screenshot "text"
+select ELEMENTNAME "dropdownoption"
 type ELEMENTNAME "text"
 typeclr ELEMENTNAME "text"
 waitforatr ELEMENTNAME "attribute" "value"
@@ -54,12 +65,17 @@ finish
 Statements in script does the following:
 
 assert - returns true if element is found
-select - selects a element in a dropdown
-asserttxt - do getText() on element and check against "text"
 assertatr  - do getAttribute on "attribute" of element compare against "value"
 assertcss - do getCssValue on "property" of element compare against "value" 
+asserttxt - do getText() on element and check against "text"
 click - click() on element
+drawbox - draws a box with the mouse inside the element, "offset" pixels in
 dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
+printatr - print out value of getText() on element
+printcss - do getCssValue on "property" of element and print it out
+printtxt - do getAttribute on "attribute" of element and print it out
+screenshot - takes a screenshot, saves it with filename "text"
+select - selects a element in a dropdown
 type -  sendKeys("text") on element
 typeclr - Sends CTRL+a+DEL before sendKeys("text")
 waitforatr - wait until element is found and has "attribute" set to "value"
@@ -89,19 +105,19 @@ asserttxt message "Received!"
 
 assertatr message "class" "lead"
 assertcss message "font-size" "20px"
-$ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt 
-INFO: Google Chrome 122.0.6261.94 
+$ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt
 INFO: Using Config config.txt
 INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
 INFO: Using Script: script.txt
-SUCCESS: script.txt
+INFO: SUCCESS: script.txt (1/1)
+SUCCESS: script.txt (1/1)
 
 #Example FAIL with multiple scripts (here, reusing the same one):
 $ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt script.txt
-INFO: Google Chrome 122.0.6261.94 
 INFO: Using Config config.txt
 INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
 INFO: Using Script: script.txt
 INFO: Using Script: script.txt
-FAIL: script.txt:1:waitfor dropdown
+INFO: SUCCESS: script.txt (1/2)
+FAIL: script.txt (2/2):1:waitfor dropdown
 
