@@ -199,7 +199,7 @@ public class SimpleTester {
 			by = By.name(selector);
 			break;
 		    case CSSSELECTOR:
-			by = By.cssSelector​(selector);
+			by = By.cssSelector(selector);
 			break;
 		    case TAGNAME:
 			by = By.tagName(selector);
