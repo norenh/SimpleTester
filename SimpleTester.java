@@ -808,7 +808,9 @@ public class SimpleTester {
 		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
 		    takeScreenshot(sfile+".png");
 		    script_file.close();
-		    curr_driver.quit();
+		    if(!stay_open || headless) {
+			curr_driver.quit();
+		    }
 		    System.exit(1);
 		}
 		script_file.close();
