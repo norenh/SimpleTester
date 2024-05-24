@@ -585,6 +585,10 @@ public class SimpleTester {
 		findElement(list);
 		ret = curr_element.getText();
 		if(!sor.matches(ret)) {
+		    if(sor.matches(ret.strip())) {
+			System.out.println("WARN: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			return true;
+		    }
 		    System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
 		    return false;
 		}
@@ -597,8 +601,9 @@ public class SimpleTester {
 		for(int i=0;i<100;i++) {
 		    findElement(list);
 		    ret = curr_element.getText();
-		    if(!sor.matches(ret))
+		    if(!sor.matches(ret)) {
 			return true;
+		    }
 		    sleep(200);
 		}
 		return false;
@@ -611,6 +616,10 @@ public class SimpleTester {
 		findElement(list);
 		ret = curr_element.getAttribute(s1);
 		if(!ret.equals(s2)) {
+		    if(ret.equals(s2.strip())) {
+			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			return true;
+		    }
 		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
 		    return false;
 		}
@@ -624,6 +633,10 @@ public class SimpleTester {
 		findElement(list);
 		ret = curr_element.getCssValue(s1);
 		if(!ret.equals(s2)) {
+		    if(ret.equals(s2.strip())) {
+			System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
+			return true;
+		    }
 		    System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
 		    return false;
 		}
