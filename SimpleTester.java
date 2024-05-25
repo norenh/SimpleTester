@@ -18,6 +18,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.remote.NoSuchDriverException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -508,7 +509,14 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
-		curr_element.click();
+		try {
+		    curr_element.click();
+		}
+		catch(ElementClickInterceptedException e) {
+		    System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
+		    System.out.println("ERROR: "+e.getCause());
+		    return false;
+		}
 		//System.out.println(curr_element.toString());
 		return true;
 	    case PRINTATR:
