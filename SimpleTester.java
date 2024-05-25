@@ -712,33 +712,38 @@ public class SimpleTester {
 		isMac = true;
 	    }
 	}
-	if(args[argi].equals("-h")) {
-	    headless = true;
-	    stay_open = false;
-	    argi++;
-	}
-	if(args[argi].equals("-p")) {
-	    if(!headless) {
-		stay_open = true;
+	while(args[argi].charAt(0) == '-' && args[argi].length() == 2) {
+	    switch(args[argi].charAt(1)) {
+	    case 'h':
+		headless = true;
+		stay_open = false;
+		argi++;
+		break;
+	    case 'p':
+		if(!headless) {
+		    stay_open = true;
+		}
+		argi++;
+		break;
+	    case 'b':
+		argi++;
+		if(args[argi].equals("firefox"))
+		    edrive = enumDriver.FIREFOX;
+		else if(args[argi].equals("chrome"))
+		    edrive = enumDriver.CHROME;
+		else if(args[argi].equals("safari"))
+		    edrive = enumDriver.SAFARI;
+		else if(args[argi].equals("edge"))
+		    edrive = enumDriver.EDGE;
+		else {
+		    System.out.println("Unsupported driver: "+args[argi]);
+		    System.exit(1);
+		}
+		argi++;
+		break;
 	    }
-	    argi++;
 	}
-	if(args[argi].equals("-b")) {
-	    argi++;
-	    if(args[argi].equals("firefox"))
-		edrive = enumDriver.FIREFOX;
-	    else if(args[argi].equals("chrome"))
-		edrive = enumDriver.CHROME;
-	    else if(args[argi].equals("safari"))
-		edrive = enumDriver.SAFARI;
-	    else if(args[argi].equals("edge"))
-		edrive = enumDriver.EDGE;
-	    else {
-		System.out.println("Unsupported driver: "+args[argi]);
-		System.exit(1);
-	    }
-	    argi++;
-	}
+
 	String cfgfile = args[argi];
 	String url = args[argi+1];
 	String sfile = "";
