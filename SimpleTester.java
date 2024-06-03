@@ -78,6 +78,7 @@ public class SimpleTester {
 	WAIT,
 	WAITFOR,
 	WAITFORATR,
+	WAITFORENABLED,
 	WAITFORTXT,
 	FINISH;
     }
@@ -118,6 +119,7 @@ public class SimpleTester {
 	    put("wait",      stmt.WAIT);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("waitforatr",stmt.WAITFORATR);
+	    put("waitfor",   stmt.WAITFORENABLED);
 	    put("waitfortxt",stmt.WAITFORTXT);
 	    put("finish",    stmt.FINISH);
 	}};
@@ -439,6 +441,30 @@ public class SimpleTester {
 			findElement(list);
 			if(!notSel)
 			    return true;
+		    }
+		    catch(NoSuchElementException e) {
+			if(notSel)
+			    return true;
+		    }
+		    sleep(200); // try every 200ms for 20s
+		}
+		return false;
+	    case WAITFORENABLED:
+		list = readSel(true);
+		if(novalidate)
+		    return true;
+
+		for(int i=0; i<100; i++) {
+		    try {
+			findElement(list);
+			if(curr_element.isEnabled()) {
+			    if(!notSel)
+				return true;
+			}
+			else {
+			    if(notSel)
+				return true;
+			}
 		    }
 		    catch(NoSuchElementException e) {
 			if(notSel)
