@@ -540,7 +540,7 @@ public class SimpleTester {
 		}
 		catch(ElementClickInterceptedException e) {
 		    System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
-		    System.out.println("ERROR: "+e.getCause());
+		    System.out.println("ERROR: "+e.getMessage());
 		    return false;
 		}
 		//System.out.println(curr_element.toString());
@@ -740,6 +740,7 @@ public class SimpleTester {
 	int argi = 0;
 	boolean headless = false;
 	boolean stay_open = false;
+	int resolution_x = 0, resolution_y = 0;
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 	    if((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
@@ -771,6 +772,19 @@ public class SimpleTester {
 		    edrive = enumDriver.EDGE;
 		else {
 		    System.out.println("Unsupported driver: "+args[argi]);
+		    System.exit(1);
+		}
+		argi++;
+		break;
+	    case 'r':
+		argi++;
+		if(args[argi].matches("^\\d+x\\d+$")) {
+		    String[] res=args[argi].split("x");
+		    resolution_x = Integer.valueOf(res[0]);
+		    resolution_y = Integer.valueOf(res[1]);
+		}
+		else {
+		    System.out.println("Invalid resolution: "+args[argi]);
 		    System.exit(1);
 		}
 		argi++;
@@ -815,23 +829,29 @@ public class SimpleTester {
 	try {
 	    switch(edrive) {
 	    case CHROME:
-		if(headless) {
+		{
 		    ChromeOptions options = new ChromeOptions();
-		    options.addArguments("--headless=new");
-		    options.addArguments("--window-size=1920,1080");
+		    if(resolution_x > 0 && resolution_y > 0) {
+			options.addArguments("--window-size="+resolution_x+","+resolution_y);
+		    }
+		    if(headless) {
+			options.addArguments("--headless=new");
+		    }
 		    curr_driver = new ChromeDriver(options);
 		}
-		else
-		    curr_driver = new ChromeDriver();
 		break;
 	    case FIREFOX:
-		if(headless) {
+		{
 		    FirefoxOptions options = new FirefoxOptions();
-		    options.addArguments("-headless");
+		    if(resolution_x > 0 && resolution_y > 0) {
+			options.addArguments("--width="+resolution_x);
+			options.addArguments("--height="+resolution_y);
+		    }
+		    if(headless) {
+			options.addArguments("-headless");
+		    }
 		    curr_driver = new FirefoxDriver(options);
 		}
-		else
-		    curr_driver = new FirefoxDriver();
 		break;
 	    case SAFARI:
 		curr_driver = new SafariDriver();
