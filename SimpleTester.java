@@ -119,7 +119,7 @@ public class SimpleTester {
 	    put("wait",      stmt.WAIT);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("waitforatr",stmt.WAITFORATR);
-	    put("waitfor",   stmt.WAITFORENABLED);
+	    put("waitforenabled",stmt.WAITFORENABLED);
 	    put("waitfortxt",stmt.WAITFORTXT);
 	    put("finish",    stmt.FINISH);
 	}};
