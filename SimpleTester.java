@@ -27,6 +27,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.Dimension;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -880,7 +881,10 @@ public class SimpleTester {
 		{
 		    isSafari = true;
 		    curr_driver = new SafariDriver();
-		}
+		    if(resolution_x > 0 && resolution_y > 0) {
+			curr_driver.manage().window().setSize(new Dimension(resolution_x, resolution_y));
+		    }
+		}				     
 		break;
 	    case EDGE:
 		curr_driver = new EdgeDriver();
