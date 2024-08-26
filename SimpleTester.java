@@ -58,12 +58,14 @@ public class SimpleTester {
     private static EnumStmt stmt;
     private static EnumBy enumby;
     private static boolean isMac = false;
+    private static boolean isSafari = false;
     private static int linenr = 0;
     private static String curr_line = "";
     private enum EnumStmt {
 	ASSERT,
 	ASSERTATR,
 	ASSERTCSS,
+	ASSERTSEL,
 	ASSERTTXT,
 	CLICK,
 	DRAWBOX,
@@ -105,6 +107,7 @@ public class SimpleTester {
 	    put("assert",    stmt.ASSERT);
 	    put("assertatr", stmt.ASSERTATR);
 	    put("assertcss", stmt.ASSERTCSS);
+	    put("assertsel", stmt.ASSERTSEL);
 	    put("asserttxt", stmt.ASSERTTXT);
 	    put("click",     stmt.CLICK);
 	    put("drawbox",   stmt.DRAWBOX);
@@ -422,6 +425,16 @@ public class SimpleTester {
 			return true;
 		}
 		return false;
+	    case ASSERTSEL:
+		list = readSel(true);
+		s1 = readString();
+		boolean b = s1.equals("true");
+		if(!b && !s1.equals("false"))
+		    return false;
+		if(novalidate)
+		    return true;
+		findElement(list);
+		return curr_element.isSelected() == b;
 	    case FINISH:
 		script_done = true;
 		return true;		
@@ -618,6 +631,8 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getText();
+		if(ret == null)
+		    return false;
 		if(!sor.matches(ret)) {
 		    if(sor.matches(ret.strip())) {
 			System.out.println("WARN: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
@@ -649,11 +664,17 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getAttribute(s1);
+		if(ret == null)
+		    return false;
 		if(!ret.equals(s2)) {
 		    if(ret.equals(s2.strip())) {
 			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
 			return true;
 		    }
+		    // Workaround for Safari returning true for attributes with a empty value
+		    if(isSafari && s2.equals("") && ret.equals("true"))
+			return true;
+
 		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
 		    return false;
 		}
@@ -666,6 +687,8 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getCssValue(s1);
+		if(ret == null)
+		    return false;
 		if(!ret.equals(s2)) {
 		    if(ret.equals(s2.strip())) {
 			System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
@@ -684,7 +707,7 @@ public class SimpleTester {
 		for(int i=0;i<100;i++) {
 		    findElement(list);
 		    ret = curr_element.getAttribute(s1);
-		    if(ret.equals(s2))
+		    if(ret != null && ret.equals(s2))
 			return true;
 		    sleep(200);
 		}
@@ -854,7 +877,10 @@ public class SimpleTester {
 		}
 		break;
 	    case SAFARI:
-		curr_driver = new SafariDriver();
+		{
+		    isSafari = true;
+		    curr_driver = new SafariDriver();
+		}
 		break;
 	    case EDGE:
 		curr_driver = new EdgeDriver();
