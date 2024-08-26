@@ -76,6 +76,7 @@ public class SimpleTester {
 	PRINTTXT,
 	SCREENSHOT,
 	SELECT,
+	SETTOGGLE,
 	TYPE,
 	TYPECLR,
 	WAIT,
@@ -118,6 +119,7 @@ public class SimpleTester {
 	    put("printtxt",  stmt.PRINTTXT);
 	    put("screenshot",stmt.SCREENSHOT);
 	    put("select",    stmt.SELECT);
+	    put("settoggle", stmt.SETTOGGLE);
 	    put("type",      stmt.TYPE);
 	    put("typeclr",   stmt.TYPECLR);
 	    put("wait",      stmt.WAIT);
@@ -410,6 +412,7 @@ public class SimpleTester {
 	try {
 	    EnumStmt st = readStmt();
 	    int index1 = currPos;
+	    boolean b;
 	    switch(st) {
 	    case ASSERT:
 		list = readSel(true);
@@ -429,7 +432,7 @@ public class SimpleTester {
 	    case ASSERTSEL:
 		list = readSel(true);
 		s1 = readString();
-		boolean b = s1.equals("true");
+		b = s1.equals("true");
 		if(!b && !s1.equals("false"))
 		    return false;
 		if(novalidate)
@@ -600,6 +603,27 @@ public class SimpleTester {
 		findElement(list);
 		Select dropdown = new Select(curr_element);
 		dropdown.selectByVisibleText(s1);
+		return true;
+	    case SETTOGGLE:
+		// should return true if radiobutton/checkbox is set to chosen value
+		list = readSel(false);
+		s1 = readString();
+		b = s1.equals("true");
+		if(!b && !s1.equals("false"))
+		    return false;
+		if(novalidate)
+		    return true;
+		findElement(list);
+		if(curr_element.isSelected() != b && curr_element.isEnabled()) {
+		    try {
+			curr_element.click();
+		    }
+		    catch(ElementClickInterceptedException e) {
+			System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
+			System.out.println("ERROR: "+e.getMessage());
+			return false;
+		    }
+		}
 		return true;
 	    case TYPE:
 		list = readSel(false);
