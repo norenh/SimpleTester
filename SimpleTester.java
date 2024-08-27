@@ -912,6 +912,7 @@ public class SimpleTester {
 		break;
 	    case EDGE:
 		curr_driver = new EdgeDriver();
+		break;
 	    default:
 		System.out.println("Unsupported driver");
 		System.exit(1);
