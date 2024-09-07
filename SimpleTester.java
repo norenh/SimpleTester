@@ -30,6 +30,7 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.Dimension;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -65,16 +66,20 @@ public class SimpleTester {
     private enum EnumStmt {
 	ASSERT,
 	ASSERTATR,
+	ASSERTCLK,
 	ASSERTCSS,
 	ASSERTSEL,
 	ASSERTTXT,
 	CLICK,
 	DRAWBOX,
 	DWAITFOR,
+	FINISH,
 	PRINTATR,
 	PRINTCSS,
+	PRINTTIME,
 	PRINTTXT,
 	SCREENSHOT,
+	SCROLLTO,
 	SELECT,
 	SETTOGGLE,
 	TYPE,
@@ -83,8 +88,7 @@ public class SimpleTester {
 	WAITFOR,
 	WAITFORATR,
 	WAITFORENABLED,
-	WAITFORTXT,
-	FINISH;
+	WAITFORTXT;
     }
 
     private enum EnumBy {
@@ -108,6 +112,7 @@ public class SimpleTester {
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
 	    put("assert",    stmt.ASSERT);
 	    put("assertatr", stmt.ASSERTATR);
+	    put("assertclk", stmt.ASSERTCLK);
 	    put("assertcss", stmt.ASSERTCSS);
 	    put("assertsel", stmt.ASSERTSEL);
 	    put("asserttxt", stmt.ASSERTTXT);
@@ -116,8 +121,10 @@ public class SimpleTester {
 	    put("dwaitfor",  stmt.DWAITFOR);
 	    put("printatr",  stmt.PRINTATR);
 	    put("printcss",  stmt.PRINTCSS);
+	    put("printtime", stmt.PRINTTIME);
 	    put("printtxt",  stmt.PRINTTXT);
 	    put("screenshot",stmt.SCREENSHOT);
+	    put("scrollto",  stmt.SCROLLTO);
 	    put("select",    stmt.SELECT);
 	    put("settoggle", stmt.SETTOGGLE);
 	    put("type",      stmt.TYPE);
@@ -437,6 +444,61 @@ public class SimpleTester {
 			return true;
 		}
 		return false;
+	    case ASSERTATR:
+		list = readSel(false);
+		s1 = readString();
+		s2 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getAttribute(s1);
+		if(ret == null)
+		    return false;
+		if(!ret.equals(s2)) {
+		    if(ret.equals(s2.strip())) {
+			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			return true;
+		    }
+		    // Workaround for Safari returning true for attributes with a empty value
+		    if(isSafari && s2.equals("") && ret.equals("true"))
+			return true;
+
+		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+		    return false;
+		}
+		return true;
+	    case ASSERTCLK:
+		list = readSel(true);
+		if(novalidate)
+		    return true;
+		findElement(list);
+
+		/** Element might still be hidden behind other, but this should do for now **/
+		b = curr_element.isDisplayed() && curr_element.isEnabled();
+
+		if(!notSel)
+		    return b;
+		else
+		    return !b;
+	    case ASSERTCSS:
+		list = readSel(false);
+		s1 = readString();
+		s2 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getCssValue(s1);
+		if(ret == null)
+		    return false;
+		if(!ret.equals(s2)) {
+		    if(ret.equals(s2.strip())) {
+			System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
+			return true;
+		    }
+		    System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
+		    return false;
+		}
+		return true;
 	    case ASSERTSEL:
 		list = readSel(true);
 		b = readBool();
@@ -446,57 +508,39 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		return curr_element.isSelected() == b;
-	    case FINISH:
-		script_done = true;
-		return true;		
-	    case WAIT:
-		x = readInt();
-		if(!novalidate) {
-		    sleep(x*100);
+	    case ASSERTTXT:
+		list = readSel(false);
+		sor = new StrOrRegex();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getText();
+		if(ret == null)
+		    return false;
+		if(!sor.matches(ret)) {
+		    if(sor.matches(ret.strip())) {
+			System.out.println("WARN: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			return true;
+		    }
+		    System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+		    return false;
 		}
 		return true;
-	    case WAITFOR:
-		list = readSel(true);
+	    case CLICK:
+		list = readSel(false);
 		if(novalidate)
 		    return true;
-		
-		for(int i=0; i<100; i++) {
-		    try {
-			findElement(list);
-			if(!notSel)
-			    return true;
-		    }
-		    catch(NoSuchElementException e) {
-			if(notSel)
-			    return true;
-		    }
-		    sleep(200); // try every 200ms for 20s
+		findElement(list);
+		try {
+		    curr_element.click();
 		}
-		return false;
-	    case WAITFORENABLED:
-		list = readSel(true);
-		if(novalidate)
-		    return true;
-
-		for(int i=0; i<100; i++) {
-		    try {
-			findElement(list);
-			if(curr_element.isEnabled()) {
-			    if(!notSel)
-				return true;
-			}
-			else {
-			    if(notSel)
-				return true;
-			}
-		    }
-		    catch(NoSuchElementException e) {
-			if(notSel)
-			    return true;
-		    }
-		    sleep(200); // try every 200ms for 20s
+		catch(ElementClickInterceptedException e) {
+		    System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
+		    System.out.println("ERROR: "+e.getMessage());
+		    return false;
 		}
-		return false;
+		//System.out.println(curr_element.toString());
+		return true;
 	    case DRAWBOX:
 		list = readSel(false);
 	        x = readInt();
@@ -554,20 +598,8 @@ public class SimpleTester {
 		    sleep(200); // try every 200ms for 20s
 		}
 		return false;
-	    case CLICK:
-		list = readSel(false);
-		if(novalidate)
-		    return true;
-		findElement(list);
-		try {
-		    curr_element.click();
-		}
-		catch(ElementClickInterceptedException e) {
-		    System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
-		    System.out.println("ERROR: "+e.getMessage());
-		    return false;
-		}
-		//System.out.println(curr_element.toString());
+	    case FINISH:
+		script_done = true;
 		return true;
 	    case PRINTATR:
 		list = readSel(false);
@@ -587,6 +619,11 @@ public class SimpleTester {
 		ret = curr_element.getCssValue(s1);
 		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
 		return true;
+	    case PRINTTIME:
+		if(novalidate)
+		    return true;
+		System.out.println("PRINT:"+linenr+":"+Instant.now());
+		return true;
 	    case PRINTTXT:
 		list = readSel(false);
 		if(novalidate)
@@ -601,6 +638,18 @@ public class SimpleTester {
 		    return true;
 		takeScreenshot(s1);
 		System.out.println("INFO: Screenshot taken \""+s1+"\"");
+		return true;
+	    case SCROLLTO:
+		list = readSel(false);
+		if(novalidate)
+		    return true;
+		findElement(list);
+		{
+		    Actions scroller = new Actions(curr_driver);
+		    scroller
+			.moveToElement(curr_element)
+			.perform();
+		}
 		return true;
 	    case SELECT:
 		list = readSel(false);
@@ -655,80 +704,30 @@ public class SimpleTester {
 		}
 		curr_element.sendKeys(s1);
 		return true;
-	    case ASSERTTXT:
-		list = readSel(false);
-		sor = new StrOrRegex();
-		if(novalidate)
-		    return true;
-		findElement(list);
-		ret = curr_element.getText();
-		if(ret == null)
-		    return false;
-		if(!sor.matches(ret)) {
-		    if(sor.matches(ret.strip())) {
-			System.out.println("WARN: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
-			return true;
-		    }
-		    System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
-		    return false;
+	    case WAIT:
+		x = readInt();
+		if(!novalidate) {
+		    sleep(x*100);
 		}
 		return true;
-	    case WAITFORTXT:
-		list = readSel(false);
-		sor = new StrOrRegex();
+	    case WAITFOR:
+		list = readSel(true);
 		if(novalidate)
 		    return true;
-		for(int i=0;i<100;i++) {
-		    findElement(list);
-		    ret = curr_element.getText();
-		    if(!sor.matches(ret)) {
-			return true;
+
+		for(int i=0; i<100; i++) {
+		    try {
+			findElement(list);
+			if(!notSel)
+			    return true;
 		    }
-		    sleep(200);
+		    catch(NoSuchElementException e) {
+			if(notSel)
+			    return true;
+		    }
+		    sleep(200); // try every 200ms for 20s
 		}
 		return false;
-	    case ASSERTATR:
-		list = readSel(false);
-		s1 = readString();
-		s2 = readString();
-		if(novalidate)
-		    return true;
-		findElement(list);
-		ret = curr_element.getAttribute(s1);
-		if(ret == null)
-		    return false;
-		if(!ret.equals(s2)) {
-		    if(ret.equals(s2.strip())) {
-			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
-			return true;
-		    }
-		    // Workaround for Safari returning true for attributes with a empty value
-		    if(isSafari && s2.equals("") && ret.equals("true"))
-			return true;
-
-		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
-		    return false;
-		}
-		return true;
-	    case ASSERTCSS:
-		list = readSel(false);
-		s1 = readString();
-		s2 = readString();
-		if(novalidate)
-		    return true;
-		findElement(list);
-		ret = curr_element.getCssValue(s1);
-		if(ret == null)
-		    return false;
-		if(!ret.equals(s2)) {
-		    if(ret.equals(s2.strip())) {
-			System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
-			return true;
-		    }
-		    System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
-		    return false;
-		}
-		return true;
 	    case WAITFORATR:
 		list = readSel(false);
 		s1 = readString();
@@ -740,6 +739,44 @@ public class SimpleTester {
 		    ret = curr_element.getAttribute(s1);
 		    if(ret != null && ret.equals(s2))
 			return true;
+		    sleep(200);
+		}
+		return false;
+	    case WAITFORENABLED:
+		list = readSel(true);
+		if(novalidate)
+		    return true;
+
+		for(int i=0; i<100; i++) {
+		    try {
+			findElement(list);
+			if(curr_element.isEnabled()) {
+			    if(!notSel)
+				return true;
+			}
+			else {
+			    if(notSel)
+				return true;
+			}
+		    }
+		    catch(NoSuchElementException e) {
+			if(notSel)
+			    return true;
+		    }
+		    sleep(200); // try every 200ms for 20s
+		}
+		return false;
+	    case WAITFORTXT:
+		list = readSel(false);
+		sor = new StrOrRegex();
+		if(novalidate)
+		    return true;
+		for(int i=0;i<100;i++) {
+		    findElement(list);
+		    ret = curr_element.getText();
+		    if(!sor.matches(ret)) {
+			return true;
+		    }
 		    sleep(200);
 		}
 		return false;
