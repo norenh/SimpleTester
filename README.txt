@@ -32,6 +32,7 @@ Arguments supported are:
  -h for running in headless mode (only firefox and chrome supported)
  -p for browser window persistance after script finishes. In headless mode, does nothing
  -b [firefox|chrome|safari|edge] sets the browser to use
+ -r [HEIGHTxWIDTH] sets initial browser size to height x width, example "-r 1600x1200"
 
 The config-file should have the following structure:
 ELEMENTNAME [[id|name|cssSelector|tagName|className|linkTest|xpath] "string"]+
@@ -42,20 +43,26 @@ name, followed by one or more selectors that each have a type and a text.
 The script supports the following statements for now:
 --
 assert ELEMENTNAME
-asserttxt ELEMENTNAME "text"
 assertatr ELEMENTNAME "attribute" "value"
+assertclk ELEMENTNAME
 assertcss ELEMENTNAME "property" "value"
+assertsel ELEMENTNAME "boolean"
+asserttxt ELEMENTNAME "text"
 click ELEMENTNAME
 drawbox ELEMENTNAME "offset"
 dwaitfor INTEGER [!]ELEMENTNAME
 printatr ELEMENTNAME "attribute"
 printcss ELEMENTNAME "property"
+printtime
 printtxt ELEMENTNAME
 screenshot "text"
+scrollto ELEMENTNAME
 select ELEMENTNAME "dropdownoption"
+settoggle ELEMENTNAME "boolean"
 type ELEMENTNAME "text"
 typeclr ELEMENTNAME "text"
 waitforatr ELEMENTNAME "attribute" "value"
+waitforenabled ELEMENTNAME
 waitfortxt ELEMENTNAME "text"
 waitfor [!]ELEMENTNAME
 wait INTEGER
@@ -66,19 +73,25 @@ Statements in script does the following:
 
 assert - returns true if element is found
 assertatr  - do getAttribute on "attribute" of element compare against "value"
-assertcss - do getCssValue on "property" of element compare against "value" 
+assertclk - do isVisible() & isEnabled() of element
+assertcss - do getCssValue on "property" of element compare against "value"
+assertsel - do isSelected() and compare with boolean
 asserttxt - do getText() on element and check against "text"
 click - click() on element
 drawbox - draws a box with the mouse inside the element, "offset" pixels in
 dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
 printatr - print out value of getText() on element
 printcss - do getCssValue on "property" of element and print it out
+printtime - print out a current timestamp
 printtxt - do getAttribute on "attribute" of element and print it out
 screenshot - takes a screenshot, saves it with filename "text"
+scrollto - scroll so element is visible
 select - selects a element in a dropdown
+settoggle - sets a checkbox/radiobutton to checked if true, unchecked if false
 type -  sendKeys("text") on element
 typeclr - Sends CTRL+a+DEL before sendKeys("text")
 waitforatr - wait until element is found and has "attribute" set to "value"
+waitforenabled - wait until element is enabled
 waitfortxt - wait until element is found and has text set to "text"
 waitfor - wait until element is found for up to 20s
 wait - just sleeps INTEGER*0.1s
