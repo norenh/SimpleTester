@@ -824,7 +824,7 @@ public class SimpleTester {
 
     public static void main(String[] args) {
 	if(args.length < 3) {
-	    System.out.println("Usage: ./run.sh [-h] [-p] [-b [firefox|chrome|safari|edge]] <configfile> <URL> <script>");
+	    System.out.println("Usage: ./run.sh [-h] [-p] [-b [firefox|chrome|safari|edge]] [-r HEIGHTxWIDTH] <configfile> <URL> <script>");
 	    System.exit(1);
 	}
 	enumDriver edrive = enumDriver.CHROME;
