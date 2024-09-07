@@ -400,6 +400,14 @@ public class SimpleTester {
 	//System.out.println("String: "+s);
 	return s;
     }
+
+    private static boolean readBool() throws ParsingException {
+	if(readString().equals("true"))
+	    return true;
+	else if(readString().equals("false"))
+	    return false;
+	throw new ParsingException("Not true or false");
+    }
     
     
     private static boolean runStatement(boolean novalidate) {
@@ -431,9 +439,8 @@ public class SimpleTester {
 		return false;
 	    case ASSERTSEL:
 		list = readSel(true);
-		s1 = readString();
-		b = s1.equals("true");
-		if(!b && !s1.equals("false"))
+		b = readBool();
+		if(!b)
 		    return false;
 		if(novalidate)
 		    return true;
@@ -607,9 +614,8 @@ public class SimpleTester {
 	    case SETTOGGLE:
 		// should return true if radiobutton/checkbox is set to chosen value
 		list = readSel(false);
-		s1 = readString();
-		b = s1.equals("true");
-		if(!b && !s1.equals("false"))
+		b = readBool();
+		if(!b)
 		    return false;
 		if(novalidate)
 		    return true;
