@@ -1,4 +1,7 @@
 message id "message"
 textbox name "my-text"
+pwdbox xpath "//input[@name='my-password']"
 submitButton cssSelector "button"
 dropdown name "my-select"
+checkcheckbox id "my-check-1"
+defcheckbox id "my-check-2"

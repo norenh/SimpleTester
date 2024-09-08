@@ -1,6 +1,14 @@
 waitfor dropdown
 select dropdown "One"
 type textbox "my-text"
+type pwdbox "hello"
+assertsel checkcheckbox "true"
+assertsel defcheckbox "false"
+scrollto checkcheckbox
+settoggle checkcheckbox "false"
+scrollto checkcheckbox
+settoggle defcheckbox "false"
+scrollto submitButton
 click submitButton
 waitfor !dropdown
 waitfor message

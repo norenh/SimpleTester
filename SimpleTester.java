@@ -61,7 +61,10 @@ public class SimpleTester {
     private static EnumBy enumby;
     private static boolean isMac = false;
     private static boolean isSafari = false;
+    private static boolean isFirefox = false;
+    private static boolean isChrome = false;
     private static int linenr = 0;
+    private static int lastDelta = 0;
     private static String curr_line = "";
     private enum EnumStmt {
 	ASSERT,
@@ -409,9 +412,10 @@ public class SimpleTester {
     }
 
     private static boolean readBool() throws ParsingException {
-	if(readString().equals("true"))
+	String s = readString();
+	if(s.equals("true"))
 	    return true;
-	else if(readString().equals("false"))
+	else if(s.equals("false"))
 	    return false;
 	throw new ParsingException("Not true or false");
     }
@@ -502,8 +506,6 @@ public class SimpleTester {
 	    case ASSERTSEL:
 		list = readSel(true);
 		b = readBool();
-		if(!b)
-		    return false;
 		if(novalidate)
 		    return true;
 		findElement(list);
@@ -645,10 +647,29 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		{
-		    Actions scroller = new Actions(curr_driver);
-		    scroller
-			.moveToElement(curr_element)
-			.perform();
+		    if(isFirefox) {
+			/**
+			   workaround since scrollToElement does
+			   not seem to work in firefox.
+			   Just scroll back to top and then
+			   rely on scrollByAmount instead
+			*/
+			Rectangle rect = curr_element.getRect();
+			int deltaY = rect.y + rect.height;
+			Actions scroller = new Actions(curr_driver);
+			System.out.println("deltaY: "+deltaY);
+			scroller
+			    .scrollByAmount(0,lastDelta)
+			    .scrollByAmount(0,deltaY)
+			    .perform();
+			lastDelta = -deltaY;
+		    }
+		    else {
+			Actions scroller = new Actions(curr_driver);
+			scroller
+			    .scrollToElement(curr_element)
+			    .perform();
+		    }
 		}
 		return true;
 	    case SELECT:
@@ -664,8 +685,6 @@ public class SimpleTester {
 		// should return true if radiobutton/checkbox is set to chosen value
 		list = readSel(false);
 		b = readBool();
-		if(!b)
-		    return false;
 		if(novalidate)
 		    return true;
 		findElement(list);
@@ -921,6 +940,7 @@ public class SimpleTester {
 	    switch(edrive) {
 	    case CHROME:
 		{
+		    isChrome = true;
 		    ChromeOptions options = new ChromeOptions();
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--window-size="+resolution_x+","+resolution_y);
@@ -933,6 +953,7 @@ public class SimpleTester {
 		break;
 	    case FIREFOX:
 		{
+		    isFirefox = true;
 		    FirefoxOptions options = new FirefoxOptions();
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--width="+resolution_x);
