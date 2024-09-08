@@ -87,6 +87,7 @@ public class SimpleTester {
 	SETTOGGLE,
 	TYPE,
 	TYPECLR,
+	TYPEKEY,
 	WAIT,
 	WAITFOR,
 	WAITFORATR,
@@ -132,6 +133,7 @@ public class SimpleTester {
 	    put("settoggle", stmt.SETTOGGLE);
 	    put("type",      stmt.TYPE);
 	    put("typeclr",   stmt.TYPECLR);
+	    put("typekey",   stmt.TYPEKEY);
 	    put("wait",      stmt.WAIT);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("waitforatr",stmt.WAITFORATR);
@@ -359,6 +361,37 @@ public class SimpleTester {
 	}
 	currPos = index2;
 	return tmp.intValue();
+    }
+
+    private static Keys readKey() throws ParsingException {
+	currPos++;
+	if(currPos >= curr_line.length())
+	    throw new ParsingException("Expected KEY");
+	int index2 = curr_line.indexOf(' ', currPos);
+	if(index2 == -1)
+	    index2 = curr_line.length();
+
+	String str = curr_line.substring(currPos, index2);
+	currPos = index2;
+
+	if(str.equals("BACKSPACE"))
+	    return Keys.BACK_SPACE;
+	else if(str.equals("DELETE"))
+	    return Keys.DELETE;
+	else if(str.equals("END"))
+	    return Keys.END;
+	else if(str.equals("ENTER"))
+	    return Keys.ENTER;
+	else if(str.equals("ESCAPE"))
+	    return Keys.ESCAPE;
+	else if(str.equals("HOME"))
+	    return Keys.HOME;
+	else if(str.equals("INSERT"))
+	    return Keys.INSERT;
+	else if(str.equals("TAB"))
+	    return Keys.TAB;
+	else
+	    throw new ParsingException("Expected a KEY, got \""+str+"\"");
     }
 
     private static ArrayList<By> readSel(boolean neg) throws ParsingException {
@@ -722,6 +755,14 @@ public class SimpleTester {
 		    curr_element.sendKeys(Keys.DELETE);
 		}
 		curr_element.sendKeys(s1);
+		return true;
+	    case TYPEKEY:
+		list = readSel(false);
+		Keys k = readKey();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		curr_element.sendKeys(k);
 		return true;
 	    case WAIT:
 		x = readInt();
