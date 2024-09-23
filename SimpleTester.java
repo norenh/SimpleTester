@@ -51,6 +51,7 @@ import javax.xml.xpath.XPathExpressionException;
 public class SimpleTester {
     
     private final static HashMap<String, ArrayList<By>> selectors = new HashMap<String, ArrayList<By>>();
+    private final static HashMap<String, String> defines = new HashMap<String, String>();
     private static WebDriver curr_driver;
     private static ArrayList<By> curr_by_list;
     private static WebElement curr_element;
@@ -186,74 +187,90 @@ public class SimpleTester {
 		if(index1 == -1)
 		    return false;
 		String statement = curr_line.substring(0,index1);
-		if(selectors.containsKey(statement)) {
-		    System.out.println("ERROR: Duplicate statement ("+statement+")?");
-		    return false;
-		}
-		ArrayList<By> l = new ArrayList<By>();
-		selectors.put(statement,l);
-		while(true) {
+		if(statement.equals("DEFINE")) {
 		    int index2 = curr_line.indexOf(' ', index1+1);
 		    if(index2 == -1) {
 			System.out.println("ERROR: Unexpected EOL, did you miss a keyword?");
 			return false;
 		    }
-		    String by_string = curr_line.substring(index1+1, index2);
-		    EnumBy ret = by_names.get(by_string);
-		    if(ret == null) {
-			System.out.println("ERROR: \""+by_string+"\" not a valid Locator");
+		    String define_name = curr_line.substring(index1+1, index2);
+		    String define_string = curr_line.substring(index2+1, curr_line.length());
+		    if(defines.containsKey(define_name)) {
+			System.out.println("ERROR: Duplicate define ("+define_name+")");
 			return false;
 		    }
-		    index1 = index2+1;
-		    index2 = curr_line.indexOf('"', index1+1);
-		    if(index2 == -1) {
+		    defines.put(define_name,define_string);
+		}
+		else {
+		    if(selectors.containsKey(statement)) {
+			System.out.println("ERROR: Duplicate statement ("+statement+")");
 			return false;
 		    }
-		    String selector = curr_line.substring(index1+1, index2);
-		    XPathFactory xpathFactory = XPathFactory.newInstance();
-		    By by;
-		    switch(ret) {
-		    case ID:
-			by = By.id(selector);
-			break;
-		    case NAME:
-			by = By.name(selector);
-			break;
-		    case CSSSELECTOR:
-			by = By.cssSelector(selector);
-			break;
-		    case TAGNAME:
-			by = By.tagName(selector);
-			break;
-		    case CLASSNAME:
-			by = By.className(selector);
-			break;
-		    case LINKTEXT:
-			by = By.linkText(selector);
-			break;
-		    case XPATH:
-			try {
-			    // try to compile it, we do not use this
-			    // only for validating it is a proper XPath
-			    xpathFactory.newXPath().compile(selector);
-			}
-			catch(XPathExpressionException e) {
-			    System.out.println("ERROR: Invalid Xpath: "+selector);
+		    ArrayList<By> l = new ArrayList<By>();
+		    selectors.put(statement,l);
+		    while(true) {
+			int index2 = curr_line.indexOf(' ', index1+1);
+			if(index2 == -1) {
+			    System.out.println("ERROR: Unexpected EOL, did you miss a keyword?");
 			    return false;
 			}
-			by = By.xpath(selector);
-			break;
-		    default:
-			return false;
+			String by_string = curr_line.substring(index1+1, index2);
+			EnumBy ret = by_names.get(by_string);
+			if(ret == null) {
+			    System.out.println("ERROR: \""+by_string+"\" not a valid Locator");
+			    return false;
+			}
+			index1 = index2+1;
+			index2 = curr_line.indexOf('"', index1+1);
+			if(index2 == -1) {
+			    return false;
+			}
+			String selector = curr_line.substring(index1+1, index2);
+			XPathFactory xpathFactory = XPathFactory.newInstance();
+			By by;
+			switch(ret) {
+			case ID:
+			    by = By.id(selector);
+			    break;
+			case NAME:
+			    by = By.name(selector);
+			    break;
+			case CSSSELECTOR:
+			    by = By.cssSelector(selector);
+			    break;
+			case TAGNAME:
+			    by = By.tagName(selector);
+			    break;
+			case CLASSNAME:
+			    by = By.className(selector);
+			    break;
+			case LINKTEXT:
+			    by = By.linkText(selector);
+			    break;
+			case XPATH:
+			    try {
+				// try to compile it, we do not use this
+				// only for validating it is a proper XPath
+				xpathFactory.newXPath().compile(selector);
+			    }
+			    catch(XPathExpressionException e) {
+				System.out.println("ERROR: Invalid Xpath: "+selector);
+				return false;
+			    }
+			    by = By.xpath(selector);
+			    break;
+			default:
+			    return false;
+			}
+			l.add(by);
+
+			//System.out.println(statement+"' '"+ret.toString()+by_string+"' '"+selector+"' " + index2 + " "+ curr_line.length());
+
+			index1 = index2+1;
+			if(curr_line.length() <= index1)
+			    break;
+			selectors.put(statement,l);
 		    }
-		    l.add(by);
-		    
-		    //System.out.println(statement+"' '"+ret.toString()+by_string+"' '"+selector+"' " + index2 + " "+ curr_line.length());
-		    
-		    index1 = index2+1;
-		    if(curr_line.length() <= index1)
-			break;
-		    selectors.put(statement,l);
 		}
 		curr_line = buffer.readLine();
 	    }
@@ -284,6 +301,65 @@ public class SimpleTester {
 	}
     }
 
+    private static String readStrGen(char c) throws ParsingException {
+	int index2;
+	boolean isVar = false;
+
+	// the compiler is not smart enough to realise they will be initialized
+	int tmpPos = 0, endIndex = 0;
+	String tmpLine = "";
+
+	// If this is a variable, read it first and replace curr_line with it
+	// we will replace it curr_line and currPos back to after the variable
+	// one we have parsed and validated it
+	if(curr_line.charAt(currPos) == '#') {
+	    currPos++;
+	    endIndex = curr_line.indexOf('#', currPos);
+	    String s = curr_line.substring(currPos, endIndex);
+	    tmpLine = curr_line;
+	    curr_line = defines.get(s);
+	    if(curr_line == null) {
+		curr_line = tmpLine;
+		throw new ParsingException("Unknown Define: "+s);
+	    }
+	    tmpPos = currPos;
+	    currPos = 0;
+	    isVar = true;
+	}
+	else if(curr_line.charAt(currPos) != c) 
+	    throw new ParsingException("Expected String");
+	currPos++;  // eat the quotation mark
+
+	switch(c) {
+	case '"':
+	    index2 = curr_line.indexOf('"', currPos);
+	    if(index2 == -1) {
+		throw new ParsingException("Expected ending '\"'-character!");
+	    }
+	    break;
+	case '%':
+	    index2 = curr_line.lastIndexOf('%', curr_line.length()-1);
+	    if(index2 == -1 || index2 <= currPos) {
+		throw new ParsingException("Expected ending '%'-character!");
+	    }
+	    break;
+	default:
+	    throw new ParsingException("Expected starting '\"'-character!");
+	}
+
+	String s = curr_line.substring(currPos, index2);
+	if(s == null)
+	    throw new ParsingException("Impossible string!");
+	currPos=index2+1;
+
+	// restore curr_line and currPos if this was a variable
+	if(isVar) {
+	    curr_line = tmpLine;
+	    currPos = tmpPos + endIndex;
+	}
+	return s;
+    }
+
     static class StrOrRegex {
 	private String str;
 	private Pattern pat;
@@ -294,33 +370,14 @@ public class SimpleTester {
 		throw new ParsingException("Expected String");
 
 	    if(curr_line.charAt(currPos) == '%') {
-		currPos++;  // eat the quotation mark
-		int index2 = curr_line.lastIndexOf('%', curr_line.length()-1);
-		if(index2 == -1 || index2 <= currPos) {
-		    throw new ParsingException("Expected ending '%'-character!");
-		}
-		String s = curr_line.substring(currPos, index2);
+		String s = readStrGen('%');
 		pat = Pattern.compile(s);
 		str = s;
-		currPos=index2+1;
 		type = false;
 		return;
 	    }
-	    if(curr_line.charAt(currPos) != '"') {
-		throw new ParsingException("Expected starting '\"'-character!");
-	    }
-	    currPos++;  // eat the quotation mark
-	    int index2 = curr_line.indexOf('"', currPos);
-	    if(index2 == -1) {
-		throw new ParsingException("Expected ending '\"'-character!");
-	    }
-	    String s = curr_line.substring(currPos, index2);
-	    if(s == null) {
-		throw new ParsingException("Impossible string!");
-	    }
-	    currPos=index2+1;
+	    str = readStrGen('"');
 	    //System.out.println("String: "+s);
-	    str = s;
 	}
 	public boolean matches(String s) {
 	    if(type)
@@ -427,21 +484,8 @@ public class SimpleTester {
 	currPos++;
 	if(currPos >= curr_line.length())
 	    throw new ParsingException("Expected String");
-	if(curr_line.charAt(currPos) != '"') {
-	    throw new ParsingException("Expected starting '\"'-character!");
-	}
-	currPos++;  // eat the quotation mark
-	int index2 = curr_line.indexOf('"', currPos);
-	if(index2 == -1) {
-	    throw new ParsingException("Expected ending '\"'-character!");
-	}
-	String s = curr_line.substring(currPos, index2);
-	if(s == null) {
-	    throw new ParsingException("Impossible string!");
-	}
-	currPos=index2+1;
-	//System.out.println("String: "+s);
-	return s;
+
+	return readStrGen(curr_line.charAt(currPos));
     }
 
     private static boolean readBool() throws ParsingException {
@@ -876,6 +920,7 @@ public class SimpleTester {
 	    return false;
 	}
 	catch(Exception e) {
+	    //e.printStackTrace(System.out);
 	    System.out.println("ERROR: "+e.toString());
 	    return false;
 	}
