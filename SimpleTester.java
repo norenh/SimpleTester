@@ -303,15 +303,15 @@ public class SimpleTester {
 
     private static String readStrGen(char c) throws ParsingException {
 	int index2;
-	boolean isVar = false;
+	boolean isDef = false;
 
 	// the compiler is not smart enough to realise they will be initialized
 	int tmpPos = 0, endIndex = 0;
 	String tmpLine = "";
 
-	// If this is a variable, read it first and replace curr_line with it
-	// we will replace it curr_line and currPos back to after the variable
-	// one we have parsed and validated it
+	// If this is a define, read it first and replace curr_line with it
+	// we will replace it curr_line and currPos back to after the define
+	// have been parsed and validated it
 	if(curr_line.charAt(currPos) == '#') {
 	    currPos++;
 	    endIndex = curr_line.indexOf('#', currPos);
@@ -324,7 +324,7 @@ public class SimpleTester {
 	    }
 	    tmpPos = currPos;
 	    currPos = 0;
-	    isVar = true;
+	    isDef = true;
 	}
 	else if(curr_line.charAt(currPos) != c) 
 	    throw new ParsingException("Expected String");
@@ -352,8 +352,8 @@ public class SimpleTester {
 	    throw new ParsingException("Impossible string!");
 	currPos=index2+1;
 
-	// restore curr_line and currPos if this was a variable
-	if(isVar) {
+	// restore curr_line and currPos if this was a define
+	if(isDef) {
 	    curr_line = tmpLine;
 	    currPos = tmpPos + endIndex;
 	}
