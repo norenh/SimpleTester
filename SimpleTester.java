@@ -301,7 +301,19 @@ public class SimpleTester {
 	}
     }
 
-    private static String readStrGen(char c) throws ParsingException {
+    /**
+       handles reading a string on current line and postion but also handles
+       defines.
+
+       expectChar can be ",% or ? where allow for all kinds of strings but
+       the other expects that the first char is matching the expected char
+
+       Returns the string parsed (might be from a define) but if expectChar is ?
+       then the returns string will start with the resulting type (" or %).
+
+       Yes, it is a mess. Should rewrite one day
+     */
+    private static String readStrGen(char expectChar) throws ParsingException {
 	int index2;
 	boolean isDef = false;
 
@@ -312,9 +324,11 @@ public class SimpleTester {
 	// If this is a define, read it first and replace curr_line with it
 	// we will replace it curr_line and currPos back to after the define
 	// have been parsed and validated it
-	if(curr_line.charAt(currPos) == '#') {
+	if(curr_line.charAt(currPos) == '_') {
 	    currPos++;
-	    endIndex = curr_line.indexOf('#', currPos);
+	    endIndex = curr_line.indexOf(' ', currPos);
+	    if(endIndex == -1)
+		endIndex = curr_line.length();
 	    String s = curr_line.substring(currPos, endIndex);
 	    tmpLine = curr_line;
 	    curr_line = defines.get(s);
@@ -326,22 +340,30 @@ public class SimpleTester {
 	    currPos = 0;
 	    isDef = true;
 	}
-	else if(curr_line.charAt(currPos) != c) 
-	    throw new ParsingException("Expected String");
-	currPos++;  // eat the quotation mark
+	//System.out.println("String("+currPos+":"+curr_line.charAt(currPos)+"): "+curr_line);
+	if(curr_line.charAt(currPos) == '%' && expectChar == '"') {
+	    throw new ParsingException("Expected starting '\"'-character!");
+	}
+	if(curr_line.charAt(currPos) == '"' && expectChar == '%') {
+	    throw new ParsingException("Expected starting '%'-character!");
+	}
 
-	switch(c) {
+	char c = '"';
+	switch(curr_line.charAt(currPos)) {
 	case '"':
+	    currPos++;  // eat the quotation mark
 	    index2 = curr_line.indexOf('"', currPos);
 	    if(index2 == -1) {
 		throw new ParsingException("Expected ending '\"'-character!");
 	    }
 	    break;
 	case '%':
+	    currPos++;  // eat the quotation mark
 	    index2 = curr_line.lastIndexOf('%', curr_line.length()-1);
 	    if(index2 == -1 || index2 <= currPos) {
 		throw new ParsingException("Expected ending '%'-character!");
 	    }
+	    c = '%';
 	    break;
 	default:
 	    throw new ParsingException("Expected starting '\"'-character!");
@@ -357,7 +379,10 @@ public class SimpleTester {
 	    curr_line = tmpLine;
 	    currPos = tmpPos + endIndex;
 	}
-	return s;
+	if(expectChar == '?')
+	    return c+s;
+	else
+	    return s;
     }
 
     static class StrOrRegex {
@@ -369,14 +394,13 @@ public class SimpleTester {
 	    if(currPos >= curr_line.length())
 		throw new ParsingException("Expected String");
 
-	    if(curr_line.charAt(currPos) == '%') {
-		String s = readStrGen('%');
-		pat = Pattern.compile(s);
-		str = s;
+	    String s = readStrGen('?');
+	    str = s.substring(1,s.length());
+	    if(s.charAt(0) == '%') {
+		pat = Pattern.compile(str);
 		type = false;
 		return;
 	    }
-	    str = readStrGen('"');
 	    //System.out.println("String: "+s);
 	}
 	public boolean matches(String s) {
@@ -485,7 +509,7 @@ public class SimpleTester {
 	if(currPos >= curr_line.length())
 	    throw new ParsingException("Expected String");
 
-	return readStrGen(curr_line.charAt(currPos));
+	return readStrGen('"');
     }
 
     private static boolean readBool() throws ParsingException {
