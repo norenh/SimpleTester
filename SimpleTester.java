@@ -342,9 +342,17 @@ public class SimpleTester {
 	}
 	//System.out.println("String("+currPos+":"+curr_line.charAt(currPos)+"): "+curr_line);
 	if(curr_line.charAt(currPos) == '%' && expectChar == '"') {
+	    if(isDef) {
+		currPos = tmpPos;
+		curr_line = tmpLine;
+	    }
 	    throw new ParsingException("Expected starting '\"'-character!");
 	}
 	if(curr_line.charAt(currPos) == '"' && expectChar == '%') {
+	    if(isDef) {
+		currPos = tmpPos;
+		curr_line = tmpLine;
+	    }
 	    throw new ParsingException("Expected starting '%'-character!");
 	}
 
@@ -354,6 +362,10 @@ public class SimpleTester {
 	    currPos++;  // eat the quotation mark
 	    index2 = curr_line.indexOf('"', currPos);
 	    if(index2 == -1) {
+		if(isDef) {
+		    currPos = tmpPos;
+		    curr_line = tmpLine;
+		}
 		throw new ParsingException("Expected ending '\"'-character!");
 	    }
 	    break;
@@ -361,17 +373,30 @@ public class SimpleTester {
 	    currPos++;  // eat the quotation mark
 	    index2 = curr_line.lastIndexOf('%', curr_line.length()-1);
 	    if(index2 == -1 || index2 <= currPos) {
+		if(isDef) {
+		    currPos = tmpPos;
+		    curr_line = tmpLine;
+		}
 		throw new ParsingException("Expected ending '%'-character!");
 	    }
 	    c = '%';
 	    break;
 	default:
+	    if(isDef) {
+		currPos = tmpPos;
+		curr_line = tmpLine;
+	    }
 	    throw new ParsingException("Expected starting '\"'-character!");
 	}
 
 	String s = curr_line.substring(currPos, index2);
-	if(s == null)
+	if(s == null) {
+	    if(isDef) {
+		currPos = tmpPos;
+		curr_line = tmpLine;
+	    }
 	    throw new ParsingException("Impossible string!");
+	}
 	currPos=index2+1;
 
 	// restore curr_line and currPos if this was a define
