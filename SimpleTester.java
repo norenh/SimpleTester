@@ -588,19 +588,19 @@ public class SimpleTester {
 	    case ASSERTCSS:
 		list = readSel(false);
 		s1 = readString();
-		s2 = readString();
+		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
 		findElement(list);
 		ret = curr_element.getCssValue(s1);
 		if(ret == null)
 		    return false;
-		if(!ret.equals(s2)) {
-		    if(ret.equals(s2.strip())) {
-			System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
+		if(!sor.matches(ret)) {
+		    if(sor.matches(ret.strip())) {
+			System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 			return true;
 		    }
-		    System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+s2+"\"");
+		    System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 		    return false;
 		}
 		return true;
