@@ -927,7 +927,7 @@ public class SimpleTester {
 		for(int i=0;i<100;i++) {
 		    findElement(list);
 		    ret = curr_element.getText();
-		    if(!sor.matches(ret)) {
+		    if(sor.matches(ret)) {
 			return true;
 		    }
 		    sleep(200);
