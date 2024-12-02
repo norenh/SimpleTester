@@ -16,8 +16,7 @@ to automate data-entries.
 The requirements to build is:
 
 Java (unknown version, should work with JDK 17 for latest selenium)
-Selenium Webdriver 4.18.1
-Chrome Browser
+Selenium Webdriver 4.27.0 (change stenv.sh to set intended version)
 Linux terminal to use the included script files (write your own for windows)
 
 You can download the selenium webdriver from the webpage 
@@ -43,9 +42,10 @@ name, followed by one or more selectors that each have a type and a text.
 The script supports the following statements for now:
 --
 assert ELEMENTNAME
-assertatr ELEMENTNAME "attribute" "value"
+assertatr ELEMENTNAME "attribute" "value" (Warning! use assertpro for properties)
 assertclk ELEMENTNAME
 assertcss ELEMENTNAME "property" "value"
+assertpro ELEMENTNAME "property" "value"
 assertsel ELEMENTNAME "boolean"
 asserttxt ELEMENTNAME "text"
 click ELEMENTNAME
@@ -53,6 +53,7 @@ drawbox ELEMENTNAME "offset"
 dwaitfor INTEGER [!]ELEMENTNAME
 printatr ELEMENTNAME "attribute"
 printcss ELEMENTNAME "property"
+printpro ELEMENTNAME "property" (Warning! use printpro for properties)
 printtime
 printtxt ELEMENTNAME
 screenshot "text"
@@ -61,8 +62,9 @@ select ELEMENTNAME "dropdownoption"
 settoggle ELEMENTNAME "boolean"
 type ELEMENTNAME "text"
 typeclr ELEMENTNAME "text"
-waitforatr ELEMENTNAME "attribute" "value"
+waitforatr ELEMENTNAME "attribute" "value" (Warning! use waitforpro for properties)
 waitforenabled ELEMENTNAME
+waitforpro ELEMENTNAME "property" "value"
 waitfortxt ELEMENTNAME "text"
 waitfor [!]ELEMENTNAME
 wait INTEGER
@@ -72,18 +74,20 @@ finish
 Statements in script does the following:
 
 assert - returns true if element is found
-assertatr  - do getAttribute on "attribute" of element compare against "value"
+assertatr  - do getAttribute on "attribute" of element compare with "value"
 assertclk - do isVisible() & isEnabled() of element
-assertcss - do getCssValue on "property" of element compare against "value"
+assertcss - do getCssValue on "property" of element compare with "value"
+assertpro  - do getDomProperty on "property" of element compare with "value"
 assertsel - do isSelected() and compare with boolean
-asserttxt - do getText() on element and check against "text"
-click - click() on element
+asserttxt - do getText() on element and compare with "text"
+click - click() on element (will try scrolling if element is hidden)
 drawbox - draws a box with the mouse inside the element, "offset" pixels in
 dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
-printatr - print out value of getText() on element
-printcss - do getCssValue on "property" of element and print it out
+printatr - print result of getAttribute on "attribute" of element
+printcss - print result of getCssValue on "property" of element
+printpro - print result of getDomProperty on "property" of element
 printtime - print out a current timestamp
-printtxt - do getAttribute on "attribute" of element and print it out
+printtxt - print out value of getText() on element
 screenshot - takes a screenshot, saves it with filename "text"
 scrollto - scroll so element is visible
 select - selects a element in a dropdown
@@ -92,6 +96,7 @@ type -  sendKeys("text") on element
 typeclr - Sends CTRL+a+DEL before sendKeys("text")
 waitforatr - wait until element is found and has "attribute" set to "value"
 waitforenabled - wait until element is enabled
+waitforpro - wait until element is found and has "property" set to "value"
 waitfortxt - wait until element is found and has text set to "text"
 waitfor - wait until element is found for up to 20s
 wait - just sleeps INTEGER*0.1s

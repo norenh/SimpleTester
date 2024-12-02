@@ -17,6 +17,8 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.remote.NoSuchDriverException;
@@ -53,6 +55,7 @@ public class SimpleTester {
     private final static HashMap<String, ArrayList<By>> selectors = new HashMap<String, ArrayList<By>>();
     private final static HashMap<String, String> defines = new HashMap<String, String>();
     private static WebDriver curr_driver;
+    private static JavascriptExecutor js;
     private static ArrayList<By> curr_by_list;
     private static WebElement curr_element;
     private static FileReader config_file;
@@ -72,6 +75,7 @@ public class SimpleTester {
 	ASSERTATR,
 	ASSERTCLK,
 	ASSERTCSS,
+	ASSERTPRO,
 	ASSERTSEL,
 	ASSERTTXT,
 	CLICK,
@@ -80,6 +84,7 @@ public class SimpleTester {
 	FINISH,
 	PRINTATR,
 	PRINTCSS,
+	PRINTPRO,
 	PRINTTIME,
 	PRINTTXT,
 	SCREENSHOT,
@@ -93,6 +98,7 @@ public class SimpleTester {
 	WAITFOR,
 	WAITFORATR,
 	WAITFORENABLED,
+	WAITFORPRO,
 	WAITFORTXT;
     }
 
@@ -119,6 +125,7 @@ public class SimpleTester {
 	    put("assertatr", stmt.ASSERTATR);
 	    put("assertclk", stmt.ASSERTCLK);
 	    put("assertcss", stmt.ASSERTCSS);
+	    put("assertpro", stmt.ASSERTPRO);
 	    put("assertsel", stmt.ASSERTSEL);
 	    put("asserttxt", stmt.ASSERTTXT);
 	    put("click",     stmt.CLICK);
@@ -126,6 +133,7 @@ public class SimpleTester {
 	    put("dwaitfor",  stmt.DWAITFOR);
 	    put("printatr",  stmt.PRINTATR);
 	    put("printcss",  stmt.PRINTCSS);
+	    put("printpro",  stmt.PRINTPRO);
 	    put("printtime", stmt.PRINTTIME);
 	    put("printtxt",  stmt.PRINTTXT);
 	    put("screenshot",stmt.SCREENSHOT);
@@ -138,6 +146,7 @@ public class SimpleTester {
 	    put("wait",      stmt.WAIT);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("waitforatr",stmt.WAITFORATR);
+	    put("waitforpro",stmt.WAITFORPRO);
 	    put("waitforenabled",stmt.WAITFORENABLED);
 	    put("waitfortxt",stmt.WAITFORTXT);
 	    put("finish",    stmt.FINISH);
@@ -629,6 +638,29 @@ public class SimpleTester {
 		    return false;
 		}
 		return true;
+	    case ASSERTPRO:
+		list = readSel(false);
+		s1 = readString();
+		s2 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getDomProperty(s1);
+		if(ret == null)
+		    return false;
+		if(!ret.equals(s2)) {
+		    if(ret.equals(s2.strip())) {
+			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			return true;
+		    }
+		    // Workaround for Safari returning true for attributes with a empty value
+		    if(isSafari && s2.equals("") && ret.equals("true"))
+			return true;
+
+		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+		    return false;
+		}
+		return true;
 	    case ASSERTSEL:
 		list = readSel(true);
 		b = readBool();
@@ -659,13 +691,33 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
+		boolean retry_click = false;
 		try {
+		    if(!curr_element.isDisplayed()) {
+			js.executeScript("arguments[0].scrollIntoView();", curr_element);
+		    }
 		    curr_element.click();
 		}
 		catch(ElementClickInterceptedException e) {
-		    System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
-		    System.out.println("ERROR: "+e.getMessage());
-		    return false;
+		    retry_click = true;
+		}
+		catch(WebDriverException e) {
+		    if(isSafari)
+			retry_click = true;
+		    else
+			throw e;
+		}
+		if(retry_click) {
+		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
+		    sleep(10);
+		    try {
+			curr_element.click();
+		    }
+		    catch(ElementClickInterceptedException e) {
+			System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
+			System.out.println("ERROR: "+e.getMessage());
+			return false;
+		    }
 		}
 		//System.out.println(curr_element.toString());
 		return true;
@@ -747,6 +799,15 @@ public class SimpleTester {
 		ret = curr_element.getCssValue(s1);
 		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
 		return true;
+	    case PRINTPRO:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		findElement(list);
+		ret = curr_element.getDomProperty(s1);
+		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		return true;
 	    case PRINTTIME:
 		if(novalidate)
 		    return true;
@@ -773,13 +834,16 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		{
-		    if(isFirefox) {
-			/**
-			   workaround since scrollToElement does
-			   not seem to work in firefox.
-			   Just scroll back to top and then
-			   rely on scrollByAmount instead
-			*/
+		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
+		    sleep(10);
+		    /**
+		       if(isFirefox) {
+
+			//   workaround since scrollToElement does
+			//   not seem to work in firefox.
+			//   Just scroll back to top and then
+			//   rely on scrollByAmount instead
+
 			Rectangle rect = curr_element.getRect();
 			int deltaY = rect.y + rect.height;
 			Actions scroller = new Actions(curr_driver);
@@ -795,7 +859,7 @@ public class SimpleTester {
 			scroller
 			    .scrollToElement(curr_element)
 			    .perform();
-		    }
+		    }*/
 		}
 		return true;
 	    case SELECT:
@@ -917,6 +981,20 @@ public class SimpleTester {
 			    return true;
 		    }
 		    sleep(200); // try every 200ms for 20s
+		}
+		return false;
+	    case WAITFORPRO:
+		list = readSel(false);
+		s1 = readString();
+		s2 = readString();
+		if(novalidate)
+		    return true;
+		for(int i=0;i<100;i++) {
+		    findElement(list);
+		    ret = curr_element.getDomProperty(s1);
+		    if(ret != null && ret.equals(s2))
+			return true;
+		    sleep(200);
 		}
 		return false;
 	    case WAITFORTXT:
@@ -1121,6 +1199,7 @@ public class SimpleTester {
 	    System.exit(1);
 	}
 	curr_driver.get(url);
+	js = (JavascriptExecutor) curr_driver;
 	//String title = curr_driver.getTitle();
 	//System.out.println(title);
 
