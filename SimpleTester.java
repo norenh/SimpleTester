@@ -303,6 +303,7 @@ public class SimpleTester {
 
     private static int currPos;
     private static boolean notSel = false;
+    private static boolean notStr = false;
 
     private static class ParsingException extends Exception {
 	public ParsingException(String message) {
@@ -331,8 +332,8 @@ public class SimpleTester {
 	String tmpLine = "";
 
 	// If this is a define, read it first and replace curr_line with it
-	// we will replace it curr_line and currPos back to after the define
-	// have been parsed and validated it
+	// we will replace curr_line and currPos back to after the define
+	// has been parsed and validated it
 	if(curr_line.charAt(currPos) == '_') {
 	    currPos++;
 	    endIndex = curr_line.indexOf(' ', currPos);
@@ -546,6 +547,22 @@ public class SimpleTester {
 	return readStrGen('"');
     }
 
+    private static String readString(boolean neg) throws ParsingException {
+	currPos++;
+	if(currPos >= curr_line.length())
+	    throw new ParsingException("Expected String");
+
+	if(curr_line.charAt(currPos) == '!') {
+	    notStr = true;
+	    currPos++;
+	    if(currPos >= curr_line.length())
+		throw new ParsingException("Expected String");
+	}
+	else
+	    notStr = false;
+	return readStrGen('"');
+    }
+
     private static boolean readBool() throws ParsingException {
 	String s = readString();
 	if(s.equals("true"))
@@ -563,6 +580,8 @@ public class SimpleTester {
 	String ret;
 	StrOrRegex sor;
 	int x;
+	notSel = false;
+	notStr = false;
 	try {
 	    EnumStmt st = readStmt();
 	    int index1 = currPos;
@@ -585,14 +604,17 @@ public class SimpleTester {
 		return false;
 	    case ASSERTATR:
 		list = readSel(false);
-		s1 = readString();
+		s1 = readString(true);
 		s2 = readString();
 		if(novalidate)
 		    return true;
 		findElement(list);
 		ret = curr_element.getAttribute(s1);
 		if(ret == null)
+		    return notStr;
+		else if(notStr)
 		    return false;
+
 		if(!ret.equals(s2)) {
 		    if(ret.equals(s2.strip())) {
 			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
@@ -640,13 +662,15 @@ public class SimpleTester {
 		return true;
 	    case ASSERTPRO:
 		list = readSel(false);
-		s1 = readString();
+		s1 = readString(true);
 		s2 = readString();
 		if(novalidate)
 		    return true;
 		findElement(list);
 		ret = curr_element.getDomProperty(s1);
 		if(ret == null)
+		    return notStr;
+		else if(notStr)
 		    return false;
 		if(!ret.equals(s2)) {
 		    if(ret.equals(s2.strip())) {
@@ -662,7 +686,7 @@ public class SimpleTester {
 		}
 		return true;
 	    case ASSERTSEL:
-		list = readSel(true);
+		list = readSel(false);
 		b = readBool();
 		if(novalidate)
 		    return true;
@@ -764,7 +788,7 @@ public class SimpleTester {
 		list = readSel(true);
 		if(novalidate)
 		    return true;
-		
+
 		for(int i=0; i<100; i++) {
 		    try {
 			findElement(list);
@@ -1168,6 +1192,7 @@ public class SimpleTester {
 		{
 		    isFirefox = true;
 		    FirefoxOptions options = new FirefoxOptions();
+		    //options.setCapability("webSocketUrl", true);
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--width="+resolution_x);
 			options.addArguments("--height="+resolution_y);
