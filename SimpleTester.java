@@ -609,7 +609,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
-		ret = curr_element.getAttribute(s1);
+		ret = curr_element.getDomAttribute(s1);
 		if(ret == null)
 		    return notStr;
 		else if(notStr)
@@ -674,14 +674,14 @@ public class SimpleTester {
 		    return false;
 		if(!ret.equals(s2)) {
 		    if(ret.equals(s2.strip())) {
-			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			System.out.println("WARN: ASSERTPRO got \""+ret+"\", expected \""+s2+"\"");
 			return true;
 		    }
 		    // Workaround for Safari returning true for attributes with a empty value
 		    if(isSafari && s2.equals("") && ret.equals("true"))
 			return true;
 
-		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+		    System.out.println("INFO: ASSERTPRO got \""+ret+"\", expected \""+s2+"\"");
 		    return false;
 		}
 		return true;
@@ -733,7 +733,7 @@ public class SimpleTester {
 		}
 		if(retry_click) {
 		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-		    sleep(10);
+		    sleep(20);
 		    try {
 			curr_element.click();
 		    }
@@ -811,7 +811,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
-		ret = curr_element.getAttribute(s1);
+		ret = curr_element.getDomAttribute(s1);
 		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
 		return true;
 	    case PRINTCSS:
@@ -977,7 +977,7 @@ public class SimpleTester {
 		    return true;
 		for(int i=0;i<100;i++) {
 		    findElement(list);
-		    ret = curr_element.getAttribute(s1);
+		    ret = curr_element.getDomAttribute(s1);
 		    if(ret != null && ret.equals(s2))
 			return true;
 		    sleep(200);
@@ -1030,6 +1030,10 @@ public class SimpleTester {
 		    findElement(list);
 		    ret = curr_element.getText();
 		    if(sor.matches(ret)) {
+			return true;
+		    }
+		    else if(sor.matches(ret.strip())) {
+			System.out.println("WARN: WAITFORTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
 			return true;
 		    }
 		    sleep(200);
@@ -1192,7 +1196,7 @@ public class SimpleTester {
 		{
 		    isFirefox = true;
 		    FirefoxOptions options = new FirefoxOptions();
-		    //options.setCapability("webSocketUrl", true);
+		    options.setCapability("webSocketUrl", true);
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--width="+resolution_x);
 			options.addArguments("--height="+resolution_y);
