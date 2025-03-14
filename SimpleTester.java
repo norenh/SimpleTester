@@ -5,7 +5,7 @@
 
    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-   Copyright 2023 Henning Norén <henning.noren@gmail.com>
+   Copyright 2025 Henning Norén <henning.noren@gmail.com>
  */
 
 import org.openqa.selenium.By;
@@ -258,8 +258,8 @@ public class SimpleTester {
 			    break;
 			case XPATH:
 			    try {
-				// try to compile it, we do not use this
-				// only for validating it is a proper XPath
+				// try to compile it, not really used.
+				// only for validating it is a proper XPath.
 				xpathFactory.newXPath().compile(selector);
 			    }
 			    catch(XPathExpressionException e) {
@@ -315,11 +315,11 @@ public class SimpleTester {
        handles reading a string on current line and postion but also handles
        defines.
 
-       expectChar can be ",% or ? where allow for all kinds of strings but
-       the other expects that the first char is matching the expected char
+       expectChar can be '"','%' or '?' where '?' allow for all kinds of strings
+       but the other expects that the first char is matching the expected char
 
        Returns the string parsed (might be from a define) but if expectChar is ?
-       then the returns string will start with the resulting type (" or %).
+       then the returned string will start with the resulting type (" or %).
 
        Yes, it is a mess. Should rewrite one day
      */
@@ -331,8 +331,8 @@ public class SimpleTester {
 	int tmpPos = 0, endIndex = 0;
 	String tmpLine = "";
 
-	// If this is a define, read it first and replace curr_line with it
-	// we will replace curr_line and currPos back to after the define
+	// If this is a DEFINE, read it first and replace curr_line with it.
+	// We will replace curr_line and currPos back after the DEFINE
 	// has been parsed and validated it
 	if(curr_line.charAt(currPos) == '_') {
 	    currPos++;
@@ -409,7 +409,7 @@ public class SimpleTester {
 	}
 	currPos=index2+1;
 
-	// restore curr_line and currPos if this was a define
+	// restore curr_line and currPos if this was a DEFINE
 	if(isDef) {
 	    curr_line = tmpLine;
 	    currPos = tmpPos + endIndex;
@@ -634,7 +634,7 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 
-		/** Element might still be hidden behind other, but this should do for now **/
+		// Element might still be hidden behind other, but this should do for now
 		b = curr_element.isDisplayed() && curr_element.isEnabled();
 
 		if(!notSel)

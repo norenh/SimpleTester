@@ -16,7 +16,7 @@ to automate data-entries.
 The requirements to build is:
 
 Java (unknown version, should work with JDK 17 for latest selenium)
-Selenium Webdriver 4.27.0 (change stenv.sh to set intended version)
+Selenium Webdriver 4.29.0 (change stenv.sh to set intended version)
 Linux terminal to use the included script files (write your own for windows)
 
 You can download the selenium webdriver from the webpage 
@@ -41,11 +41,11 @@ name, followed by one or more selectors that each have a type and a text.
 
 The script supports the following statements for now:
 --
-assert ELEMENTNAME
-assertatr ELEMENTNAME "attribute" "value" (Warning! use assertpro for properties)
-assertclk ELEMENTNAME
+assert [!]ELEMENTNAME
+assertatr ELEMENTNAME [!]"attribute" "value" (Warning! use assertpro for properties)
+assertclk [!]ELEMENTNAME
 assertcss ELEMENTNAME "property" "value"
-assertpro ELEMENTNAME "property" "value"
+assertpro ELEMENTNAME [!]"property" "value"
 assertsel ELEMENTNAME "boolean"
 asserttxt ELEMENTNAME "text"
 click ELEMENTNAME
