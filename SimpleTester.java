@@ -44,6 +44,8 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 // for validation only
 import javax.xml.xpath.XPath;
@@ -1084,13 +1086,15 @@ public class SimpleTester {
 
     public static void main(String[] args) {
 	if(args.length < 3) {
-	    System.out.println("Usage: ./run.sh [-h] [-p] [-b [firefox|chrome|safari|edge]] [-r HEIGHTxWIDTH] <configfile> <URL> <script>");
+	    System.out.println("Usage: ./run.sh [-e FILENAME][-h] [-p] [-b [firefox|chrome|safari|edge]] [-r HEIGHTxWIDTH] <configfile> <URL> <script>");
 	    System.exit(1);
 	}
 	enumDriver edrive = enumDriver.CHROME;
 	int argi = 0;
 	boolean headless = false;
 	boolean stay_open = false;
+	boolean screenshot_p = false;
+	Path screenshot_path = Paths.get("ERROR");
 	int resolution_x = 0, resolution_y = 0;
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
@@ -1100,6 +1104,12 @@ public class SimpleTester {
 	}
 	while(args[argi].charAt(0) == '-' && args[argi].length() == 2) {
 	    switch(args[argi].charAt(1)) {
+	    case 'e':
+		argi++;
+		screenshot_p = true;
+		screenshot_path = Paths.get(args[argi]);
+		argi++;
+		break;
 	    case 'h':
 		headless = true;
 		stay_open = false;
@@ -1240,7 +1250,10 @@ public class SimpleTester {
 		script_file = new FileReader(sfile);
 		if(!parseScript(false)) {
 		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
-		    takeScreenshot(sfile+".png");
+		    if(screenshot_p)
+			takeScreenshot(screenshot_path.toString()+".png");
+		    else
+			takeScreenshot(sfile+".png");
 		    script_file.close();
 		    if(!stay_open || headless) {
 			curr_driver.quit();

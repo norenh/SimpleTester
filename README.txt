@@ -28,6 +28,7 @@ Run it with "run.sh"
 
 Arguments supported are:
 
+ -e filename used for screenshot if script fails
  -h for running in headless mode (only firefox and chrome supported)
  -p for browser window persistance after script finishes. In headless mode, does nothing
  -b [firefox|chrome|safari|edge] sets the browser to use
