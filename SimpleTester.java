@@ -84,6 +84,7 @@ public class SimpleTester {
 	DRAWBOX,
 	DWAITFOR,
 	FINISH,
+	PRINT,
 	PRINTATR,
 	PRINTCSS,
 	PRINTPRO,
@@ -133,6 +134,7 @@ public class SimpleTester {
 	    put("click",     stmt.CLICK);
 	    put("drawbox",   stmt.DRAWBOX);
 	    put("dwaitfor",  stmt.DWAITFOR);
+	    put("print",     stmt.PRINT);
 	    put("printatr",  stmt.PRINTATR);
 	    put("printcss",  stmt.PRINTCSS);
 	    put("printpro",  stmt.PRINTPRO);
@@ -807,6 +809,12 @@ public class SimpleTester {
 	    case FINISH:
 		script_done = true;
 		return true;
+	    case PRINT:
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		System.out.println("PRINT:"+linenr+":\""+s1+"\"");
+		return true;
 	    case PRINTATR:
 		list = readSel(false);
 		s1 = readString();
@@ -814,7 +822,7 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getDomAttribute(s1);
-		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		System.out.println("PRINTATR:"+linenr+":\""+ret+"\"");
 		return true;
 	    case PRINTCSS:
 		list = readSel(false);
@@ -823,7 +831,7 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getCssValue(s1);
-		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		System.out.println("PRINTCSS:"+linenr+":\""+ret+"\"");
 		return true;
 	    case PRINTPRO:
 		list = readSel(false);
@@ -832,12 +840,12 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getDomProperty(s1);
-		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
 		return true;
 	    case PRINTTIME:
 		if(novalidate)
 		    return true;
-		System.out.println("PRINT:"+linenr+":"+Instant.now());
+		System.out.println("PRINTTIME:"+linenr+":"+Instant.now());
 		return true;
 	    case PRINTTXT:
 		list = readSel(false);
@@ -845,7 +853,7 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		ret = curr_element.getText();
-		System.out.println("PRINT:"+linenr+":\""+ret+"\"");
+		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
 		return true;
 	    case SCREENSHOT:
 		s1 = readString();

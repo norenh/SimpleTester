@@ -52,6 +52,7 @@ asserttxt ELEMENTNAME "text"
 click ELEMENTNAME
 drawbox ELEMENTNAME "offset"
 dwaitfor INTEGER [!]ELEMENTNAME
+print "text"
 printatr ELEMENTNAME "attribute"
 printcss ELEMENTNAME "property"
 printpro ELEMENTNAME "property" (Warning! use printpro for properties)
@@ -84,6 +85,7 @@ asserttxt - do getText() on element and compare with "text"
 click - click() on element (will try scrolling if element is hidden)
 drawbox - draws a box with the mouse inside the element, "offset" pixels in
 dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
+print - print string
 printatr - print result of getAttribute on "attribute" of element
 printcss - print result of getCssValue on "property" of element
 printpro - print result of getDomProperty on "property" of element
