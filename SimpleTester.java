@@ -1197,6 +1197,10 @@ public class SimpleTester {
 	String url = args[argi+1];
 	String sfile = "";
 
+	System.out.println("INFO: Using Driver: "+edrive);
+	if(binary_p) {
+	    System.out.println("INFO: Browser Path: "+binary_path.toString());
+	}
 	System.out.println("INFO: Using Config "+cfgfile);
 	System.out.println("INFO: Using URL: "+url);
 
@@ -1288,7 +1292,7 @@ public class SimpleTester {
 		    if(binary_p) {
 			options.setBinary(binary_path.toString());
 		    }
-		    curr_driver = new EdgeDriver();
+		    curr_driver = new EdgeDriver(options);
 		}
 		break;
 	    default:
