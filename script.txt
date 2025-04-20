@@ -14,6 +14,6 @@ waitfor !dropdown
 waitfor message
 
 # assert for success!
-asserttxt message "Received!" 
+asserttxt message _recv
 assertatr message "class" "lead"
 assertcss message "font-size" "20px"

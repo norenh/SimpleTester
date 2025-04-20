@@ -17,6 +17,7 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.NoSuchElementException;
@@ -69,6 +70,7 @@ public class SimpleTester {
     private static boolean isSafari = false;
     private static boolean isFirefox = false;
     private static boolean isChrome = false;
+    private static boolean isEdge = false;
     private static int linenr = 0;
     private static int lastDelta = 0;
     private static String curr_line = "";
@@ -164,6 +166,28 @@ public class SimpleTester {
 	    put("className",   enumby.CLASSNAME);
 	    put("linkText",    enumby.LINKTEXT);
 	    put("xpath",       enumby.XPATH);
+	}};
+
+    private final static HashMap<String, Keys> key_names = new HashMap<String, Keys>() {{
+	    put("ALT",          Keys.ALT);
+	    put("ARROW_DOWN",   Keys.ARROW_DOWN);
+	    put("ARROW_LEFT",   Keys.ARROW_LEFT);
+	    put("ARROW_RIGHT",  Keys.ARROW_RIGHT);
+	    put("ARROW_UP",     Keys.ARROW_UP);
+	    put("BACKSPACE",    Keys.BACK_SPACE);
+	    put("COMMAND",      Keys.COMMAND);
+	    put("CONTROL",      Keys.CONTROL);
+	    put("DELETE",       Keys.DELETE);
+	    put("END",          Keys.END);
+	    put("ENTER",        Keys.ENTER);
+	    put("ESCAPE",       Keys.ESCAPE);
+	    put("HOME",         Keys.HOME);
+	    put("INSERT",       Keys.INSERT);
+	    put("META",         Keys.META);
+	    put("NULL",         Keys.NULL);
+	    put("PAGE_DOWN",    Keys.PAGE_DOWN);
+	    put("PAGE_UP",      Keys.PAGE_UP);
+	    put("TAB",          Keys.TAB);
 	}};
 
     private static void takeScreenshot(String pathname) {
@@ -494,24 +518,11 @@ public class SimpleTester {
 	String str = curr_line.substring(currPos, index2);
 	currPos = index2;
 
-	if(str.equals("BACKSPACE"))
-	    return Keys.BACK_SPACE;
-	else if(str.equals("DELETE"))
-	    return Keys.DELETE;
-	else if(str.equals("END"))
-	    return Keys.END;
-	else if(str.equals("ENTER"))
-	    return Keys.ENTER;
-	else if(str.equals("ESCAPE"))
-	    return Keys.ESCAPE;
-	else if(str.equals("HOME"))
-	    return Keys.HOME;
-	else if(str.equals("INSERT"))
-	    return Keys.INSERT;
-	else if(str.equals("TAB"))
-	    return Keys.TAB;
-	else
+	Keys ret = key_names.get(str);
+	if(ret == null) {
 	    throw new ParsingException("Expected a KEY, got \""+str+"\"");
+	}
+	return ret;
     }
 
     private static ArrayList<By> readSel(boolean neg) throws ParsingException {
@@ -1092,9 +1103,13 @@ public class SimpleTester {
 	return true;
     }
 
+    private static void printUsage() {
+	System.out.println("Usage: ./run.sh [-e FILENAME] [-f PATH] [-h] [-p] [-b [firefox|chrome|safari|edge]] [-r HEIGHTxWIDTH] <configfile> <URL> <script>");
+    }
+
     public static void main(String[] args) {
 	if(args.length < 3) {
-	    System.out.println("Usage: ./run.sh [-e FILENAME][-h] [-p] [-b [firefox|chrome|safari|edge]] [-r HEIGHTxWIDTH] <configfile> <URL> <script>");
+	    printUsage();
 	    System.exit(1);
 	}
 	enumDriver edrive = enumDriver.CHROME;
@@ -1103,6 +1118,9 @@ public class SimpleTester {
 	boolean stay_open = false;
 	boolean screenshot_p = false;
 	Path screenshot_path = Paths.get("ERROR");
+	boolean binary_p = false;
+	boolean dev_mode = false;
+	Path binary_path = null;
 	int resolution_x = 0, resolution_y = 0;
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
@@ -1110,12 +1128,22 @@ public class SimpleTester {
 		isMac = true;
 	    }
 	}
-	while(args[argi].charAt(0) == '-' && args[argi].length() == 2) {
+	while(argi < args.length && args[argi].charAt(0) == '-' && args[argi].length() == 2) {
 	    switch(args[argi].charAt(1)) {
+	    case 'd':
+		dev_mode = true;
+		argi++;
+		break;
 	    case 'e':
 		argi++;
 		screenshot_p = true;
 		screenshot_path = Paths.get(args[argi]);
+		argi++;
+		break;
+	    case 'f':
+		argi++;
+		binary_p = true;
+		binary_path = Paths.get(args[argi]);
 		argi++;
 		break;
 	    case 'h':
@@ -1159,6 +1187,10 @@ public class SimpleTester {
 		argi++;
 		break;
 	    }
+	}
+	if(argi >= args.length) {
+	    printUsage();
+	    System.exit(1);
 	}
 
 	String cfgfile = args[argi];
@@ -1207,6 +1239,12 @@ public class SimpleTester {
 		    if(headless) {
 			options.addArguments("--headless=new");
 		    }
+		    if(binary_p) {
+			options.setBinary(binary_path.toString());
+		    }
+		    if(dev_mode) {
+			options.addArguments("--auto-open-devtools-for-tabs");
+		    }
 		    curr_driver = new ChromeDriver(options);
 		}
 		break;
@@ -1220,7 +1258,10 @@ public class SimpleTester {
 			options.addArguments("--height="+resolution_y);
 		    }
 		    if(headless) {
-			options.addArguments("-headless");
+			options.addArguments("--headless");
+		    }
+		    if(binary_p) {
+			options.setBinary(binary_path);
 		    }
 		    curr_driver = new FirefoxDriver(options);
 		}
@@ -1235,7 +1276,20 @@ public class SimpleTester {
 		}				     
 		break;
 	    case EDGE:
-		curr_driver = new EdgeDriver();
+		{
+		    isEdge = true;
+		    EdgeOptions options = new EdgeOptions();
+		    if(resolution_x > 0 && resolution_y > 0) {
+			options.addArguments("--window-size="+resolution_x+","+resolution_y);
+		    }
+		    if(headless) {
+			options.addArguments("--headless=new");
+		    }
+		    if(binary_p) {
+			options.setBinary(binary_path.toString());
+		    }
+		    curr_driver = new EdgeDriver();
+		}
 		break;
 	    default:
 		System.out.println("Unsupported driver");

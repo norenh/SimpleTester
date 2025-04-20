@@ -1,3 +1,5 @@
+DEFINE recv "Received!"
+
 message id "message"
 textbox name "my-text"
 pwdbox xpath "//input[@name='my-password']"
