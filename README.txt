@@ -16,7 +16,7 @@ to automate data-entries.
 The requirements to build is:
 
 Java (unknown version, should work with JDK 17 for latest selenium)
-Selenium Webdriver 4.29.0 (change stenv.sh to set intended version)
+Selenium Webdriver 4.29.0 (change stenv.cfg to set intended version)
 Linux terminal to use the included script files (write your own for windows)
 
 You can download the selenium webdriver from the webpage 

@@ -1,7 +1,8 @@
-. stenv.sh
+#!/bin/bash
+source stenv.cfg
 
 if [ -z ${JAVA_HOME} ]; then
-  java -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:selenium-java-${SELENIUM_VERSION}/lib/*:." SimpleTester "$@"
+  java -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:." SimpleTester "$@"
 else
-  ${JAVA_HOME}/bin/java -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:selenium-java-${SELENIUM_VERSION}/lib/*:." SimpleTester "$@"
+  ${JAVA_HOME}/bin/java -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:." SimpleTester "$@"
 fi

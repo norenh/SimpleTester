@@ -1,7 +1,8 @@
-. stenv.sh
+#!/bin/bash
+source stenv.cfg
 
 if [ -z ${JAVA_HOME} ]; then
-  javac -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:selenium-java-${SELENIUM_VERSION}/lib/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+  javac -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
 else
-  ${JAVA_HOME}/bin/javac -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*:selenium-java-${SELENIUM_VERSION}/lib/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+  ${JAVA_HOME}/bin/javac -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
 fi
