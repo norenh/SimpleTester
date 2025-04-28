@@ -1121,6 +1121,9 @@ public class SimpleTester {
 	boolean binary_p = false;
 	boolean dev_mode = false;
 	Path binary_path = null;
+	boolean debug_connect = true;
+	String debug_connect_address = "";
+
 	int resolution_x = 0, resolution_y = 0;
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
@@ -1130,6 +1133,28 @@ public class SimpleTester {
 	}
 	while(argi < args.length && args[argi].charAt(0) == '-' && args[argi].length() == 2) {
 	    switch(args[argi].charAt(1)) {
+	    case 'b':
+		argi++;
+		if(args[argi].equals("firefox"))
+		    edrive = enumDriver.FIREFOX;
+		else if(args[argi].equals("chrome"))
+		    edrive = enumDriver.CHROME;
+		else if(args[argi].equals("safari"))
+		    edrive = enumDriver.SAFARI;
+		else if(args[argi].equals("edge"))
+		    edrive = enumDriver.EDGE;
+		else {
+		    System.out.println("Unsupported driver: "+args[argi]);
+		    System.exit(1);
+		}
+		argi++;
+		break;
+	    case 'c':
+		debug_connect = true;
+		argi++;
+		debug_connect_address = args[argi];
+		argi++;
+		break;
 	    case 'd':
 		dev_mode = true;
 		argi++;
@@ -1154,22 +1179,6 @@ public class SimpleTester {
 	    case 'p':
 		if(!headless) {
 		    stay_open = true;
-		}
-		argi++;
-		break;
-	    case 'b':
-		argi++;
-		if(args[argi].equals("firefox"))
-		    edrive = enumDriver.FIREFOX;
-		else if(args[argi].equals("chrome"))
-		    edrive = enumDriver.CHROME;
-		else if(args[argi].equals("safari"))
-		    edrive = enumDriver.SAFARI;
-		else if(args[argi].equals("edge"))
-		    edrive = enumDriver.EDGE;
-		else {
-		    System.out.println("Unsupported driver: "+args[argi]);
-		    System.exit(1);
 		}
 		argi++;
 		break;
@@ -1249,6 +1258,9 @@ public class SimpleTester {
 		    if(dev_mode) {
 			options.addArguments("--auto-open-devtools-for-tabs");
 		    }
+		    if(debug_connect) {
+			options.setExperimentalOption("debuggerAddress", debug_connect_address);
+		    }
 		    curr_driver = new ChromeDriver(options);
 		}
 		break;
@@ -1267,12 +1279,32 @@ public class SimpleTester {
 		    if(binary_p) {
 			options.setBinary(binary_path);
 		    }
+		    if(debug_connect) {
+			System.out.println("WARN: remote debug (-c) not supported with FIREFOX");
+		    }
+		    if(dev_mode) {
+			System.out.println("WARN: devel mode (-d) not supported with FIREFOX");
+		    }
+
 		    curr_driver = new FirefoxDriver(options);
 		}
 		break;
 	    case SAFARI:
 		{
 		    isSafari = true;
+		    if(headless) {
+			System.out.println("WARN: headless mode (-h) not supported with SAFARI");
+		    }
+		    if(binary_p) {
+			System.out.println("WARN: setBinary (-b) not supported with SAFARI");
+		    }
+		    if(debug_connect) {
+			System.out.println("WARN: remote debug (-c) not supported with SAFARI");
+		    }
+		    if(dev_mode) {
+			System.out.println("WARN: devel mode (-d) not supported with SAFARI");
+		    }
+
 		    curr_driver = new SafariDriver();
 		    if(resolution_x > 0 && resolution_y > 0) {
 			curr_driver.manage().window().setSize(new Dimension(resolution_x, resolution_y));
@@ -1292,6 +1324,13 @@ public class SimpleTester {
 		    if(binary_p) {
 			options.setBinary(binary_path.toString());
 		    }
+		    if(debug_connect) {
+			System.out.println("WARN: remote debug (-c) not supported with EDGE");
+		    }
+		    if(dev_mode) {
+			System.out.println("WARN: devel mode (-d) not supported with EDGE");
+		    }
+
 		    curr_driver = new EdgeDriver(options);
 		}
 		break;
