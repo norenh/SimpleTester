@@ -74,6 +74,11 @@ public class SimpleTester {
     private static int linenr = 0;
     private static int lastDelta = 0;
     private static String curr_line = "";
+    /** line_history is a ring-list and contains current_line
+	size needs to be one more than amount of lines you want to keep **/
+    private static String line_history[];
+    private static int line_history_position = 0;
+
     private enum EnumStmt {
 	ASSERT,
 	ASSERTATR,
@@ -1086,6 +1091,10 @@ public class SimpleTester {
 		    curr_line = buffer.readLine();
 		    continue;
 		}
+		if(!novalidate && line_history != null) {
+		    line_history[line_history_position] = curr_line;
+		    line_history_position = (line_history_position+1) % line_history.length;
+		}
 		if(!runStatement(novalidate)) {
 		    return false;
 		}
@@ -1108,10 +1117,12 @@ public class SimpleTester {
     }
 
     public static void main(String[] args) {
+
 	if(args.length < 3) {
 	    printUsage();
 	    System.exit(1);
 	}
+
 	enumDriver edrive = enumDriver.CHROME;
 	int argi = 0;
 	boolean headless = false;
@@ -1121,16 +1132,18 @@ public class SimpleTester {
 	boolean binary_p = false;
 	boolean dev_mode = false;
 	Path binary_path = null;
-	boolean debug_connect = true;
+	boolean debug_connect = false;
 	String debug_connect_address = "";
-
 	int resolution_x = 0, resolution_y = 0;
+
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 	    if((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
 		isMac = true;
 	    }
 	}
+
+	/** Parse optional arguments **/
 	while(argi < args.length && args[argi].charAt(0) == '-' && args[argi].length() == 2) {
 	    switch(args[argi].charAt(1)) {
 	    case 'b':
@@ -1194,6 +1207,10 @@ public class SimpleTester {
 		    System.exit(1);
 		}
 		argi++;
+		break;
+	    case 'v':
+		argi++;
+		line_history = new String[8];
 		break;
 	    }
 	}
@@ -1354,11 +1371,23 @@ public class SimpleTester {
 		sfile = args[script_nr+argi+1];
 		script_file = new FileReader(sfile);
 		if(!parseScript(false)) {
-		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
 		    if(screenshot_p)
 			takeScreenshot(screenshot_path.toString()+".png");
 		    else
 			takeScreenshot(sfile+".png");
+
+		    /** print out history if we have one **/
+		    if(line_history != null) {
+			for(int i=0;i<line_history.length-1;i++) {
+			    if(line_history[line_history_position] == null)
+				continue;
+			    System.out.println("FAIL: Previous: "+
+					       line_history[line_history_position]);
+			    line_history_position = (line_history_position+1) % line_history.length;
+			}
+		    }
+		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
+				       nr_of_scripts+")"+":"+linenr+":"+curr_line);
 		    script_file.close();
 		    if(!stay_open || headless) {
 			curr_driver.quit();
@@ -1366,15 +1395,18 @@ public class SimpleTester {
 		    System.exit(1);
 		}
 		script_file.close();
-		System.out.println("INFO: SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
+		System.out.println("INFO: SUCCESS: "+sfile+" ("+script_nr+
+				   "/"+nr_of_scripts+")");
 	    }
 	    script_nr--;
-	    System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")");
+	    System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+
+			       nr_of_scripts+")");
 	}
 	catch(Exception e) {
 	    //e.printStackTrace(System.out);
 	    System.out.println(e.toString());
-	    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+nr_of_scripts+")"+":"+linenr+":"+curr_line);
+	    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
+			       nr_of_scripts+")"+":"+linenr+":"+curr_line);
 	    System.exit(2);
 	}
 	if(!stay_open || headless) {
