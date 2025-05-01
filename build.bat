@@ -6,3 +6,7 @@ IF DEFINED JAVA_HOME (
 ) ELSE (
   javac -cp "slf4j-nop.jar;selenium-java-%SELENIUM_VERSION%\*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
 )
+
+jar cf SimpleTester.jar SimpleTester*.class
+del *.class
+
