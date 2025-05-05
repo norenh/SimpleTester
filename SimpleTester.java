@@ -1379,12 +1379,12 @@ public class SimpleTester {
 		    /** print out history if we have one **/
 		    if(line_history != null) {
 			for(int i=0;i<line_history.length-1;i++) {
-			    if(line_history[line_history_position] == null) {
-				line_history_position = (line_history_position+1) % line_history.length;
-				continue;
+			    // skip null-entries - in case we bail out too early
+			    // to have them populated with strings
+			    if(line_history[line_history_position] != null) {
+				System.out.println("FAIL: Previous: "+
+						   line_history[line_history_position]);
 			    }
-			    System.out.println("FAIL: Previous: "+
-					       line_history[line_history_position]);
 			    line_history_position = (line_history_position+1) % line_history.length;
 			}
 		    }
