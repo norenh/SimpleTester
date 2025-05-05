@@ -54,7 +54,7 @@ import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathExpressionException;
 
 public class SimpleTester {
-    
+
     private final static HashMap<String, ArrayList<By>> selectors = new HashMap<String, ArrayList<By>>();
     private final static HashMap<String, String> defines = new HashMap<String, String>();
     private static WebDriver curr_driver;
@@ -129,7 +129,7 @@ public class SimpleTester {
 	SAFARI,
 	UNDEFINED;
     }
-    
+
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
 	    put("assert",    stmt.ASSERT);
 	    put("assertatr", stmt.ASSERTATR);
@@ -211,7 +211,7 @@ public class SimpleTester {
 	    Thread.sleep(x);
 	} catch(InterruptedException e) {}
     }
-    
+
     private static boolean parseConfig() {
 	BufferedReader buffer = new BufferedReader(config_file);
 	linenr = 0;
@@ -537,7 +537,7 @@ public class SimpleTester {
 	int index2 = curr_line.indexOf(' ', currPos);
 	if(index2 == -1)
 	    index2 = curr_line.length();
-	
+
 	String selector = curr_line.substring(currPos, index2);
 	currPos = index2;
 	if(selector.charAt(0) == '!') {
@@ -591,8 +591,8 @@ public class SimpleTester {
 	    return false;
 	throw new ParsingException("Not true or false");
     }
-    
-    
+
+
     private static boolean runStatement(boolean novalidate) {
 	ArrayList<By> list = null;
 	String s1;
@@ -1326,7 +1326,7 @@ public class SimpleTester {
 		    if(resolution_x > 0 && resolution_y > 0) {
 			curr_driver.manage().window().setSize(new Dimension(resolution_x, resolution_y));
 		    }
-		}				     
+		}
 		break;
 	    case EDGE:
 		{
@@ -1379,8 +1379,10 @@ public class SimpleTester {
 		    /** print out history if we have one **/
 		    if(line_history != null) {
 			for(int i=0;i<line_history.length-1;i++) {
-			    if(line_history[line_history_position] == null)
+			    if(line_history[line_history_position] == null) {
+				line_history_position = (line_history_position+1) % line_history.length;
 				continue;
+			    }
 			    System.out.println("FAIL: Previous: "+
 					       line_history[line_history_position]);
 			    line_history_position = (line_history_position+1) % line_history.length;
