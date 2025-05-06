@@ -74,9 +74,10 @@ public class SimpleTester {
     private static int linenr = 0;
     private static int lastDelta = 0;
     private static String curr_line = "";
-    /** line_history is a ring-list and contains current_line
-	size needs to be one more than amount of lines you want to keep **/
+    /** line_history is a ring-list and contains curr_line history.
+	null means it is not used, null-entries are not yet populated **/
     private static String line_history[];
+    /** pointer to the current position in the ring-list **/
     private static int line_history_position = 0;
 
     private enum EnumStmt {
@@ -221,7 +222,8 @@ public class SimpleTester {
 		linenr++;
 		curr_line = curr_line.trim();
 		//System.out.println(curr_line);
-		if(curr_line.length() == 0 || (curr_line.length() > 0 && curr_line.charAt(0) == '#')) {
+		if(curr_line.length() == 0 ||
+		   (curr_line.length() > 0 && curr_line.charAt(0) == '#')) {
 		    curr_line = buffer.readLine();
 		    continue;
 		}
@@ -259,7 +261,8 @@ public class SimpleTester {
 			String by_string = curr_line.substring(index1+1, index2);
 			EnumBy ret = by_names.get(by_string);
 			if(ret == null) {
-			    System.out.println("ERROR: \""+by_string+"\" not a valid Locator");
+			    System.out.println("ERROR: \""+by_string+
+					       "\" not a valid Locator");
 			    return false;
 			}
 			index1 = index2+1;
@@ -1087,16 +1090,18 @@ public class SimpleTester {
 		//System.out.println(linenr+":"+curr_line + " " + curr_line.trim().length());
 
 		curr_line = curr_line.trim();
-		if(curr_line.length() == 0 || (curr_line.length() > 0 && curr_line.charAt(0) == '#')) {
+		if(curr_line.length() == 0 ||
+		   (curr_line.length() > 0 && curr_line.charAt(0) == '#')) {
 		    curr_line = buffer.readLine();
 		    continue;
 		}
-		if(!novalidate && line_history != null) {
-		    line_history[line_history_position] = curr_line;
-		    line_history_position = (line_history_position+1) % line_history.length;
-		}
 		if(!runStatement(novalidate)) {
 		    return false;
+		}
+		// populate the history ring buffer with current line
+		else if(!novalidate && line_history != null) {
+		    line_history[line_history_position] = curr_line;
+		    line_history_position = (line_history_position+1) % line_history.length;
 		}
 		curr_line = buffer.readLine();
 	    }
@@ -1144,7 +1149,9 @@ public class SimpleTester {
 	}
 
 	/** Parse optional arguments **/
-	while(argi < args.length && args[argi].charAt(0) == '-' && args[argi].length() == 2) {
+	while(argi < args.length &&
+	      args[argi].charAt(0) == '-' &&
+	      args[argi].length() == 2) {
 	    switch(args[argi].charAt(1)) {
 	    case 'b':
 		argi++;
@@ -1235,7 +1242,8 @@ public class SimpleTester {
 	    config_file = new FileReader(cfgfile);
 	    
 	    if(!parseConfig()) {
-		System.out.println("FAIL: Unable to parse config file "+cfgfile+":"+linenr+":"+curr_line);
+		System.out.println("FAIL: Unable to parse config file "+
+				   cfgfile+":"+linenr+":"+curr_line);
 		System.exit(2);
 	    }
 	    config_file.close();
@@ -1247,7 +1255,8 @@ public class SimpleTester {
 		script_file = new FileReader(sfile);
 
 		if(!parseScript(true)) {
-		    System.out.println("FAIL: Unable to parse script file "+sfile+":"+linenr+":"+curr_line);
+		    System.out.println("FAIL: Unable to parse script file "+
+				       sfile+":"+linenr+":"+curr_line);
 		    System.exit(2);
 		}
 		script_file.close();
@@ -1264,7 +1273,8 @@ public class SimpleTester {
 		    isChrome = true;
 		    ChromeOptions options = new ChromeOptions();
 		    if(resolution_x > 0 && resolution_y > 0) {
-			options.addArguments("--window-size="+resolution_x+","+resolution_y);
+			options.addArguments("--window-size="+resolution_x+
+					     ","+resolution_y);
 		    }
 		    if(headless) {
 			options.addArguments("--headless=new");
@@ -1333,7 +1343,8 @@ public class SimpleTester {
 		    isEdge = true;
 		    EdgeOptions options = new EdgeOptions();
 		    if(resolution_x > 0 && resolution_y > 0) {
-			options.addArguments("--window-size="+resolution_x+","+resolution_y);
+			options.addArguments("--window-size="+resolution_x+
+					     ","+resolution_y);
 		    }
 		    if(headless) {
 			options.addArguments("--headless=new");
@@ -1378,9 +1389,8 @@ public class SimpleTester {
 
 		    /** print out history if we have one **/
 		    if(line_history != null) {
-			for(int i=0;i<line_history.length-1;i++) {
-			    // skip null-entries - in case we bail out too early
-			    // to have them populated with strings
+			for(int i=0;i<line_history.length;i++) {
+			    // skip null-entries in case we bail out too early
 			    if(line_history[line_history_position] != null) {
 				System.out.println("FAIL: Previous: "+
 						   line_history[line_history_position]);
