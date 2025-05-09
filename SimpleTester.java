@@ -21,7 +21,7 @@ import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.remote.NoSuchDriverException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -745,7 +745,7 @@ public class SimpleTester {
 		    }
 		    curr_element.click();
 		}
-		catch(ElementClickInterceptedException e) {
+		catch(ElementNotInteractableException e) {
 		    retry_click = true;
 		}
 		catch(WebDriverException e) {
@@ -760,7 +760,7 @@ public class SimpleTester {
 		    try {
 			curr_element.click();
 		    }
-		    catch(ElementClickInterceptedException e) {
+		    catch(ElementNotInteractableException e) {
 			System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
 			System.out.println("ERROR: "+e.getMessage());
 			return false;
@@ -935,7 +935,7 @@ public class SimpleTester {
 		    try {
 			curr_element.click();
 		    }
-		    catch(ElementClickInterceptedException e) {
+		    catch(ElementNotInteractableException e) {
 			System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
 			System.out.println("ERROR: "+e.getMessage());
 			return false;
