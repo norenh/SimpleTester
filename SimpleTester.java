@@ -89,6 +89,8 @@ public class SimpleTester {
 	ASSERTSEL,
 	ASSERTTXT,
 	CLICK,
+	CLICKFOR,
+	CLICKFORCE,
 	DRAWBOX,
 	DWAITFOR,
 	FINISH,
@@ -108,6 +110,7 @@ public class SimpleTester {
 	WAIT,
 	WAITFOR,
 	WAITFORATR,
+	WAITFORCSS,
 	WAITFORENABLED,
 	WAITFORPRO,
 	WAITFORTXT;
@@ -140,6 +143,8 @@ public class SimpleTester {
 	    put("assertsel", stmt.ASSERTSEL);
 	    put("asserttxt", stmt.ASSERTTXT);
 	    put("click",     stmt.CLICK);
+	    put("clickfor",  stmt.CLICKFOR);
+	    put("clickforce",stmt.CLICKFORCE);
 	    put("drawbox",   stmt.DRAWBOX);
 	    put("dwaitfor",  stmt.DWAITFOR);
 	    put("print",     stmt.PRINT);
@@ -158,8 +163,9 @@ public class SimpleTester {
 	    put("wait",      stmt.WAIT);
 	    put("waitfor",   stmt.WAITFOR);
 	    put("waitforatr",stmt.WAITFORATR);
-	    put("waitforpro",stmt.WAITFORPRO);
+	    put("waitforcss",stmt.WAITFORCSS);
 	    put("waitforenabled",stmt.WAITFORENABLED);
+	    put("waitforpro",stmt.WAITFORPRO);
 	    put("waitfortxt",stmt.WAITFORTXT);
 	    put("finish",    stmt.FINISH);
 	}};
@@ -595,6 +601,37 @@ public class SimpleTester {
 	throw new ParsingException("Not true or false");
     }
 
+    private static boolean tryClick() {
+	boolean retry_click = false;
+	try {
+	    if(!curr_element.isDisplayed()) {
+		js.executeScript("arguments[0].scrollIntoView();", curr_element);
+	    }
+	    curr_element.click();
+	}
+	catch(ElementNotInteractableException e) {
+	    retry_click = true;
+	}
+	catch(WebDriverException e) {
+	    if(isSafari)
+		retry_click = true;
+	    else
+		throw e;
+	}
+	if(retry_click) {
+	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
+	    sleep(70);
+	    try {
+		curr_element.click();
+	    }
+	    catch(ElementNotInteractableException e) {
+		//System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
+		//System.out.println("ERROR: "+e.getMessage());
+		return false;
+	    }
+	}
+	return true;
+    }
 
     private static boolean runStatement(boolean novalidate) {
 	ArrayList<By> list = null;
@@ -738,36 +775,46 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
-		boolean retry_click = false;
-		try {
-		    if(!curr_element.isDisplayed()) {
-			js.executeScript("arguments[0].scrollIntoView();", curr_element);
-		    }
-		    curr_element.click();
-		}
-		catch(ElementNotInteractableException e) {
-		    retry_click = true;
-		}
-		catch(WebDriverException e) {
-		    if(isSafari)
-			retry_click = true;
-		    else
-			throw e;
-		}
-		if(retry_click) {
-		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-		    sleep(20);
-		    try {
-			curr_element.click();
-		    }
-		    catch(ElementNotInteractableException e) {
-			System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
-			System.out.println("ERROR: "+e.getMessage());
-			return false;
-		    }
-		}
 		//System.out.println(curr_element.toString());
+		return tryClick();
+	    case CLICKFOR:
+		list = readSel(false);
+		{
+		    ArrayList<By> untilList = readSel(true);
+		    if(novalidate)
+			return true;
+		    for(int i=0;i<100;i++) {
+			try {
+			    findElement(untilList);
+			    if(!notSel)
+				return true;
+			}
+			catch(NoSuchElementException e) {
+			    if(notSel)
+				return true;
+			}
+			findElement(list);
+			tryClick();
+			sleep(200);
+		    }
+		}
 		return true;
+	    case CLICKFORCE:
+		list = readSel(false);
+		if(novalidate)
+		    return true;
+		findElement(list);
+
+		if(tryClick()) {
+		    return true;
+		}
+		for(int i=0;i<100;i++) {
+		    sleep(200);
+		    if(tryClick()) {
+			return true;
+		    }
+		}
+		return false;
 	    case DRAWBOX:
 		list = readSel(false);
 	        x = readInt();
@@ -1011,6 +1058,31 @@ public class SimpleTester {
 			return true;
 		    sleep(200);
 		}
+		return false;
+	    case WAITFORCSS:
+		list = readSel(false);
+		s1 = readString();
+		sor = new StrOrRegex();
+		if(novalidate)
+		    return true;
+		ret = null; // compiler not smart enough to see it always is initalised
+		for(int i=0; i<100; i++) {
+		    findElement(list);
+		    ret = curr_element.getCssValue(s1);
+		    if(ret == null)
+			continue;
+		    if(!sor.matches(ret)) {
+			if(sor.matches(ret.strip())) {
+			    System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    return true;
+			}
+		    }
+		    else {
+			return true;
+		    }
+		    sleep(200);
+		}
+		System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 		return false;
 	    case WAITFORENABLED:
 		list = readSel(true);
