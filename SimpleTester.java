@@ -627,7 +627,16 @@ public class SimpleTester {
 	    catch(ElementNotInteractableException e) {
 		//System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
 		//System.out.println("ERROR: "+e.getMessage());
+		System.out.println("WARN: Click failed with "+e.getClass().getCanonicalName());
 		return false;
+	    }
+	    catch(WebDriverException e) {
+		if(isSafari) {
+		    System.out.println("WARN: Click failed with "+e.getClass().getCanonicalName());
+		    return false;
+		}
+		else
+		    throw e;
 	    }
 	}
 	return true;
