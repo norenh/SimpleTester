@@ -336,7 +336,8 @@ public class SimpleTester {
 
     private static void findElement(ArrayList<By> s) {
 	curr_element = curr_driver.findElement(s.get(0));
-	for (int i = 1; i < s.size(); i++) {
+	int size = s.size();
+	for (int i = 1; i < size; i++) {
 	    if(curr_element == null)
 		return;
 	    curr_element = curr_element.findElement(s.get(i));
@@ -1470,7 +1471,8 @@ public class SimpleTester {
 
 		    /** print out history if we have one **/
 		    if(line_history != null) {
-			for(int i=0;i<line_history.length;i++) {
+			int lineHistoryLength = line_history.length;
+			for(int i=0;i<lineHistoryLength;i++) {
 			    // skip null-entries in case we bail out too early
 			    if(line_history[line_history_position] != null) {
 				System.out.println("FAIL: Previous: "+
