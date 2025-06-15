@@ -1062,10 +1062,15 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		for(int i=0;i<100;i++) {
-		    findElement(list);
-		    ret = curr_element.getDomAttribute(s1);
-		    if(ret != null && ret.equals(s2))
-			return true;
+		    try {
+			findElement(list);
+			ret = curr_element.getDomAttribute(s1);
+			if(ret != null && ret.equals(s2))
+			    return true;
+		    }
+		    catch(NoSuchElementException e) {
+			// keep on looking...
+		    }
 		    sleep(200);
 		}
 		return false;
@@ -1077,18 +1082,23 @@ public class SimpleTester {
 		    return true;
 		ret = null; // compiler not smart enough to see it always is initalised
 		for(int i=0; i<100; i++) {
-		    findElement(list);
-		    ret = curr_element.getCssValue(s1);
-		    if(ret == null)
-			continue;
-		    if(!sor.matches(ret)) {
-			if(sor.matches(ret.strip())) {
-			    System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+		    try {
+			findElement(list);
+			ret = curr_element.getCssValue(s1);
+			if(ret == null)
+			    continue;
+			if(!sor.matches(ret)) {
+			    if(sor.matches(ret.strip())) {
+				System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+				return true;
+			    }
+			}
+			else {
 			    return true;
 			}
 		    }
-		    else {
-			return true;
+		    catch(NoSuchElementException e) {
+			// keep on looking...
 		    }
 		    sleep(200);
 		}
@@ -1125,10 +1135,15 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		for(int i=0;i<100;i++) {
-		    findElement(list);
-		    ret = curr_element.getDomProperty(s1);
-		    if(ret != null && ret.equals(s2))
-			return true;
+		    try {
+			findElement(list);
+			ret = curr_element.getDomProperty(s1);
+			if(ret != null && ret.equals(s2))
+			    return true;
+		    }
+		    catch(NoSuchElementException e) {
+			// keep on looking...
+		    }
 		    sleep(200);
 		}
 		return false;
@@ -1138,14 +1153,19 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		for(int i=0;i<100;i++) {
-		    findElement(list);
-		    ret = curr_element.getText();
-		    if(sor.matches(ret)) {
-			return true;
+		    try {
+			findElement(list);
+			ret = curr_element.getText();
+			if(sor.matches(ret)) {
+			    return true;
+			}
+			else if(sor.matches(ret.strip())) {
+			    System.out.println("WARN: WAITFORTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    return true;
+			}
 		    }
-		    else if(sor.matches(ret.strip())) {
-			System.out.println("WARN: WAITFORTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
-			return true;
+		    catch(NoSuchElementException e) {
+			// keep on looking...
 		    }
 		    sleep(200);
 		}
