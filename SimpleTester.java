@@ -97,6 +97,7 @@ public class SimpleTester {
 	PRINT,
 	PRINTATR,
 	PRINTCSS,
+	PRINTJS,
 	PRINTPRO,
 	PRINTTIME,
 	PRINTTXT,
@@ -150,6 +151,7 @@ public class SimpleTester {
 	    put("print",     stmt.PRINT);
 	    put("printatr",  stmt.PRINTATR);
 	    put("printcss",  stmt.PRINTCSS);
+	    put("printjs",   stmt.PRINTJS);
 	    put("printpro",  stmt.PRINTPRO);
 	    put("printtime", stmt.PRINTTIME);
 	    put("printtxt",  stmt.PRINTTXT);
@@ -909,6 +911,16 @@ public class SimpleTester {
 		ret = curr_element.getCssValue(s1);
 		System.out.println("PRINTCSS:"+linenr+":\""+ret+"\"");
 		return true;
+	    case PRINTJS:
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		Object o = js.executeScript(s1);
+		if(String.class.isInstance(o))       { ret = (String)o; }
+		else if(o == null)                   { ret = "NULL"; }
+		else                                 { ret = o.toString(); }
+		System.out.println("PRINTJS:"+linenr+":\""+ret+"\"");
+		return true;
 	    case PRINTPRO:
 		list = readSel(false);
 		s1 = readString();
@@ -1321,6 +1333,9 @@ public class SimpleTester {
 		argi++;
 		line_history = new String[8];
 		break;
+	    default:
+		System.out.println("Unknown argument: "+args[argi]);
+		System.exit(1);
 	    }
 	}
 	if(argi >= args.length) {
