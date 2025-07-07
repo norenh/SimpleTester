@@ -1268,6 +1268,7 @@ public class SimpleTester {
 	boolean debug_connect = false;
 	String debug_connect_address = "";
 	int resolution_x = 0, resolution_y = 0;
+	ArrayList<String> scripts = null;
 
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
@@ -1347,16 +1348,42 @@ public class SimpleTester {
 		argi++;
 		line_history = new String[8];
 		break;
+	    case 's':
+		argi++;
+		try {
+		    FileReader scripts_file = new FileReader(args[argi]);
+		    BufferedReader buffer = new BufferedReader(scripts_file);
+		    String f = buffer.readLine();
+		    scripts = new ArrayList<String>();
+		    while(f != null) {
+			f = f.trim();
+			scripts.add(f);
+			f = buffer.readLine();
+		    }
+		}
+		catch(Exception e) {
+		    System.out.println("FAIL: Unable to open file "+e.toString());
+		    System.exit(1);
+		}
+		argi++;
+		break;
 	    default:
 		System.out.println("Unknown argument: "+args[argi]);
 		System.exit(1);
 	    }
 	}
-	if(argi >= args.length) {
+	if(scripts == null) {
+	    scripts = new ArrayList<String>();
+	    for(int i=argi+2; i < args.length; i++) {
+		scripts.add(args[i]);
+	    }
+	}
+	else if(argi >= args.length-1) {
+	    // No scripts file and we have passed argument length
 	    printUsage();
 	    System.exit(1);
 	}
-
+	int nr_of_scripts = scripts.size();
 	String cfgfile = args[argi];
 	String url = args[argi+1];
 	String sfile = "";
@@ -1380,8 +1407,8 @@ public class SimpleTester {
 	    config_file.close();
 	    
 	    // read in and parse script files
-	    for(int i=argi+2; i < args.length; i++) {
-		sfile = args[i];
+	    for(int i=0; i < nr_of_scripts; i++) {
+		sfile = scripts.get(i);
 		System.out.println("INFO: Using Script: "+sfile);
 		script_file = new FileReader(sfile);
 
@@ -1506,11 +1533,10 @@ public class SimpleTester {
 	//String title = curr_driver.getTitle();
 	//System.out.println(title);
 
-	int nr_of_scripts = args.length-argi-2;
 	int script_nr = 1;
 	try {
 	    for(script_nr=1; script_nr <= nr_of_scripts; script_nr++) {
-		sfile = args[script_nr+argi+1];
+		sfile = scripts.get(script_nr-1);
 		script_file = new FileReader(sfile);
 		if(!parseScript(false)) {
 		    if(screenshot_p)
