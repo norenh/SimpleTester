@@ -22,6 +22,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.remote.NoSuchDriverException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -790,6 +791,12 @@ public class SimpleTester {
 		//System.out.println(curr_element.toString());
 		return tryClick();
 	    case CLICKFOR:
+		// This is a tricky one, but used for special cases
+		// Takes two elements, the last one can be negated and
+		// is the state we aim for...
+		// If we find the state (element exists or not),
+		// return early, but otherwise keep trying to click
+		// until state has been reached or time has run out
 		list = readSel(false);
 		{
 		    ArrayList<By> untilList = readSel(true);
@@ -805,11 +812,18 @@ public class SimpleTester {
 			    if(notSel)
 				return true;
 			}
-			findElement(list);
-			tryClick();
+			try {
+			    // if conditions have not been met
+			    // keep trying until time has run out
+			    findElement(list);
+			    tryClick();
+			}
+			catch(NoSuchElementException e) {}
+			catch(StaleElementReferenceException e) {}
 			sleep(200);
 		    }
 		}
+		// we failed to find condition, return true anyway
 		return true;
 	    case CLICKFORCE:
 		list = readSel(false);
