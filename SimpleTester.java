@@ -76,8 +76,8 @@ public class SimpleTester {
     private static int lastDelta = 0;
     private static String curr_line = "";
     /** line_history is a ring-list and contains curr_line history.
-	null means it is not used, null-entries are not yet populated **/
-    private static String line_history[];
+	null-entries are not yet populated **/
+    private static String line_history[] = new String[8];
     /** pointer to the current position in the ring-list **/
     private static int line_history_position = 0;
 
@@ -1227,7 +1227,7 @@ public class SimpleTester {
 		    return false;
 		}
 		// populate the history ring buffer with current line
-		else if(!novalidate && line_history != null) {
+		else if(!novalidate) {
 		    line_history[line_history_position] = curr_line;
 		    line_history_position = (line_history_position+1) % line_history.length;
 		}
@@ -1343,10 +1343,6 @@ public class SimpleTester {
 		    System.exit(1);
 		}
 		argi++;
-		break;
-	    case 'v':
-		argi++;
-		line_history = new String[8];
 		break;
 	    case 's':
 		argi++;
@@ -1549,18 +1545,17 @@ public class SimpleTester {
 		    else
 			takeScreenshot(sfile+".png");
 
-		    /** print out history if we have one **/
-		    if(line_history != null) {
-			int lineHistoryLength = line_history.length;
-			for(int i=0;i<lineHistoryLength;i++) {
-			    // skip null-entries in case we bail out too early
-			    if(line_history[line_history_position] != null) {
-				System.out.println("FAIL: Previous: "+
-						   line_history[line_history_position]);
-			    }
-			    line_history_position = (line_history_position+1) % line_history.length;
+		    /** print out history **/
+		    int lineHistoryLength = line_history.length;
+		    for(int i=0;i<lineHistoryLength;i++) {
+			// skip null-entries in case we bail out too early
+			if(line_history[line_history_position] != null) {
+			    System.out.println("FAIL: Previous: "+
+					       line_history[line_history_position]);
 			}
+			line_history_position = (line_history_position+1) % line_history.length;
 		    }
+
 		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
 				       nr_of_scripts+")"+":"+linenr+":"+curr_line);
 		    script_file.close();
