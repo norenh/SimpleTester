@@ -1353,16 +1353,21 @@ public class SimpleTester {
 		try {
 		    FileReader scripts_file = new FileReader(args[argi]);
 		    BufferedReader buffer = new BufferedReader(scripts_file);
-		    String f = buffer.readLine();
 		    scripts = new ArrayList<String>();
+		    String f = buffer.readLine();
 		    while(f != null) {
 			f = f.trim();
-			scripts.add(f);
+			if(f.length() > 0 && f.charAt(0) != '#')
+			    scripts.add(f);
 			f = buffer.readLine();
 		    }
 		}
 		catch(Exception e) {
 		    System.out.println("FAIL: Unable to open file "+e.toString());
+		    System.exit(1);
+		}
+		if(scripts.size() <= 0) {
+		    System.out.println("No scripts in "+args[argi]);
 		    System.exit(1);
 		}
 		argi++;
