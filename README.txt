@@ -135,10 +135,19 @@ SUCCESS: script.txt (1/1)
 
 #Example FAIL with multiple scripts (here, reusing the same one):
 $ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt script.txt
+INFO: Using Driver: CHROME
 INFO: Using Config config.txt
 INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
 INFO: Using Script: script.txt
 INFO: Using Script: script.txt
 INFO: SUCCESS: script.txt (1/2)
+FAIL: Previous: settoggle defcheckbox "false"
+FAIL: Previous: scrollto submitButton
+FAIL: Previous: click submitButton
+FAIL: Previous: waitfor !dropdown
+FAIL: Previous: waitfor message
+FAIL: Previous: asserttxt message _recv
+FAIL: Previous: assertatr message "class" "lead"
+FAIL: Previous: assertcss message "font-size" "20px"
 FAIL: script.txt (2/2):1:waitfor dropdown
 
