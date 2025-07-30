@@ -1264,6 +1264,7 @@ public class SimpleTester {
 	Path screenshot_path = Paths.get("ERROR");
 	boolean binary_p = false;
 	boolean dev_mode = false;
+	boolean dry_run = false;
 	Path binary_path = null;
 	boolean debug_connect = false;
 	String debug_connect_address = "";
@@ -1368,6 +1369,10 @@ public class SimpleTester {
 		}
 		argi++;
 		break;
+	    case 't':
+		dry_run = true;
+		argi++;
+		break;
 	    default:
 		System.out.println("Unknown argument: "+args[argi]);
 		System.exit(1);
@@ -1424,6 +1429,11 @@ public class SimpleTester {
 	catch(Exception e) {
 	    System.out.println("FAIL: Unable to open file "+e.toString());
 	    System.exit(2);
+	}
+	if(dry_run) {
+	    System.out.println("SUCCESS: Dry run succeeded. "+
+			       "Ignoring extra arguments");
+	    System.exit(0);
 	}
 	try {
 	    switch(edrive) {
