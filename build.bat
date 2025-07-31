@@ -2,11 +2,15 @@
 FOR /F "delims=" %%x IN (stenv.cfg) DO (SET "%%x")
 
 IF DEFINED JAVA_HOME (
-  %JAVA_HOME%\bin\javac -cp "slf4j-nop.jar;selenium-java-%SELENIUM_VERSION%\*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+  set JAVAC="%JAVA_HOME%\bin\javac"
+  set JAVAP="%JAVA_HOME%\bin\jar"
 ) ELSE (
-  javac -cp "slf4j-nop.jar;selenium-java-%SELENIUM_VERSION%\*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+  set JAVAC="javac"
+  set JAVAP="jar"
 )
 
-jar cf SimpleTester.jar SimpleTester*.class
+%JAVAC% -cp "slf4j-nop.jar;selenium-java-%SELENIUM_VERSION%\*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+
+%JAVAP% cf SimpleTester.jar SimpleTester*.class
 del *.class
 
