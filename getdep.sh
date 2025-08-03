@@ -1,7 +1,6 @@
 #!/bin/bash
 source stenv.cfg
 
-set +x
 LIBDIR="selenium-java-${SELENIUM_VERSION}"
 
 if [ -d "${LIBDIR}" ]; then
