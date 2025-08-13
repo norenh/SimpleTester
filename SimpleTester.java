@@ -670,7 +670,7 @@ public class SimpleTester {
 		    if(!notSel)
 			return true;
 		}
-		catch(NoSuchElementException e) {
+		catch(StaleElementReferenceException|NoSuchElementException e) {
 		    if(notSel)
 			return true;
 		}
@@ -808,7 +808,7 @@ public class SimpleTester {
 			    if(!notSel)
 				return true;
 			}
-			catch(NoSuchElementException e) {
+			catch(StaleElementReferenceException|NoSuchElementException e) {
 			    if(notSel)
 				return true;
 			}
@@ -818,8 +818,7 @@ public class SimpleTester {
 			    findElement(list);
 			    tryClick();
 			}
-			catch(NoSuchElementException e) {}
-			catch(StaleElementReferenceException e) {}
+			catch(StaleElementReferenceException|NoSuchElementException e) {}
 			sleep(200);
 		    }
 		}
@@ -891,7 +890,7 @@ public class SimpleTester {
 			if(!notSel)
 			    return true;
 		    }
-		    catch(NoSuchElementException e) {
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			if(notSel)
 			    return true;
 		    }
@@ -1074,7 +1073,7 @@ public class SimpleTester {
 			if(!notSel)
 			    return true;
 		    }
-		    catch(NoSuchElementException e) {
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			if(notSel)
 			    return true;
 		    }
@@ -1094,7 +1093,7 @@ public class SimpleTester {
 			if(ret != null && ret.equals(s2))
 			    return true;
 		    }
-		    catch(NoSuchElementException e) {
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
 		    sleep(200);
@@ -1123,7 +1122,7 @@ public class SimpleTester {
 			    return true;
 			}
 		    }
-		    catch(NoSuchElementException e) {
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
 		    sleep(200);
@@ -1147,7 +1146,7 @@ public class SimpleTester {
 				return true;
 			}
 		    }
-		    catch(NoSuchElementException e) {
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			if(notSel)
 			    return true;
 		    }
@@ -1167,7 +1166,7 @@ public class SimpleTester {
 			if(ret != null && ret.equals(s2))
 			    return true;
 		    }
-		    catch(NoSuchElementException e) {
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
 		    sleep(200);
@@ -1190,7 +1189,7 @@ public class SimpleTester {
 			    return true;
 			}
 		    }
-		    catch(NoSuchElementException e) {
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
 		    sleep(200);
