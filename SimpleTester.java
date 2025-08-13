@@ -1280,8 +1280,8 @@ public class SimpleTester {
 
 	/** Parse optional arguments **/
 	while(argi < args.length &&
-	      args[argi].charAt(0) == '-' &&
-	      args[argi].length() == 2) {
+	      args[argi].length() == 2 &&
+	      args[argi].charAt(0) == '-') {
 	    switch(args[argi].charAt(1)) {
 	    case 'b':
 		argi++;
@@ -1394,12 +1394,12 @@ public class SimpleTester {
 	String url = args[argi+1];
 	String sfile = "";
 
-	System.out.println("INFO: Using Driver: "+edrive);
+	System.out.println("INFO: Using Driver: '"+edrive+"'");
 	if(binary_p) {
-	    System.out.println("INFO: Browser Path: "+binary_path.toString());
+	    System.out.println("INFO: Browser Path: '"+binary_path.toString()+"'");
 	}
-	System.out.println("INFO: Using Config "+cfgfile);
-	System.out.println("INFO: Using URL: "+url);
+	System.out.println("INFO: Using Config: '"+cfgfile+"'");
+	System.out.println("INFO: Using URL: '"+url+"'");
 
 	try {
 	    // read in and parse config file
@@ -1415,7 +1415,7 @@ public class SimpleTester {
 	    // read in and parse script files
 	    for(int i=0; i < nr_of_scripts; i++) {
 		sfile = scripts.get(i);
-		System.out.println("INFO: Using Script: "+sfile);
+		System.out.println("INFO: Using Script: '"+sfile+"'");
 		script_file = new FileReader(sfile);
 
 		if(!parseScript(true)) {
