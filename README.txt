@@ -16,7 +16,7 @@ to automate data-entries.
 The requirements to build is:
 
 Java (unknown version, should work with JDK 17 for latest selenium)
-Selenium Webdriver 4.29.0 (change stenv.cfg to set intended version)
+Selenium Webdriver 4.35.0 (change stenv.cfg to set intended version)
 Linux terminal to use the included script files (write your own for windows)
 
 You can download the selenium webdriver from the webpage 
@@ -26,13 +26,15 @@ or use the included getdep.sh-script to grab and remove the included src-files
 Build the program with "build.sh" (or the content of it, adapted for your OS)
 Run it with "run.sh"
 
-Arguments supported are:
+Arguments supported are (not all are valid for all browsers):
 
  -e filename used for screenshot if script fails
- -h for running in headless mode (only firefox and chrome supported)
+ -h for running in headless mode (only firefox and chrome and edge supported)
  -p for browser window persistance after script finishes. In headless mode, does nothing
  -b [firefox|chrome|safari|edge] sets the browser to use
+ -f path to browser (only needed if not in path, safari not supported)
  -r [HEIGHTxWIDTH] sets initial browser size to height x width, example "-r 1600x1200"
+ -t test run only, only checks config, scripts and some arguments in a dry run
 
 The config-file should have the following structure:
 ELEMENTNAME [[id|name|cssSelector|tagName|className|linkTest|xpath] "string"]+
@@ -55,6 +57,7 @@ dwaitfor INTEGER [!]ELEMENTNAME
 print "text"
 printatr ELEMENTNAME "attribute"
 printcss ELEMENTNAME "property"
+printjs "text"
 printpro ELEMENTNAME "property" (Warning! use printpro for properties)
 printtime
 printtxt ELEMENTNAME
@@ -88,6 +91,7 @@ dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
 print - print string
 printatr - print result of getAttribute on "attribute" of element
 printcss - print result of getCssValue on "property" of element
+printjs - executes the text-line as js in context and tries to print the returned result
 printpro - print result of getDomProperty on "property" of element
 printtime - print out a current timestamp
 printtxt - print out value of getText() on element
@@ -127,19 +131,20 @@ asserttxt message "Received!"
 assertatr message "class" "lead"
 assertcss message "font-size" "20px"
 $ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt
-INFO: Using Config config.txt
-INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
-INFO: Using Script: script.txt
+INFO: Using Driver: 'CHROME'
+INFO: Using Config: 'config.txt'
+INFO: Using URL: 'https://www.selenium.dev/selenium/web/web-form.html'
+INFO: Using Script: 'script.txt'
 INFO: SUCCESS: script.txt (1/1)
 SUCCESS: script.txt (1/1)
 
 #Example FAIL with multiple scripts (here, reusing the same one):
 $ ./run.sh config.txt https://www.selenium.dev/selenium/web/web-form.html script.txt script.txt
-INFO: Using Driver: CHROME
-INFO: Using Config config.txt
-INFO: Using URL: https://www.selenium.dev/selenium/web/web-form.html
-INFO: Using Script: script.txt
-INFO: Using Script: script.txt
+INFO: Using Driver: 'CHROME'
+INFO: Using Config: 'config.txt'
+INFO: Using URL: 'https://www.selenium.dev/selenium/web/web-form.html'
+INFO: Using Script: 'script.txt'
+INFO: Using Script: 'script.txt'
 INFO: SUCCESS: script.txt (1/2)
 FAIL: Previous: settoggle defcheckbox "false"
 FAIL: Previous: scrollto submitButton
@@ -150,4 +155,5 @@ FAIL: Previous: asserttxt message _recv
 FAIL: Previous: assertatr message "class" "lead"
 FAIL: Previous: assertcss message "font-size" "20px"
 FAIL: script.txt (2/2):1:waitfor dropdown
+
 
