@@ -58,6 +58,10 @@ public class SimpleTester {
 
     private final static HashMap<String, ArrayList<By>> selectors = new HashMap<String, ArrayList<By>>();
     private final static HashMap<String, String> defines = new HashMap<String, String>();
+    // RETRY_TIMES*RETRY_INTERVAL=longest wait before giving up
+    // Example 100*200 = 20 seconds, trying every 200 ms (5 times per second, 100 times = 20s)
+    private final static int RETRY_INTERVAL = 200; // retry actions after 200ms
+    private final static int RETRY_TIMES = 100; // retry 100 times
     private static WebDriver curr_driver;
     private static JavascriptExecutor js;
     private static ArrayList<By> curr_by_list;
@@ -624,7 +628,7 @@ public class SimpleTester {
 	}
 	if(retry_click) {
 	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-	    sleep(70);
+	    sleep(70); // wait 70ms for scrolling to take effect, just an arbitrary amount of time
 	    try {
 		curr_element.click();
 	    }
@@ -802,7 +806,7 @@ public class SimpleTester {
 		    ArrayList<By> untilList = readSel(true);
 		    if(novalidate)
 			return true;
-		    for(int i=0;i<100;i++) {
+		    for(int i=0;i<RETRY_TIMES;i++) {
 			try {
 			    findElement(untilList);
 			    if(!notSel)
@@ -819,7 +823,7 @@ public class SimpleTester {
 			    tryClick();
 			}
 			catch(StaleElementReferenceException|NoSuchElementException e) {}
-			sleep(200);
+			sleep(RETRY_INTERVAL);
 		    }
 		}
 		// we failed to find condition, return true anyway
@@ -833,8 +837,8 @@ public class SimpleTester {
 		if(tryClick()) {
 		    return true;
 		}
-		for(int i=0;i<100;i++) {
-		    sleep(200);
+		for(int i=0;i<RETRY_TIMES;i++) {
+		    sleep(RETRY_INTERVAL);
 		    if(tryClick()) {
 			return true;
 		    }
@@ -884,7 +888,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 
-		for(int i=0; i<100; i++) {
+		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
 			findElement(list);
 			if(!notSel)
@@ -894,7 +898,7 @@ public class SimpleTester {
 			if(notSel)
 			    return true;
 		    }
-		    sleep(200); // try every 200ms for 20s
+		    sleep(RETRY_INTERVAL); // try every 200ms for 20s
 		}
 		return false;
 	    case FINISH:
@@ -1067,7 +1071,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 
-		for(int i=0; i<100; i++) {
+		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
 			findElement(list);
 			if(!notSel)
@@ -1077,7 +1081,7 @@ public class SimpleTester {
 			if(notSel)
 			    return true;
 		    }
-		    sleep(200); // try every 200ms for 20s
+		    sleep(RETRY_INTERVAL); // try every 200ms for 20s
 		}
 		return false;
 	    case WAITFORATR:
@@ -1086,7 +1090,7 @@ public class SimpleTester {
 		s2 = readString();
 		if(novalidate)
 		    return true;
-		for(int i=0;i<100;i++) {
+		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
 			findElement(list);
 			ret = curr_element.getDomAttribute(s1);
@@ -1096,7 +1100,7 @@ public class SimpleTester {
 		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
-		    sleep(200);
+		    sleep(RETRY_INTERVAL);
 		}
 		return false;
 	    case WAITFORCSS:
@@ -1106,7 +1110,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		ret = null; // compiler not smart enough to see it always is initalised
-		for(int i=0; i<100; i++) {
+		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
 			findElement(list);
 			ret = curr_element.getCssValue(s1);
@@ -1125,7 +1129,7 @@ public class SimpleTester {
 		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
-		    sleep(200);
+		    sleep(RETRY_INTERVAL);
 		}
 		System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 		return false;
@@ -1134,7 +1138,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 
-		for(int i=0; i<100; i++) {
+		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
 			findElement(list);
 			if(curr_element.isEnabled()) {
@@ -1150,7 +1154,7 @@ public class SimpleTester {
 			if(notSel)
 			    return true;
 		    }
-		    sleep(200); // try every 200ms for 20s
+		    sleep(RETRY_INTERVAL); // try every 200ms for 20s
 		}
 		return false;
 	    case WAITFORPRO:
@@ -1159,7 +1163,7 @@ public class SimpleTester {
 		s2 = readString();
 		if(novalidate)
 		    return true;
-		for(int i=0;i<100;i++) {
+		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
 			findElement(list);
 			ret = curr_element.getDomProperty(s1);
@@ -1169,7 +1173,7 @@ public class SimpleTester {
 		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
-		    sleep(200);
+		    sleep(RETRY_INTERVAL);
 		}
 		return false;
 	    case WAITFORTXT:
@@ -1177,7 +1181,7 @@ public class SimpleTester {
 		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
-		for(int i=0;i<100;i++) {
+		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
 			findElement(list);
 			ret = curr_element.getText();
@@ -1192,7 +1196,7 @@ public class SimpleTester {
 		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			// keep on looking...
 		    }
-		    sleep(200);
+		    sleep(RETRY_INTERVAL);
 		}
 		return false;
 	    default:
