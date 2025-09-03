@@ -76,9 +76,12 @@ public class SimpleTester {
     private static boolean isFirefox = false;
     private static boolean isChrome = false;
     private static boolean isEdge = false;
+    private static boolean printTime = false;
     private static int linenr = 0;
     private static int lastDelta = 0;
+    private static long totalTimeTaken = 0;
     private static String curr_line = "";
+    private static String sfile = "";
     /** line_history is a ring-list and contains curr_line history.
 	null-entries are not yet populated **/
     private static String line_history[] = new String[8];
@@ -1211,6 +1214,9 @@ public class SimpleTester {
 
     
     private static boolean parseScript(boolean novalidate) {
+	long startTimeStamp = System.currentTimeMillis();
+	long stopTimeStamp = 0;
+	boolean ret = true;
 	script_done = false;
 	BufferedReader buffer = new BufferedReader(script_file);
 	linenr = 0;
@@ -1227,7 +1233,9 @@ public class SimpleTester {
 		    continue;
 		}
 		if(!runStatement(novalidate)) {
-		    return false;
+		    ret = false;
+		    script_done = true;
+		    continue;
 		}
 		// populate the history ring buffer with current line
 		else if(!novalidate) {
@@ -1238,14 +1246,21 @@ public class SimpleTester {
 	    }
 	}
 	catch(NoSuchElementException e) {
-	    return false;
+	    ret = false;
 	}
 	catch(Exception e) {
 	    //e.printStackTrace(System.out);
 	    System.out.println("ERROR: "+e.toString());
-	    return false;
+	    ret = false;
 	}
-	return true;
+	if(printTime && !novalidate) {
+	    stopTimeStamp = System.currentTimeMillis();
+	    long tmp = stopTimeStamp - startTimeStamp;
+	    totalTimeTaken += tmp;
+	    long secondsTaken = (long) Math.round(tmp / 1000.0);
+	    System.out.println("INFO: TIME: "+sfile+": "+secondsTaken+"s");
+	}
+	return ret;
     }
 
     private static void printUsage() {
@@ -1329,6 +1344,10 @@ public class SimpleTester {
 		stay_open = false;
 		argi++;
 		break;
+	    case 'o':
+		printTime = true;
+		argi++;
+		break;
 	    case 'p':
 		if(!headless) {
 		    stay_open = true;
@@ -1395,7 +1414,6 @@ public class SimpleTester {
 	int nr_of_scripts = scripts.size();
 	String cfgfile = args[argi];
 	String url = args[argi+1];
-	String sfile = "";
 
 	System.out.println("INFO: Using Driver: '"+edrive+"'");
 	if(binary_p) {
@@ -1568,7 +1586,10 @@ public class SimpleTester {
 			}
 			line_history_position = (line_history_position+1) % line_history.length;
 		    }
-
+		    if(printTime) {
+			long secondsTaken = (long) Math.round(totalTimeTaken / 1000.0);
+			System.out.println("INFO: TIMETOTAL: "+secondsTaken + "s");
+		    }
 		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
 				       nr_of_scripts+")"+":"+linenr+":"+curr_line);
 		    script_file.close();
@@ -1582,6 +1603,10 @@ public class SimpleTester {
 				   "/"+nr_of_scripts+")");
 	    }
 	    script_nr--;
+	    if(printTime) {
+		long secondsTaken = (long) Math.round(totalTimeTaken / 1000.0);
+		System.out.println("INFO: TIMETOTAL: "+secondsTaken + "s");
+	    }
 	    System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+
 			       nr_of_scripts+")");
 	}
