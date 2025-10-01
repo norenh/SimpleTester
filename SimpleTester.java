@@ -12,6 +12,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -1281,9 +1282,11 @@ public class SimpleTester {
 	boolean screenshot_p = false;
 	Path screenshot_path = Paths.get("ERROR");
 	boolean binary_p = false;
+	boolean local_driver_p = false;
 	boolean dev_mode = false;
 	boolean dry_run = false;
 	Path binary_path = null;
+	Path local_driver_path = null;
 	boolean debug_connect = false;
 	String debug_connect_address = "";
 	int resolution_x = 0, resolution_y = 0;
@@ -1395,6 +1398,12 @@ public class SimpleTester {
 		dry_run = true;
 		argi++;
 		break;
+	    case 'z':
+		argi++;
+		local_driver_p = true;
+		local_driver_path = Paths.get(args[argi]);
+		argi++;
+		break;
 	    default:
 		System.out.println("Unknown argument: "+args[argi]);
 		System.exit(1);
@@ -1478,7 +1487,13 @@ public class SimpleTester {
 		    if(debug_connect) {
 			options.setExperimentalOption("debuggerAddress", debug_connect_address);
 		    }
-		    curr_driver = new ChromeDriver(options);
+		    if(local_driver_p) {
+			ChromeDriverService service = new ChromeDriverService.Builder().usingDriverExecutable(local_driver_path.toFile()).build();
+			curr_driver = new ChromeDriver(service,options);
+		    }
+		    else {
+			curr_driver = new ChromeDriver(options);
+		    }
 		}
 		break;
 	    case FIREFOX:
