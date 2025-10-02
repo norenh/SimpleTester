@@ -1265,7 +1265,25 @@ public class SimpleTester {
     }
 
     private static void printUsage() {
-	System.out.println("Usage: ./run.sh [-e FILENAME] [-f PATH] [-h] [-p] [-b [firefox|chrome|safari|edge]] [-r HEIGHTxWIDTH] <configfile> <URL> <script>");
+	System.out.println("Usage: ./run.sh [-b firefox|chrome|safari|edge] [-e FILE] [-f FILE] [-h] [-p] [-r HEIGHTxWIDTH] [-s FILE] [-t] <configfile> <URL> <script>");
+	System.out.println("configfile and URL must be last (if using -s) or before the list of scripts to run");
+	System.out.println("");
+	System.out.println("Arguments:");
+	System.out.println("-b BROWSER  browser to use. Supported are firefox, chrome, safari and edge");
+	System.out.println("-e FILE     filename used for screenshot if script fails");
+	System.out.println("-f FILE     path to browser binary, if not default");
+	System.out.println("-h          running in headless mode (all but safari");
+	System.out.println("-p          persist browser after finish run (all but safari)");
+	System.out.println("-r HxW      resolution to start with");
+	System.out.println("-s FILE     use script file instead of reading scripts from arguments");
+	System.out.println("-t          test run only, validates config and scripts");
+	System.out.println("");
+	System.out.println("Expermintal/Browser specific arguments:");
+	System.out.println("-c ADDR     try connect to ADDR as debuggeradress (experimental, chrome only)");
+	System.out.println("-d          try open browser with dev-tools on (experimental, chrome only)");
+	System.out.println("-o          print timestamps from run, subject for change!");
+	System.out.println("-z FILE     use local webdriver instead of seleniums (experimental, chrome only)");
+	System.out.println("");
     }
 
     public static void main(String[] args) {
