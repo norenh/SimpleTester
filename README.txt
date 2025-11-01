@@ -61,6 +61,7 @@ printjs "text"
 printpro ELEMENTNAME "property" (Warning! use printpro for properties)
 printtime
 printtxt ELEMENTNAME
+refresh
 screenshot "text"
 scrollto ELEMENTNAME
 select ELEMENTNAME "dropdownoption"
@@ -95,6 +96,7 @@ printjs - executes the text-line as js in context and tries to print the returne
 printpro - print result of getDomProperty on "property" of element
 printtime - print out a current timestamp
 printtxt - print out value of getText() on element
+refresh - refreshes the page
 screenshot - takes a screenshot, saves it with filename "text"
 scrollto - scroll so element is visible
 select - selects a element in a dropdown

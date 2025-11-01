@@ -110,6 +110,7 @@ public class SimpleTester {
 	PRINTPRO,
 	PRINTTIME,
 	PRINTTXT,
+	REFRESH,
 	SCREENSHOT,
 	SCROLLTO,
 	SELECT,
@@ -164,6 +165,7 @@ public class SimpleTester {
 	    put("printpro",  stmt.PRINTPRO);
 	    put("printtime", stmt.PRINTTIME);
 	    put("printtxt",  stmt.PRINTTXT);
+	    put("refresh",   stmt.REFRESH);
 	    put("screenshot",stmt.SCREENSHOT);
 	    put("scrollto",  stmt.SCROLLTO);
 	    put("select",    stmt.SELECT);
@@ -204,6 +206,18 @@ public class SimpleTester {
 	    put("END",          Keys.END);
 	    put("ENTER",        Keys.ENTER);
 	    put("ESCAPE",       Keys.ESCAPE);
+	    put("F1",           Keys.F1);
+	    put("F2",           Keys.F2);
+	    put("F3",           Keys.F3);
+	    put("F4",           Keys.F4);
+	    put("F5",           Keys.F5);
+	    put("F6",           Keys.F6);
+	    put("F7",           Keys.F7);
+	    put("F8",           Keys.F8);
+	    put("F9",           Keys.F9);
+	    put("F10",          Keys.F10);
+	    put("F11",          Keys.F11);
+	    put("F12",          Keys.F12);
 	    put("HOME",         Keys.HOME);
 	    put("INSERT",       Keys.INSERT);
 	    put("META",         Keys.META);
@@ -963,6 +977,9 @@ public class SimpleTester {
 		findElement(list);
 		ret = curr_element.getText();
 		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
+		return true;
+	    case REFRESH:
+		curr_driver.navigate().refresh();
 		return true;
 	    case SCREENSHOT:
 		s1 = readString();
