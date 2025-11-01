@@ -15,9 +15,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariDriverService;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverService;
+import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriverException;
@@ -1299,7 +1303,7 @@ public class SimpleTester {
 	System.out.println("-c ADDR     try connect to ADDR as debuggeradress (experimental, chrome only)");
 	System.out.println("-d          try open browser with dev-tools on (experimental, chrome only)");
 	System.out.println("-o          print timestamps from run, subject for change!");
-	System.out.println("-z FILE     use local webdriver instead of seleniums (experimental, chrome only)");
+	System.out.println("-z FILE     use local webdriver instead of seleniums");
 	System.out.println("");
     }
 
@@ -1552,8 +1556,13 @@ public class SimpleTester {
 		    if(dev_mode) {
 			System.out.println("WARN: devel mode (-d) not supported with FIREFOX");
 		    }
-
-		    curr_driver = new FirefoxDriver(options);
+		    if(local_driver_p) {
+			FirefoxDriverService service = new GeckoDriverService.Builder().usingDriverExecutable(local_driver_path.toFile()).build();
+			curr_driver = new FirefoxDriver(service,options);
+		    }
+		    else {
+			curr_driver = new FirefoxDriver(options);
+		    }
 		}
 		break;
 	    case SAFARI:
@@ -1571,8 +1580,14 @@ public class SimpleTester {
 		    if(dev_mode) {
 			System.out.println("WARN: devel mode (-d) not supported with SAFARI");
 		    }
+		    if(local_driver_p) {
+			SafariDriverService service = new SafariDriverService.Builder().usingDriverExecutable(local_driver_path.toFile()).build();
+			curr_driver = new SafariDriver(service);
+		    }
+		    else {
+			curr_driver = new SafariDriver();
+		    }
 
-		    curr_driver = new SafariDriver();
 		    if(resolution_x > 0 && resolution_y > 0) {
 			curr_driver.manage().window().setSize(new Dimension(resolution_x, resolution_y));
 		    }
@@ -1598,8 +1613,13 @@ public class SimpleTester {
 		    if(dev_mode) {
 			System.out.println("WARN: devel mode (-d) not supported with EDGE");
 		    }
-
-		    curr_driver = new EdgeDriver(options);
+		    if(local_driver_p) {
+			EdgeDriverService service = new EdgeDriverService.Builder().usingDriverExecutable(local_driver_path.toFile()).build();
+			curr_driver = new EdgeDriver(service,options);
+		    }
+		    else {
+			curr_driver = new EdgeDriver(options);
+		    }
 		}
 		break;
 	    default:
