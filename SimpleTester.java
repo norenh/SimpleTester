@@ -64,9 +64,9 @@ public class SimpleTester {
     private final static HashMap<String, ArrayList<By>> selectors = new HashMap<String, ArrayList<By>>();
     private final static HashMap<String, String> defines = new HashMap<String, String>();
     // RETRY_TIMES*RETRY_INTERVAL=longest wait before giving up
-    // Example 100*200 = 20 seconds, trying every 200 ms (5 times per second, 100 times = 20s)
-    private final static int RETRY_INTERVAL = 200; // retry actions after 200ms
-    private final static int RETRY_TIMES = 100; // retry 100 times
+    // Example 200*100 = 20 seconds, trying every 100 ms (10 times per second, 200 times = 20s)
+    private final static int RETRY_INTERVAL = 100; // retry actions after 100ms
+    private final static int RETRY_TIMES = 200; // retry 200 times
     private static WebDriver curr_driver;
     private static JavascriptExecutor js;
     private static ArrayList<By> curr_by_list;
@@ -777,7 +777,7 @@ public class SimpleTester {
 			System.out.println("WARN: ASSERTPRO got \""+ret+"\", expected \""+s2+"\"");
 			return true;
 		    }
-		    // Workaround for Safari returning true for attributes with a empty value
+		    // Workaround for Safari returning true for properties with a empty value
 		    if(isSafari && s2.equals("") && ret.equals("true"))
 			return true;
 
@@ -921,7 +921,7 @@ public class SimpleTester {
 			if(notSel)
 			    return true;
 		    }
-		    sleep(RETRY_INTERVAL); // try every 200ms for 20s
+		    sleep(RETRY_INTERVAL);
 		}
 		return false;
 	    case FINISH:
@@ -1072,6 +1072,7 @@ public class SimpleTester {
 		    curr_element.clear();
 		    String tmp = curr_element.getDomProperty("value");
 		    if(tmp != null) {
+			int l=tmp.length();
 			for(int i=0;i<l;i++)
 			    curr_element.sendKeys(Keys.BACK_SPACE);
 		    }
@@ -1115,7 +1116,7 @@ public class SimpleTester {
 			if(notSel)
 			    return true;
 		    }
-		    sleep(RETRY_INTERVAL); // try every 200ms for 20s
+		    sleep(RETRY_INTERVAL);
 		}
 		return false;
 	    case WAITFORATR:
@@ -1188,7 +1189,7 @@ public class SimpleTester {
 			if(notSel)
 			    return true;
 		    }
-		    sleep(RETRY_INTERVAL); // try every 200ms for 20s
+		    sleep(RETRY_INTERVAL);
 		}
 		return false;
 	    case WAITFORPRO:

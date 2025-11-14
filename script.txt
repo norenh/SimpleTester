@@ -1,7 +1,8 @@
 waitfor dropdown
 select dropdown "One"
 type textbox "my-text"
-type pwdbox "hello"
+type pwdbox "hallo"
+typeclr pwdbox "hello"
 assertsel checkcheckbox "true"
 assertsel defcheckbox "false"
 scrollto checkcheckbox
