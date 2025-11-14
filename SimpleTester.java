@@ -82,6 +82,7 @@ public class SimpleTester {
     private static boolean isChrome = false;
     private static boolean isEdge = false;
     private static boolean printTime = false;
+    private static boolean quirkMode = true;
     private static int linenr = 0;
     private static int lastDelta = 0;
     private static long totalTimeTaken = 0;
@@ -1067,7 +1068,15 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
-		if(isMac) {
+		if(quirkMode) {
+		    curr_element.clear();
+		    String tmp = curr_element.getDomProperty("value");
+		    if(tmp != null) {
+			for(int i=0;i<l;i++)
+			    curr_element.sendKeys(Keys.BACK_SPACE);
+		    }
+		}
+		else if(isMac) {
 		    curr_element.sendKeys(Keys.COMMAND + "a");
 		    curr_element.sendKeys(Keys.BACK_SPACE);
 		}
@@ -1303,6 +1312,7 @@ public class SimpleTester {
 	System.out.println("-c ADDR     try connect to ADDR as debuggeradress (experimental, chrome only)");
 	System.out.println("-d          try open browser with dev-tools on (experimental, chrome only)");
 	System.out.println("-o          print timestamps from run, subject for change!");
+	System.out.println("-q          quirk mode, currently only uses alternative typeclr method");
 	System.out.println("-z FILE     use local webdriver instead of seleniums");
 	System.out.println("");
     }
@@ -1394,6 +1404,10 @@ public class SimpleTester {
 		if(!headless) {
 		    stay_open = true;
 		}
+		argi++;
+		break;
+	    case 'q':
+		quirkMode = true;
 		argi++;
 		break;
 	    case 'r':
