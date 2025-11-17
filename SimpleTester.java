@@ -82,7 +82,7 @@ public class SimpleTester {
     private static boolean isChrome = false;
     private static boolean isEdge = false;
     private static boolean printTime = false;
-    private static boolean quirkMode = true;
+    private static boolean quirkMode = false;
     private static int linenr = 0;
     private static int lastDelta = 0;
     private static long totalTimeTaken = 0;
