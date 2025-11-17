@@ -893,13 +893,13 @@ public class SimpleTester {
 
 		    painter.moveToLocation(topLeftX+x, topLeftY+x)
 			.clickAndHold()
+			.moveByOffset(width-x,0)
+			.moveByOffset(0,height-x)
+			.moveByOffset(-width+x,0)
+			.moveByOffset(0,-height+x)
+			.moveByOffset(width-x,height-x)
+			.release()
 			.perform();
-		    painter.moveByOffset(width-x,0).perform();
-		    painter.moveByOffset(0,height-x).perform();
-		    painter.moveByOffset(-width+x,0).perform();
-		    painter.moveByOffset(0,-height+x).perform();
-		    painter.moveByOffset(width-x,height-x).perform();
-		    painter.release().perform();
 		}
 		return true;
 	    case DWAITFOR:
