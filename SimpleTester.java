@@ -76,13 +76,13 @@ public class SimpleTester {
     private static boolean script_done = false;
     private static EnumStmt stmt;
     private static EnumBy enumby;
-    private static boolean isMac = false;
     private static boolean isSafari = false;
     private static boolean isFirefox = false;
     private static boolean isChrome = false;
     private static boolean isEdge = false;
     private static boolean printTime = false;
-    private static boolean quirkMode = false;
+    private static EnumClear clearMode;
+    private static boolean inputQuirk = false;
     private static int linenr = 0;
     private static int lastDelta = 0;
     private static long totalTimeTaken = 0;
@@ -93,6 +93,12 @@ public class SimpleTester {
     private static String line_history[] = new String[8];
     /** pointer to the current position in the ring-list **/
     private static int line_history_position = 0;
+
+    private enum EnumClear {
+	DEFAULT,
+	MAC,
+	QUIRK;
+    }
 
     private enum EnumStmt {
 	ASSERT,
@@ -673,6 +679,17 @@ public class SimpleTester {
 	return true;
     }
 
+    private static void tryType(String str) {
+	if(!inputQuirk) {
+	    curr_element.sendKeys(str);
+	}
+	else {
+	    for(int i=0;i<str.length();i++) {
+		curr_element.sendKeys(""+str.charAt(i));
+	    }
+	}
+    }
+
     private static boolean runStatement(boolean novalidate) {
 	ArrayList<By> list = null;
 	String s1;
@@ -1060,7 +1077,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
-		curr_element.sendKeys(s1);
+		tryType(s1);
 		return true;
 	    case TYPECLR:
 		list = readSel(false);
@@ -1068,24 +1085,28 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
-		if(quirkMode) {
-		    curr_element.clear();
-		    String tmp = curr_element.getDomProperty("value");
-		    if(tmp != null) {
-			int l=tmp.length();
-			for(int i=0;i<l;i++)
-			    curr_element.sendKeys(Keys.BACK_SPACE);
-		    }
-		}
-		else if(isMac) {
-		    curr_element.sendKeys(Keys.COMMAND + "a");
-		    curr_element.sendKeys(Keys.BACK_SPACE);
-		}
-		else {
+		switch(clearMode) {
+		case DEFAULT:
 		    curr_element.sendKeys(Keys.CONTROL + "a");
 		    curr_element.sendKeys(Keys.DELETE);
+		    break;
+		case MAC:
+		    curr_element.sendKeys(Keys.COMMAND + "a");
+		    curr_element.sendKeys(Keys.BACK_SPACE);
+		    break;
+		case QUIRK:
+		    {
+			curr_element.clear();
+			String tmp = curr_element.getDomProperty("value");
+			if(tmp != null) {
+			    int l=tmp.length();
+			    for(int i=0;i<l;i++)
+				curr_element.sendKeys(Keys.BACK_SPACE);
+			}
+		    }
+		    break;
 		}
-		curr_element.sendKeys(s1);
+		tryType(s1);
 		return true;
 	    case TYPEKEY:
 		list = readSel(false);
@@ -1093,6 +1114,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
+		// No need for tryType, we only have one char here
 		curr_element.sendKeys(k);
 		return true;
 	    case WAIT:
@@ -1313,9 +1335,24 @@ public class SimpleTester {
 	System.out.println("-c ADDR     try connect to ADDR as debuggeradress (experimental, chrome only)");
 	System.out.println("-d          try open browser with dev-tools on (experimental, chrome only)");
 	System.out.println("-o          print timestamps from run, subject for change!");
-	System.out.println("-q          quirk mode, currently only uses alternative typeclr method");
+	System.out.println("-q INT[,INT]* quirk mode, takes a list of ints for specific quirks");
+	System.out.println("            1 = alt clear method, 2 = alt input method");
 	System.out.println("-z FILE     use local webdriver instead of seleniums");
 	System.out.println("");
+    }
+
+    private static boolean setQuirk(int i) {
+	switch(i) {
+	case 1:
+	    clearMode = clearMode.QUIRK;
+	    break;
+	case 2:
+	    inputQuirk = true;
+	    break;
+	default:
+	    return false;
+	}
+	return true;
     }
 
     public static void main(String[] args) {
@@ -1341,11 +1378,11 @@ public class SimpleTester {
 	String debug_connect_address = "";
 	int resolution_x = 0, resolution_y = 0;
 	ArrayList<String> scripts = null;
-
+	clearMode = clearMode.DEFAULT;
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 	    if((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
-		isMac = true;
+		clearMode = clearMode.MAC;
 	    }
 	}
 
@@ -1408,7 +1445,19 @@ public class SimpleTester {
 		argi++;
 		break;
 	    case 'q':
-		quirkMode = true;
+		argi++;
+		try {
+		    String[] res=args[argi].split(",");
+		    for(int i=0;i<res.length; i++) {
+			if(!setQuirk(Integer.valueOf(res[i]))) {
+			    System.out.println("Unknown Quirk-mode: "+res[i]);
+			    System.exit(1);
+			}
+		    }
+		} catch (NumberFormatException e) {
+		    System.out.println("Invalid Integer in: "+args[argi]);
+		    System.exit(1);
+		}
 		argi++;
 		break;
 	    case 'r':
