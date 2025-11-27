@@ -83,6 +83,8 @@ public class SimpleTester {
     private static boolean printTime = false;
     private static EnumClear clearMode;
     private static boolean inputQuirk = false;
+    private static boolean drawQuirk = false;
+    private static boolean elementCacheOffQuirk= false;
     private static int linenr = 0;
     private static int lastDelta = 0;
     private static long totalTimeTaken = 0;
@@ -93,6 +95,10 @@ public class SimpleTester {
     private static String line_history[] = new String[8];
     /** pointer to the current position in the ring-list **/
     private static int line_history_position = 0;
+
+    private static boolean sameSelector = false;
+    private static String lastSelector = "";
+
 
     private enum EnumClear {
 	DEFAULT,
@@ -371,6 +377,12 @@ public class SimpleTester {
     }
 
     private static void findElement(ArrayList<By> s) {
+	// We may already have the element if it is the same as before
+	// and curr_element is not null
+	if(sameSelector && !elementCacheOffQuirk && curr_element != null)
+	    return;
+
+	curr_element = null;  // invalidate curr_element, in case we exit by exception
 	curr_element = curr_driver.findElement(s.get(0));
 	int size = s.size();
 	for (int i = 1; i < size; i++) {
@@ -577,6 +589,7 @@ public class SimpleTester {
     }
 
     private static ArrayList<By> readSel(boolean neg) throws ParsingException {
+	sameSelector = false;
 	currPos++;
 	if(currPos >= curr_line.length())
 	    throw new ParsingException("Expected ELEMENTNAME");
@@ -596,6 +609,13 @@ public class SimpleTester {
 	}
 	else
 	    notSel = false;
+
+	if(lastSelector.equals(selector)) {
+	    sameSelector = true;
+	}
+	else {
+	    lastSelector = selector;
+	}
 
 	//System.out.println("Selector:"+notSel+":"+selector);
 	ArrayList<By> list = null;
@@ -680,6 +700,10 @@ public class SimpleTester {
     }
 
     private static void tryType(String str) {
+	if(!curr_element.isDisplayed()) {
+	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
+	    sleep(10);
+	}
 	if(!inputQuirk) {
 	    curr_element.sendKeys(str);
 	}
@@ -846,6 +870,15 @@ public class SimpleTester {
 		    ArrayList<By> untilList = readSel(true);
 		    if(novalidate)
 			return true;
+
+		    // Set sameSelector to false to hack around our
+		    // usage of multiple readSel without findElement between
+		    // Avoids the case:
+		    // select t1
+		    // clickfor t2 !t2
+		    // where we would set same, although we have "t1" as curr_element
+		    sameSelector = false;
+
 		    for(int i=0;i<RETRY_TIMES;i++) {
 			try {
 			    findElement(untilList);
@@ -893,6 +926,12 @@ public class SimpleTester {
 		    return true;
 		findElement(list);
 		{
+		    if(drawQuirk) {
+			// in case drawing is not working
+			// try to just click it instead
+			tryClick();
+			return true;
+		    }
 		    // get dimensions of element
 		    Rectangle rect = curr_element.getRect();
 		    int topLeftX = rect.getX();
@@ -1114,6 +1153,10 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElement(list);
+		if(!curr_element.isDisplayed()) {
+		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
+		    sleep(10);
+		}
 		// No need for tryType, we only have one char here
 		curr_element.sendKeys(k);
 		return true;
@@ -1337,6 +1380,7 @@ public class SimpleTester {
 	System.out.println("-o          print timestamps from run, subject for change!");
 	System.out.println("-q INT[,INT]* quirk mode, takes a list of ints for specific quirks");
 	System.out.println("            1 = alt clear method, 2 = alt input method");
+	System.out.println("            3 = alt draw method, 4 = no element cache");
 	System.out.println("-z FILE     use local webdriver instead of seleniums");
 	System.out.println("");
     }
@@ -1348,6 +1392,12 @@ public class SimpleTester {
 	    break;
 	case 2:
 	    inputQuirk = true;
+	    break;
+	case 3:
+	    drawQuirk = true;
+	    break;
+	case 4:
+	    elementCacheOffQuirk = true;
 	    break;
 	default:
 	    return false;
