@@ -377,11 +377,6 @@ public class SimpleTester {
     }
 
     private static void findElement(ArrayList<By> s) {
-	// We may already have the element if it is the same as before
-	// and curr_element is not null
-	if(sameSelector && !elementCacheOffQuirk && curr_element != null)
-	    return;
-
 	curr_element = null;  // invalidate curr_element, in case we exit by exception
 	curr_element = curr_driver.findElement(s.get(0));
 	int size = s.size();
@@ -390,6 +385,14 @@ public class SimpleTester {
 		return;
 	    curr_element = curr_element.findElement(s.get(i));
 	}
+    }
+
+    private static void findElementCached(ArrayList<By> s) {
+	// We may already have the element if it is the same as before
+	// and curr_element is not null
+	if(sameSelector && !elementCacheOffQuirk && curr_element != null)
+	    return;
+	findElement(s);
     }
 
     private static int currPos;
@@ -749,7 +752,7 @@ public class SimpleTester {
 		s2 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getDomAttribute(s1);
 		if(ret == null)
 		    return notStr;
@@ -773,7 +776,7 @@ public class SimpleTester {
 		list = readSel(true);
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 
 		// Element might still be hidden behind other, but this should do for now
 		b = curr_element.isDisplayed() && curr_element.isEnabled();
@@ -788,7 +791,7 @@ public class SimpleTester {
 		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getCssValue(s1);
 		if(ret == null)
 		    return false;
@@ -807,7 +810,7 @@ public class SimpleTester {
 		s2 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getDomProperty(s1);
 		if(ret == null)
 		    return notStr;
@@ -831,14 +834,14 @@ public class SimpleTester {
 		b = readBool();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		return curr_element.isSelected() == b;
 	    case ASSERTTXT:
 		list = readSel(false);
 		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getText();
 		if(ret == null)
 		    return false;
@@ -855,7 +858,7 @@ public class SimpleTester {
 		list = readSel(false);
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		//System.out.println(curr_element.toString());
 		return tryClick();
 	    case CLICKFOR:
@@ -870,14 +873,6 @@ public class SimpleTester {
 		    ArrayList<By> untilList = readSel(true);
 		    if(novalidate)
 			return true;
-
-		    // Set sameSelector to false to hack around our
-		    // usage of multiple readSel without findElement between
-		    // Avoids the case:
-		    // select t1
-		    // clickfor t2 !t2
-		    // where we would set same, although we have "t1" as curr_element
-		    sameSelector = false;
 
 		    for(int i=0;i<RETRY_TIMES;i++) {
 			try {
@@ -905,7 +900,7 @@ public class SimpleTester {
 		list = readSel(false);
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 
 		if(tryClick()) {
 		    return true;
@@ -924,7 +919,7 @@ public class SimpleTester {
 		    return false;
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		{
 		    if(drawQuirk) {
 			// in case drawing is not working
@@ -994,7 +989,7 @@ public class SimpleTester {
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getDomAttribute(s1);
 		System.out.println("PRINTATR:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1003,7 +998,7 @@ public class SimpleTester {
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getCssValue(s1);
 		System.out.println("PRINTCSS:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1022,7 +1017,7 @@ public class SimpleTester {
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getDomProperty(s1);
 		System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1035,7 +1030,7 @@ public class SimpleTester {
 		list = readSel(false);
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		ret = curr_element.getText();
 		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1053,7 +1048,7 @@ public class SimpleTester {
 		list = readSel(false);
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		{
 		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
 		    sleep(10);
@@ -1088,7 +1083,7 @@ public class SimpleTester {
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		Select dropdown = new Select(curr_element);
 		dropdown.selectByVisibleText(s1);
 		return true;
@@ -1098,7 +1093,7 @@ public class SimpleTester {
 		b = readBool();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		if(curr_element.isSelected() != b && curr_element.isEnabled()) {
 		    try {
 			curr_element.click();
@@ -1115,7 +1110,7 @@ public class SimpleTester {
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		tryType(s1);
 		return true;
 	    case TYPECLR:
@@ -1123,7 +1118,7 @@ public class SimpleTester {
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		switch(clearMode) {
 		case DEFAULT:
 		    curr_element.sendKeys(Keys.CONTROL + "a");
@@ -1152,7 +1147,7 @@ public class SimpleTester {
 		Keys k = readKey();
 		if(novalidate)
 		    return true;
-		findElement(list);
+		findElementCached(list);
 		if(!curr_element.isDisplayed()) {
 		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
 		    sleep(10);
