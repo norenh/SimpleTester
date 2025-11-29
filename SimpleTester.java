@@ -163,51 +163,51 @@ public class SimpleTester {
     }
 
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
-	    put("assert",    stmt.ASSERT);
-	    put("assertatr", stmt.ASSERTATR);
-	    put("assertclk", stmt.ASSERTCLK);
-	    put("assertcss", stmt.ASSERTCSS);
-	    put("assertpro", stmt.ASSERTPRO);
-	    put("assertsel", stmt.ASSERTSEL);
-	    put("asserttxt", stmt.ASSERTTXT);
-	    put("click",     stmt.CLICK);
-	    put("clickfor",  stmt.CLICKFOR);
-	    put("clickforce",stmt.CLICKFORCE);
-	    put("drawbox",   stmt.DRAWBOX);
-	    put("dwaitfor",  stmt.DWAITFOR);
-	    put("print",     stmt.PRINT);
-	    put("printatr",  stmt.PRINTATR);
-	    put("printcss",  stmt.PRINTCSS);
-	    put("printjs",   stmt.PRINTJS);
-	    put("printpro",  stmt.PRINTPRO);
-	    put("printtime", stmt.PRINTTIME);
-	    put("printtxt",  stmt.PRINTTXT);
-	    put("refresh",   stmt.REFRESH);
-	    put("screenshot",stmt.SCREENSHOT);
-	    put("scrollto",  stmt.SCROLLTO);
-	    put("select",    stmt.SELECT);
-	    put("settoggle", stmt.SETTOGGLE);
-	    put("type",      stmt.TYPE);
-	    put("typeclr",   stmt.TYPECLR);
-	    put("typekey",   stmt.TYPEKEY);
-	    put("wait",      stmt.WAIT);
-	    put("waitfor",   stmt.WAITFOR);
-	    put("waitforatr",stmt.WAITFORATR);
-	    put("waitforcss",stmt.WAITFORCSS);
-	    put("waitforenabled",stmt.WAITFORENABLED);
-	    put("waitforpro",stmt.WAITFORPRO);
-	    put("waitfortxt",stmt.WAITFORTXT);
-	    put("finish",    stmt.FINISH);
+	    put("assert",    EnumStmt.ASSERT);
+	    put("assertatr", EnumStmt.ASSERTATR);
+	    put("assertclk", EnumStmt.ASSERTCLK);
+	    put("assertcss", EnumStmt.ASSERTCSS);
+	    put("assertpro", EnumStmt.ASSERTPRO);
+	    put("assertsel", EnumStmt.ASSERTSEL);
+	    put("asserttxt", EnumStmt.ASSERTTXT);
+	    put("click",     EnumStmt.CLICK);
+	    put("clickfor",  EnumStmt.CLICKFOR);
+	    put("clickforce",EnumStmt.CLICKFORCE);
+	    put("drawbox",   EnumStmt.DRAWBOX);
+	    put("dwaitfor",  EnumStmt.DWAITFOR);
+	    put("print",     EnumStmt.PRINT);
+	    put("printatr",  EnumStmt.PRINTATR);
+	    put("printcss",  EnumStmt.PRINTCSS);
+	    put("printjs",   EnumStmt.PRINTJS);
+	    put("printpro",  EnumStmt.PRINTPRO);
+	    put("printtime", EnumStmt.PRINTTIME);
+	    put("printtxt",  EnumStmt.PRINTTXT);
+	    put("refresh",   EnumStmt.REFRESH);
+	    put("screenshot",EnumStmt.SCREENSHOT);
+	    put("scrollto",  EnumStmt.SCROLLTO);
+	    put("select",    EnumStmt.SELECT);
+	    put("settoggle", EnumStmt.SETTOGGLE);
+	    put("type",      EnumStmt.TYPE);
+	    put("typeclr",   EnumStmt.TYPECLR);
+	    put("typekey",   EnumStmt.TYPEKEY);
+	    put("wait",      EnumStmt.WAIT);
+	    put("waitfor",   EnumStmt.WAITFOR);
+	    put("waitforatr",EnumStmt.WAITFORATR);
+	    put("waitforcss",EnumStmt.WAITFORCSS);
+	    put("waitforenabled",EnumStmt.WAITFORENABLED);
+	    put("waitforpro",EnumStmt.WAITFORPRO);
+	    put("waitfortxt",EnumStmt.WAITFORTXT);
+	    put("finish",    EnumStmt.FINISH);
 	}};
 
     private final static HashMap<String, EnumBy> by_names = new HashMap<String, EnumBy>() {{
-	    put("id",          enumby.ID);
-	    put("name",        enumby.NAME);
-	    put("cssSelector", enumby.CSSSELECTOR);
-	    put("tagName",     enumby.TAGNAME);
-	    put("className",   enumby.CLASSNAME);
-	    put("linkText",    enumby.LINKTEXT);
-	    put("xpath",       enumby.XPATH);
+	    put("id",          EnumBy.ID);
+	    put("name",        EnumBy.NAME);
+	    put("cssSelector", EnumBy.CSSSELECTOR);
+	    put("tagName",     EnumBy.TAGNAME);
+	    put("className",   EnumBy.CLASSNAME);
+	    put("linkText",    EnumBy.LINKTEXT);
+	    put("xpath",       EnumBy.XPATH);
 	}};
 
     private final static HashMap<String, Keys> key_names = new HashMap<String, Keys>() {{
@@ -661,12 +661,17 @@ public class SimpleTester {
 	throw new ParsingException("Not true or false");
     }
 
+    private static void scrollTo() {
+	if(!curr_element.isDisplayed()) {
+	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
+	}
+	sleep(70); // wait 70ms for scrolling to take effect, just an arbitrary amount of time
+    }
+
     private static boolean tryClick() {
 	boolean retry_click = false;
 	try {
-	    if(!curr_element.isDisplayed()) {
-		js.executeScript("arguments[0].scrollIntoView();", curr_element);
-	    }
+	    scrollTo();
 	    curr_element.click();
 	}
 	catch(ElementNotInteractableException e) {
@@ -679,8 +684,7 @@ public class SimpleTester {
 		throw e;
 	}
 	if(retry_click) {
-	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-	    sleep(70); // wait 70ms for scrolling to take effect, just an arbitrary amount of time
+	    scrollTo();
 	    try {
 		curr_element.click();
 	    }
@@ -703,10 +707,6 @@ public class SimpleTester {
     }
 
     private static void tryType(String str) {
-	if(!curr_element.isDisplayed()) {
-	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-	    sleep(10);
-	}
 	if(!inputQuirk) {
 	    curr_element.sendKeys(str);
 	}
@@ -921,6 +921,7 @@ public class SimpleTester {
 		    return true;
 		findElementCached(list);
 		{
+		    scrollTo();
 		    if(drawQuirk) {
 			// in case drawing is not working
 			// try to just click it instead
@@ -1031,6 +1032,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
+		scrollTo();
 		ret = curr_element.getText();
 		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1049,34 +1051,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		{
-		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-		    sleep(10);
-		    /**
-		       if(isFirefox) {
-
-			//   workaround since scrollToElement does
-			//   not seem to work in firefox.
-			//   Just scroll back to top and then
-			//   rely on scrollByAmount instead
-
-			Rectangle rect = curr_element.getRect();
-			int deltaY = rect.y + rect.height;
-			Actions scroller = new Actions(curr_driver);
-			System.out.println("deltaY: "+deltaY);
-			scroller
-			    .scrollByAmount(0,lastDelta)
-			    .scrollByAmount(0,deltaY)
-			    .perform();
-			lastDelta = -deltaY;
-		    }
-		    else {
-			Actions scroller = new Actions(curr_driver);
-			scroller
-			    .scrollToElement(curr_element)
-			    .perform();
-		    }*/
-		}
+		scrollTo();
 		return true;
 	    case SELECT:
 		list = readSel(false);
@@ -1084,6 +1059,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
+		scrollTo();
 		Select dropdown = new Select(curr_element);
 		dropdown.selectByVisibleText(s1);
 		return true;
@@ -1094,6 +1070,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
+		scrollTo();
 		if(curr_element.isSelected() != b && curr_element.isEnabled()) {
 		    try {
 			curr_element.click();
@@ -1111,6 +1088,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
+		scrollTo();
 		tryType(s1);
 		return true;
 	    case TYPECLR:
@@ -1119,6 +1097,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
+		scrollTo();
 		switch(clearMode) {
 		case DEFAULT:
 		    curr_element.sendKeys(Keys.CONTROL + "a");
@@ -1148,10 +1127,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		if(!curr_element.isDisplayed()) {
-		    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-		    sleep(10);
-		}
+		scrollTo();
 		// No need for tryType, we only have one char here
 		curr_element.sendKeys(k);
 		return true;
@@ -1279,6 +1255,7 @@ public class SimpleTester {
 		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
 			findElement(list);
+			scrollTo();
 			ret = curr_element.getText();
 			if(sor.matches(ret)) {
 			    return true;
@@ -1349,7 +1326,7 @@ public class SimpleTester {
 	    stopTimeStamp = System.currentTimeMillis();
 	    long tmp = stopTimeStamp - startTimeStamp;
 	    totalTimeTaken += tmp;
-	    long secondsTaken = (long) Math.round(tmp / 1000.0);
+	    long secondsTaken = Math.round(tmp / 1000.0);
 	    System.out.println("INFO: TIME: "+sfile+": "+secondsTaken+"s");
 	}
 	return ret;
@@ -1383,7 +1360,7 @@ public class SimpleTester {
     private static boolean setQuirk(int i) {
 	switch(i) {
 	case 1:
-	    clearMode = clearMode.QUIRK;
+	    clearMode = EnumClear.QUIRK;
 	    break;
 	case 2:
 	    inputQuirk = true;
@@ -1423,11 +1400,11 @@ public class SimpleTester {
 	String debug_connect_address = "";
 	int resolution_x = 0, resolution_y = 0;
 	ArrayList<String> scripts = null;
-	clearMode = clearMode.DEFAULT;
+	clearMode = EnumClear.DEFAULT;
 	{
 	    String os =  System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 	    if((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
-		clearMode = clearMode.MAC;
+		clearMode = EnumClear.MAC;
 	    }
 	}
 
@@ -1766,7 +1743,7 @@ public class SimpleTester {
 			line_history_position = (line_history_position+1) % line_history.length;
 		    }
 		    if(printTime) {
-			long secondsTaken = (long) Math.round(totalTimeTaken / 1000.0);
+			long secondsTaken = Math.round(totalTimeTaken / 1000.0);
 			System.out.println("INFO: TIMETOTAL: "+secondsTaken + "s");
 		    }
 		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
@@ -1783,7 +1760,7 @@ public class SimpleTester {
 	    }
 	    script_nr--;
 	    if(printTime) {
-		long secondsTaken = (long) Math.round(totalTimeTaken / 1000.0);
+		long secondsTaken = Math.round(totalTimeTaken / 1000.0);
 		System.out.println("INFO: TIMETOTAL: "+secondsTaken + "s");
 	    }
 	    System.out.println("SUCCESS: "+sfile+" ("+script_nr+"/"+
