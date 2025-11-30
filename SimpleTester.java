@@ -664,8 +664,8 @@ public class SimpleTester {
     private static void scrollTo() {
 	if(!curr_element.isDisplayed()) {
 	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
+	    sleep(70); // wait 70ms for scrolling to take effect, just an arbitrary amount of time
 	}
-	sleep(70); // wait 70ms for scrolling to take effect, just an arbitrary amount of time
     }
 
     private static boolean tryClick() {
@@ -842,6 +842,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
+		scrollTo();
 		ret = curr_element.getText();
 		if(ret == null)
 		    return false;
