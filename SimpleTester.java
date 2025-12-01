@@ -661,17 +661,21 @@ public class SimpleTester {
 	throw new ParsingException("Not true or false");
     }
 
-    private static void scrollTo() {
+    private static void scrollToElement() {
+	js.executeScript("arguments[0].scrollIntoView();", curr_element);
+	sleep(70); // wait 70ms for scrolling to take effect, just an arbitrary amount of time
+    }
+
+    private static void scrollUnlessDisplayed() {
 	if(!curr_element.isDisplayed()) {
-	    js.executeScript("arguments[0].scrollIntoView();", curr_element);
-	    sleep(70); // wait 70ms for scrolling to take effect, just an arbitrary amount of time
+	    scrollToElement();
 	}
     }
 
     private static boolean tryClick() {
 	boolean retry_click = false;
 	try {
-	    scrollTo();
+	    scrollUnlessDisplayed();
 	    curr_element.click();
 	}
 	catch(ElementNotInteractableException e) {
@@ -684,7 +688,7 @@ public class SimpleTester {
 		throw e;
 	}
 	if(retry_click) {
-	    scrollTo();
+	    scrollToElement();
 	    try {
 		curr_element.click();
 	    }
@@ -842,7 +846,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
+		scrollUnlessDisplayed();
 		ret = curr_element.getText();
 		if(ret == null)
 		    return false;
@@ -922,13 +926,13 @@ public class SimpleTester {
 		    return true;
 		findElementCached(list);
 		{
-		    scrollTo();
 		    if(drawQuirk) {
 			// in case drawing is not working
 			// try to just click it instead
 			tryClick();
 			return true;
 		    }
+		    scrollUnlessDisplayed();
 		    // get dimensions of element
 		    Rectangle rect = curr_element.getRect();
 		    int topLeftX = rect.getX();
@@ -1033,7 +1037,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
+		scrollUnlessDisplayed();
 		ret = curr_element.getText();
 		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1052,7 +1056,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
+		scrollToElement();
 		return true;
 	    case SELECT:
 		list = readSel(false);
@@ -1060,7 +1064,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
+		scrollUnlessDisplayed();
 		Select dropdown = new Select(curr_element);
 		dropdown.selectByVisibleText(s1);
 		return true;
@@ -1071,10 +1075,9 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
 		if(curr_element.isSelected() != b && curr_element.isEnabled()) {
 		    try {
-			curr_element.click();
+			tryClick();
 		    }
 		    catch(ElementNotInteractableException e) {
 			System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
@@ -1089,7 +1092,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
+		scrollUnlessDisplayed();
 		tryType(s1);
 		return true;
 	    case TYPECLR:
@@ -1098,7 +1101,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
+		scrollUnlessDisplayed();
 		switch(clearMode) {
 		case DEFAULT:
 		    curr_element.sendKeys(Keys.CONTROL + "a");
@@ -1128,7 +1131,7 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollTo();
+		scrollUnlessDisplayed();
 		// No need for tryType, we only have one char here
 		curr_element.sendKeys(k);
 		return true;
@@ -1256,7 +1259,7 @@ public class SimpleTester {
 		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
 			findElement(list);
-			scrollTo();
+			scrollUnlessDisplayed();
 			ret = curr_element.getText();
 			if(sor.matches(ret)) {
 			    return true;
