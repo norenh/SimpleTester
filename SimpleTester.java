@@ -270,8 +270,7 @@ public class SimpleTester {
 		linenr++;
 		curr_line = curr_line.trim();
 		//System.out.println(curr_line);
-		if(curr_line.length() == 0 ||
-		   (curr_line.length() > 0 && curr_line.charAt(0) == '#')) {
+		if(curr_line.length() == 0 || curr_line.charAt(0) == '#') {
 		    curr_line = buffer.readLine();
 		    continue;
 		}
@@ -1300,8 +1299,7 @@ public class SimpleTester {
 		//System.out.println(linenr+":"+curr_line + " " + curr_line.trim().length());
 
 		curr_line = curr_line.trim();
-		if(curr_line.length() == 0 ||
-		   (curr_line.length() > 0 && curr_line.charAt(0) == '#')) {
+		if(curr_line.length() == 0 || curr_line.charAt(0) == '#') {
 		    curr_line = buffer.readLine();
 		    continue;
 		}
