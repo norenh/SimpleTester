@@ -33,7 +33,7 @@ Arguments supported are (not all are valid for all browsers):
  -p for browser window persistance after script finishes. In headless mode, does nothing
  -b [firefox|chrome|safari|edge] sets the browser to use
  -f path to browser (only needed if not in path, safari not supported)
- -r [HEIGHTxWIDTH] sets initial browser size to height x width, example "-r 1600x1200"
+ -r [WIDTHxHEIGHT] sets initial browser size to width x height, example "-r 1600x1200"
  -t test run only, only checks config, scripts and some arguments in a dry run
 
 The config-file should have the following structure:

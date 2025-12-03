@@ -1337,7 +1337,7 @@ public class SimpleTester {
     }
 
     private static void printUsage() {
-	System.out.println("Usage: ./run.sh [-b firefox|chrome|safari|edge] [-e FILE] [-f FILE] [-h] [-p] [-r HEIGHTxWIDTH] [-s FILE] [-t] <configfile> <URL> <script>");
+	System.out.println("Usage: ./run.sh [-b firefox|chrome|safari|edge] [-e FILE] [-f FILE] [-h] [-p] [-r WIDTHxHEIGHT] [-s FILE] [-t] <configfile> <URL> <script>");
 	System.out.println("configfile and URL must be last (if using -s) or before the list of scripts to run");
 	System.out.println("");
 	System.out.println("Arguments:");
@@ -1346,7 +1346,7 @@ public class SimpleTester {
 	System.out.println("-f FILE     path to browser binary, if not default");
 	System.out.println("-h          running in headless mode (all but safari");
 	System.out.println("-p          persist browser after finish run (all but safari)");
-	System.out.println("-r HxW      resolution to start with");
+	System.out.println("-r WxH      resolution to start with");
 	System.out.println("-s FILE     use script file instead of reading scripts from arguments");
 	System.out.println("-t          test run only, validates config and scripts");
 	System.out.println("");
