@@ -115,6 +115,7 @@ public class SimpleTester {
 	ASSERTSEL,
 	ASSERTTXT,
 	CLICK,
+	CLICKACTION,
 	CLICKFOR,
 	CLICKFORCE,
 	DRAWBOX,
@@ -171,6 +172,7 @@ public class SimpleTester {
 	    put("assertsel", EnumStmt.ASSERTSEL);
 	    put("asserttxt", EnumStmt.ASSERTTXT);
 	    put("click",     EnumStmt.CLICK);
+	    put("clickaction",EnumStmt.CLICKACTION);
 	    put("clickfor",  EnumStmt.CLICKFOR);
 	    put("clickforce",EnumStmt.CLICKFORCE);
 	    put("drawbox",   EnumStmt.DRAWBOX);
@@ -865,6 +867,17 @@ public class SimpleTester {
 		findElementCached(list);
 		//System.out.println(curr_element.toString());
 		return tryClick();
+	    case CLICKACTION:
+		list = readSel(false);
+		if(novalidate)
+		    return true;
+		findElementCached(list);
+		{
+		    Actions act = new Actions(curr_driver);
+
+		    act.click(curr_element).perform();
+		}
+		return true;
 	    case CLICKFOR:
 		// This is a tricky one, but used for special cases
 		// Takes two elements, the last one can be negated and
