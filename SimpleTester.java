@@ -853,6 +853,7 @@ public class SimpleTester {
 		    return true;
 		findElementCached(list);
 		{
+		    scrollUnlessDisplayed();
 		    Actions act = new Actions(curr_driver);
 
 		    act.click(curr_element).perform();
