@@ -446,73 +446,53 @@ public class SimpleTester {
 	    isDef = true;
 	}
 	//System.out.println("String("+currPos+":"+curr_line.charAt(currPos)+"): "+curr_line);
-	if(curr_line.charAt(currPos) == '%' && expectChar == '"') {
-	    if(isDef) {
-		currPos = tmpPos;
-		curr_line = tmpLine;
-	    }
-	    throw new ParsingException("Expected starting '\"'-character!");
-	}
-	if(curr_line.charAt(currPos) == '"' && expectChar == '%') {
-	    if(isDef) {
-		currPos = tmpPos;
-		curr_line = tmpLine;
-	    }
-	    throw new ParsingException("Expected starting '%'-character!");
-	}
-
-	char c = '"';
-	switch(curr_line.charAt(currPos)) {
-	case '"':
+	try {
+	    char c = curr_line.charAt(currPos);
 	    currPos++;  // eat the quotation mark
-	    index2 = curr_line.indexOf('"', currPos);
-	    if(index2 == -1) {
-		if(isDef) {
-		    currPos = tmpPos;
-		    curr_line = tmpLine;
+	    if(c == '%') {
+		if(expectChar == '"') {
+		    throw new ParsingException("Expected starting '\"'-character!");
 		}
-		throw new ParsingException("Expected ending '\"'-character!");
-	    }
-	    break;
-	case '%':
-	    currPos++;  // eat the quotation mark
-	    index2 = curr_line.lastIndexOf('%', curr_line.length()-1);
-	    if(index2 == -1 || index2 <= currPos) {
-		if(isDef) {
-		    currPos = tmpPos;
-		    curr_line = tmpLine;
+		index2 = curr_line.lastIndexOf('%', curr_line.length()-1);
+		if(index2 == -1 || index2 <= currPos) {
+		    throw new ParsingException("Expected ending '%'-character!");
 		}
-		throw new ParsingException("Expected ending '%'-character!");
 	    }
-	    c = '%';
-	    break;
-	default:
+	    else if(c == '"') {
+		if(expectChar == '%') {
+		    throw new ParsingException("Expected starting '%'-character!");
+		}
+		index2 = curr_line.indexOf('"', currPos);
+		if(index2 == -1) {
+		    throw new ParsingException("Expected ending '\"'-character!");
+		}
+	    }
+	    else {
+		throw new ParsingException("Expected starting '\"'-character!");
+	    }
+	    String s = curr_line.substring(currPos, index2);
+	    if(s == null) {
+		throw new ParsingException("Impossible string!");
+	    }
+	    currPos=index2+1;
 	    if(isDef) {
+		// Restore curr_line and pos in case of Define
+		curr_line = tmpLine;
+		currPos = tmpPos + endIndex;
+	    }
+	    if(expectChar == '?')
+		return c+s;
+	    else
+		return s;
+	}
+	catch(Exception e) {
+	    if(isDef) {
+		// Restore and rethrow in case of problems
 		currPos = tmpPos;
 		curr_line = tmpLine;
 	    }
-	    throw new ParsingException("Expected starting '\"'-character!");
+	    throw e;
 	}
-
-	String s = curr_line.substring(currPos, index2);
-	if(s == null) {
-	    if(isDef) {
-		currPos = tmpPos;
-		curr_line = tmpLine;
-	    }
-	    throw new ParsingException("Impossible string!");
-	}
-	currPos=index2+1;
-
-	// restore curr_line and currPos if this was a DEFINE
-	if(isDef) {
-	    curr_line = tmpLine;
-	    currPos = tmpPos + endIndex;
-	}
-	if(expectChar == '?')
-	    return c+s;
-	else
-	    return s;
     }
 
     static class StrOrRegex {
