@@ -103,7 +103,8 @@ public class SimpleTester {
     private enum EnumClear {
 	DEFAULT,
 	MAC,
-	QUIRK;
+	QUIRK_BS_FALLBACK,
+	QUIRK_JS_RAW;
     }
 
     private enum EnumStmt {
@@ -1104,7 +1105,7 @@ public class SimpleTester {
 		    curr_element.sendKeys(Keys.COMMAND + "a");
 		    curr_element.sendKeys(Keys.BACK_SPACE);
 		    break;
-		case QUIRK:
+		case QUIRK_BS_FALLBACK:
 		    {
 			curr_element.clear();
 			String tmp = curr_element.getDomProperty("value");
@@ -1113,6 +1114,15 @@ public class SimpleTester {
 			    for(int i=0;i<l;i++)
 				curr_element.sendKeys(Keys.BACK_SPACE);
 			}
+		    }
+		    break;
+		case QUIRK_JS_RAW:
+		    {
+			String tmp = curr_element.getDomProperty("value");
+			if(tmp != null && tmp.length() > 0) {
+			    js.executeScript("arguments[0].focus(); arguments[0].value = ''; arguments[0].textContent = ''; arguments[0].dispatchEvent(new Event('change'));", curr_element);
+			}
+			sleep(20);
 		    }
 		    break;
 		}
@@ -1356,7 +1366,7 @@ public class SimpleTester {
     private static boolean setQuirk(int i) {
 	switch(i) {
 	case 1:
-	    clearMode = EnumClear.QUIRK;
+	    clearMode = EnumClear.QUIRK_BS_FALLBACK;
 	    break;
 	case 2:
 	    inputQuirk = true;
@@ -1366,6 +1376,9 @@ public class SimpleTester {
 	    break;
 	case 4:
 	    elementCacheOffQuirk = true;
+	    break;
+	case 5:
+	    clearMode = EnumClear.QUIRK_JS_RAW;
 	    break;
 	default:
 	    return false;
