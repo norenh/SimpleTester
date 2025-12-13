@@ -83,7 +83,7 @@ public class SimpleTester {
     private static boolean printTime = false;
     private static EnumClear clearMode;
     private static boolean inputQuirk = false;
-    private static boolean drawQuirk = false;
+    private static boolean actionQuirk = false;
     private static boolean elementCacheOffQuirk= false;
     private static int linenr = 0;
     private static int lastDelta = 0;
@@ -854,6 +854,12 @@ public class SimpleTester {
 		    return true;
 		findElementCached(list);
 		{
+		    if(actionQuirk) {
+			// in case actions are not working
+			// try to just click it instead
+			tryClick();
+			return true;
+		    }
 		    scrollUnlessDisplayed();
 		    Actions act = new Actions(curr_driver);
 
@@ -920,8 +926,8 @@ public class SimpleTester {
 		    return true;
 		findElementCached(list);
 		{
-		    if(drawQuirk) {
-			// in case drawing is not working
+		    if(actionQuirk) {
+			// in case actions are not working
 			// try to just click it instead
 			tryClick();
 			return true;
@@ -1358,7 +1364,8 @@ public class SimpleTester {
 	System.out.println("-o          print timestamps from run, subject for change!");
 	System.out.println("-q INT[,INT]* quirk mode, takes a list of ints for specific quirks");
 	System.out.println("            1 = alt clear method, 2 = alt input method");
-	System.out.println("            3 = alt draw method, 4 = no element cache");
+	System.out.println("            3 = do not use actions, 4 = no element cache");
+	System.out.println("            5 = yet another clear method");
 	System.out.println("-z FILE     use local webdriver instead of seleniums");
 	System.out.println("");
     }
@@ -1372,7 +1379,7 @@ public class SimpleTester {
 	    inputQuirk = true;
 	    break;
 	case 3:
-	    drawQuirk = true;
+	    actionQuirk = true;
 	    break;
 	case 4:
 	    elementCacheOffQuirk = true;
