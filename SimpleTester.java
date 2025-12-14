@@ -76,11 +76,8 @@ public class SimpleTester {
     private static boolean script_done = false;
     private static EnumStmt stmt;
     private static EnumBy enumby;
-    private static boolean isSafari = false;
-    private static boolean isFirefox = false;
-    private static boolean isChrome = false;
-    private static boolean isEdge = false;
     private static boolean printTime = false;
+    private static enumDriver driverType;
     private static EnumClear clearMode;
     private static boolean inputQuirk = false;
     private static boolean actionQuirk = false;
@@ -402,6 +399,7 @@ public class SimpleTester {
     private static boolean notStr = false;
 
     private static class ParsingException extends Exception {
+	private static final long serialVersionUID = 1L;
 	public ParsingException(String message) {
 	    super(message);
 	}
@@ -664,7 +662,7 @@ public class SimpleTester {
 	    retry_click = true;
 	}
 	catch(WebDriverException e) {
-	    if(isSafari)
+	    if(driverType == enumDriver.SAFARI)
 		retry_click = true;
 	    else
 		throw e;
@@ -681,7 +679,7 @@ public class SimpleTester {
 		return false;
 	    }
 	    catch(WebDriverException e) {
-		if(isSafari) {
+		if(driverType == enumDriver.SAFARI) {
 		    System.out.println("WARN: Click failed with "+e.getClass().getCanonicalName());
 		    return false;
 		}
@@ -751,7 +749,7 @@ public class SimpleTester {
 			return true;
 		    }
 		    // Workaround for Safari returning true for attributes with a empty value
-		    if(isSafari && s2.equals("") && ret.equals("true"))
+		    if(driverType == enumDriver.SAFARI && s2.equals("") && ret.equals("true"))
 			return true;
 
 		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
@@ -808,7 +806,7 @@ public class SimpleTester {
 			return true;
 		    }
 		    // Workaround for Safari returning true for properties with a empty value
-		    if(isSafari && s2.equals("") && ret.equals("true"))
+		    if(driverType == enumDriver.SAFARI && s2.equals("") && ret.equals("true"))
 			return true;
 
 		    System.out.println("INFO: ASSERTPRO got \""+ret+"\", expected \""+s2+"\"");
@@ -1400,7 +1398,7 @@ public class SimpleTester {
 	    System.exit(1);
 	}
 
-	enumDriver edrive = enumDriver.CHROME;
+	driverType = enumDriver.CHROME;
 	int argi = 0;
 	boolean headless = false;
 	boolean stay_open = false;
@@ -1432,13 +1430,13 @@ public class SimpleTester {
 	    case 'b':
 		argi++;
 		if(args[argi].equals("firefox"))
-		    edrive = enumDriver.FIREFOX;
+		    driverType = enumDriver.FIREFOX;
 		else if(args[argi].equals("chrome"))
-		    edrive = enumDriver.CHROME;
+		    driverType = enumDriver.CHROME;
 		else if(args[argi].equals("safari"))
-		    edrive = enumDriver.SAFARI;
+		    driverType= enumDriver.SAFARI;
 		else if(args[argi].equals("edge"))
-		    edrive = enumDriver.EDGE;
+		    driverType = enumDriver.EDGE;
 		else {
 		    System.out.println("Unsupported driver: "+args[argi]);
 		    System.exit(1);
@@ -1565,7 +1563,7 @@ public class SimpleTester {
 	String cfgfile = args[argi];
 	String url = args[argi+1];
 
-	System.out.println("INFO: Using Driver: '"+edrive+"'");
+	System.out.println("INFO: Using Driver: '"+driverType+"'");
 	if(binary_p) {
 	    System.out.println("INFO: Browser Path: '"+binary_path.toString()+"'");
 	}
@@ -1607,10 +1605,9 @@ public class SimpleTester {
 	    System.exit(0);
 	}
 	try {
-	    switch(edrive) {
+	    switch(driverType) {
 	    case CHROME:
 		{
-		    isChrome = true;
 		    ChromeOptions options = new ChromeOptions();
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--window-size="+resolution_x+
@@ -1639,7 +1636,6 @@ public class SimpleTester {
 		break;
 	    case FIREFOX:
 		{
-		    isFirefox = true;
 		    FirefoxOptions options = new FirefoxOptions();
 		    options.setCapability("webSocketUrl", true);
 		    if(resolution_x > 0 && resolution_y > 0) {
@@ -1669,7 +1665,6 @@ public class SimpleTester {
 		break;
 	    case SAFARI:
 		{
-		    isSafari = true;
 		    if(headless) {
 			System.out.println("WARN: headless mode (-h) not supported with SAFARI");
 		    }
@@ -1697,7 +1692,6 @@ public class SimpleTester {
 		break;
 	    case EDGE:
 		{
-		    isEdge = true;
 		    EdgeOptions options = new EdgeOptions();
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--window-size="+resolution_x+
