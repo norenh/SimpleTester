@@ -1436,7 +1436,7 @@ public class SimpleTester {
 		else if(args[argi].equals("edge"))
 		    driverType = enumDriver.EDGE;
 		else {
-		    System.out.println("Unsupported driver: "+args[argi]);
+		    System.out.println("ERROR: Unsupported driver: "+args[argi]);
 		    System.exit(1);
 		}
 		argi++;
@@ -1484,12 +1484,12 @@ public class SimpleTester {
 		    String[] res=args[argi].split(",");
 		    for(int i=0;i<res.length; i++) {
 			if(!setQuirk(Integer.valueOf(res[i]))) {
-			    System.out.println("Unknown Quirk-mode: "+res[i]);
+			    System.out.println("ERROR: Unknown Quirk-mode: "+res[i]);
 			    System.exit(1);
 			}
 		    }
 		} catch (NumberFormatException e) {
-		    System.out.println("Invalid Integer in: "+args[argi]);
+		    System.out.println("ERROR: Invalid Integer in: "+args[argi]);
 		    System.exit(1);
 		}
 		argi++;
@@ -1502,7 +1502,7 @@ public class SimpleTester {
 		    resolution_y = Integer.valueOf(res[1]);
 		}
 		else {
-		    System.out.println("Invalid resolution: "+args[argi]);
+		    System.out.println("ERROR: Invalid resolution: "+args[argi]);
 		    System.exit(1);
 		}
 		argi++;
@@ -1522,11 +1522,11 @@ public class SimpleTester {
 		    }
 		}
 		catch(Exception e) {
-		    System.out.println("FAIL: Unable to open file "+e.toString());
+		    System.out.println("ERROR: Unable to open file "+e.toString());
 		    System.exit(1);
 		}
 		if(scripts.size() <= 0) {
-		    System.out.println("No scripts in "+args[argi]);
+		    System.out.println("ERROR: No scripts in "+args[argi]);
 		    System.exit(1);
 		}
 		argi++;
@@ -1542,7 +1542,7 @@ public class SimpleTester {
 		argi++;
 		break;
 	    default:
-		System.out.println("Unknown argument: "+args[argi]);
+		System.out.println("ERROR: Unknown argument: "+args[argi]);
 		System.exit(1);
 	    }
 	}
@@ -1594,7 +1594,7 @@ public class SimpleTester {
 	    }
 	}
 	catch(Exception e) {
-	    System.out.println("FAIL: Unable to open file "+e.toString());
+	    System.out.println("ERROR: Unable to open file "+e.toString());
 	    System.exit(2);
 	}
 	if(dry_run) {
@@ -1717,17 +1717,23 @@ public class SimpleTester {
 		}
 		break;
 	    default:
-		System.out.println("Unsupported driver");
+		System.out.println("ERROR: Unsupported driver");
 		System.exit(1);
 	    }
 	} catch(NoSuchDriverException e) {
 	    System.out.println("ERROR: Is the browser installed?");
 	    System.exit(1);
 	}
-	curr_driver.get(url);
-	js = (JavascriptExecutor) curr_driver;
-	//String title = curr_driver.getTitle();
-	//System.out.println(title);
+
+	try {
+	    curr_driver.get(url);
+	    js = (JavascriptExecutor) curr_driver;
+	}
+	catch(Exception e) {
+	    System.out.println(e.toString());
+	    System.out.println("ERROR: Failed opening '"+url+"'");
+	    System.exit(3);
+	}
 
 	int script_nr = 1;
 	try {
@@ -1760,7 +1766,7 @@ public class SimpleTester {
 		    if(!stay_open || headless) {
 			curr_driver.quit();
 		    }
-		    System.exit(1);
+		    System.exit(4);
 		}
 		script_file.close();
 		System.out.println("INFO: SUCCESS: "+sfile+" ("+script_nr+
@@ -1779,7 +1785,7 @@ public class SimpleTester {
 	    System.out.println(e.toString());
 	    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
 			       nr_of_scripts+")"+":"+linenr+":"+curr_line);
-	    System.exit(2);
+	    System.exit(4);
 	}
 	if(!stay_open || headless) {
 	    curr_driver.quit();
