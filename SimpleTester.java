@@ -620,6 +620,8 @@ public class SimpleTester {
 	    throw new ParsingException("Expected String");
 
 	if(curr_line.charAt(currPos) == '!') {
+	    if(!neg)
+		throw new ParsingException("Unexpected Negation!");
 	    notStr = true;
 	    currPos++;
 	    if(currPos >= curr_line.length())
