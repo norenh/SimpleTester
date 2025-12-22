@@ -285,14 +285,14 @@ public class SimpleTester {
 		    String define_name = curr_line.substring(index1+1, index2);
 		    String define_string = curr_line.substring(index2+1, curr_line.length());
 		    if(defines.containsKey(define_name)) {
-			System.out.println("ERROR: Duplicate define ("+define_name+")");
+			System.out.println("ERROR: Duplicate DEFINE ("+define_name+")");
 			return false;
 		    }
 		    defines.put(define_name,define_string);
 		}
 		else {
 		    if(selectors.containsKey(statement)) {
-			System.out.println("ERROR: Duplicate statement ("+statement+")");
+			System.out.println("ERROR: Duplicate ELEMENTNAME ("+statement+")");
 			return false;
 		    }
 		    ArrayList<By> l = new ArrayList<By>();
