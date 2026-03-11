@@ -1364,6 +1364,7 @@ public class SimpleTester {
 	System.out.println("            1 = alt clear method, 2 = alt input method");
 	System.out.println("            3 = do not use actions, 4 = no element cache");
 	System.out.println("            5 = yet another clear method");
+	System.out.println("-w FILE     fake webcam (experimental, chrome only");
 	System.out.println("-z FILE     use local webdriver instead of seleniums");
 	System.out.println("");
     }
@@ -1404,11 +1405,13 @@ public class SimpleTester {
 	boolean stay_open = false;
 	boolean screenshot_p = false;
 	Path screenshot_path = Paths.get("ERROR");
+	boolean fake_webcam_p = false;
 	boolean binary_p = false;
 	boolean local_driver_p = false;
 	boolean dev_mode = false;
 	boolean dry_run = false;
 	Path binary_path = null;
+	Path fake_webcam_path = null;
 	Path local_driver_path = null;
 	boolean debug_connect = false;
 	String debug_connect_address = "";
@@ -1537,6 +1540,12 @@ public class SimpleTester {
 		dry_run = true;
 		argi++;
 		break;
+	    case 'w':
+		argi++;
+		fake_webcam_p = true;
+		fake_webcam_path = Paths.get(args[argi]);
+		argi++;
+		break;
 	    case 'z':
 		argi++;
 		local_driver_p = true;
@@ -1625,6 +1634,11 @@ public class SimpleTester {
 		    if(debug_connect) {
 			options.setExperimentalOption("debuggerAddress", debug_connect_address);
 		    }
+		    if(fake_webcam_p) {
+			options.addArguments("--use-fake-ui-for-media-stream");
+			options.addArguments("--use-fake-device-for-media-stream");
+			options.addArguments("--use-file-for-fake-video-capture="+fake_webcam_path.toString());
+		    }
 		    if(local_driver_p) {
 			ChromeDriverService service = new ChromeDriverService.Builder().usingDriverExecutable(local_driver_path.toFile()).build();
 			curr_driver = new ChromeDriver(service,options);
@@ -1651,6 +1665,9 @@ public class SimpleTester {
 		    if(debug_connect) {
 			System.out.println("WARN: remote debug (-c) not supported with FIREFOX");
 		    }
+		    if(fake_webcam_p) {
+			System.out.println("WARN: fake webcam (-w) not supported with FIREFOX");
+		    }
 		    if(dev_mode) {
 			System.out.println("WARN: devel mode (-d) not supported with FIREFOX");
 		    }
@@ -1670,6 +1687,9 @@ public class SimpleTester {
 		    }
 		    if(binary_p) {
 			System.out.println("WARN: setBinary (-b) not supported with SAFARI");
+		    }
+		    if(fake_webcam_p) {
+			System.out.println("WARN: fake webcam (-w) not supported with SAFARI");
 		    }
 		    if(debug_connect) {
 			System.out.println("WARN: remote debug (-c) not supported with SAFARI");
@@ -1702,6 +1722,9 @@ public class SimpleTester {
 		    }
 		    if(binary_p) {
 			options.setBinary(binary_path.toString());
+		    }
+		    if(fake_webcam_p) {
+			System.out.println("WARN: fake webcam (-w) not supported with EDGE");
 		    }
 		    if(debug_connect) {
 			System.out.println("WARN: remote debug (-c) not supported with EDGE");
