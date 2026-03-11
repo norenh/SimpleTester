@@ -125,6 +125,7 @@ public class SimpleTester {
 	PRINTTIME,
 	PRINTTXT,
 	REFRESH,
+	RUNCMD,
 	SCREENSHOT,
 	SCROLLTO,
 	SELECT,
@@ -181,6 +182,7 @@ public class SimpleTester {
 	    put("printtime", EnumStmt.PRINTTIME);
 	    put("printtxt",  EnumStmt.PRINTTXT);
 	    put("refresh",   EnumStmt.REFRESH);
+	    put("runcmd",    EnumStmt.RUNCMD);
 	    put("screenshot",EnumStmt.SCREENSHOT);
 	    put("scrollto",  EnumStmt.SCROLLTO);
 	    put("select",    EnumStmt.SELECT);
@@ -1041,6 +1043,21 @@ public class SimpleTester {
 		return true;
 	    case REFRESH:
 		curr_driver.navigate().refresh();
+		return true;
+	    case RUNCMD:
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		try {
+		    // Deprecated, needs to be fixed some day
+		    Runtime rt = Runtime.getRuntime();
+		    Process proc = rt.exec(s1);
+		    if(proc.waitFor() != 0)
+			return false;
+		} catch(Exception e) {
+		    System.out.println(e.toString());
+		    return false;
+		}
 		return true;
 	    case SCREENSHOT:
 		s1 = readString();
