@@ -122,6 +122,7 @@ public class SimpleTester {
 	PRINTCSS,
 	PRINTJS,
 	PRINTPRO,
+	PRINTSRC,
 	PRINTTIME,
 	PRINTTXT,
 	REFRESH,
@@ -179,6 +180,7 @@ public class SimpleTester {
 	    put("printcss",  EnumStmt.PRINTCSS);
 	    put("printjs",   EnumStmt.PRINTJS);
 	    put("printpro",  EnumStmt.PRINTPRO);
+	    put("printsrc",  EnumStmt.PRINTSRC);
 	    put("printtime", EnumStmt.PRINTTIME);
 	    put("printtxt",  EnumStmt.PRINTTXT);
 	    put("refresh",   EnumStmt.REFRESH);
@@ -1026,6 +1028,13 @@ public class SimpleTester {
 		findElementCached(list);
 		ret = curr_element.getDomProperty(s1);
 		System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
+		return true;
+	    case PRINTSRC:
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		System.out.println("PRINTSRC:"+linenr+": Start of print\n"+curr_driver.getPageSource());
+		System.out.println("PRINTSRC:"+linenr+": End of print\n");
 		return true;
 	    case PRINTTIME:
 		if(novalidate)
