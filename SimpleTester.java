@@ -1058,9 +1058,11 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		try {
-		    // Deprecated, needs to be fixed some day
+		    // Basically the same as deprecated exec-method
+		    // Splits args on just space, need fix if better tokenizer
+		    // is needed
 		    Runtime rt = Runtime.getRuntime();
-		    Process proc = rt.exec(s1);
+		    Process proc = rt.exec(s1.split(" "));
 		    if(proc.waitFor() != 0)
 			return false;
 		} catch(Exception e) {
