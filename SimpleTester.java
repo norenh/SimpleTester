@@ -1127,7 +1127,16 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(list);
-		scrollUnlessDisplayed();
+
+		// Chrome and Safari have quirks with cursor position
+		// being updated later than expected, so try click before
+		// we do anything else. With tryClick, no extra scrolling is needed
+
+		//scrollUnlessDisplayed();
+		tryClick();
+		// Wait for one frame (50hz screen) after clicking
+		sleep(20);
+
 		switch(clearMode) {
 		case DEFAULT:
 		    curr_element.sendKeys(Keys.CONTROL + "a");
