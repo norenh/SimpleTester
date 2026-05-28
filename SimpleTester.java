@@ -1051,7 +1051,8 @@ public class SimpleTester {
 		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
 		return true;
 	    case REFRESH:
-		curr_driver.navigate().refresh();
+		if(!novalidate)
+		    curr_driver.navigate().refresh();
 		return true;
 	    case RUNCMD:
 		s1 = readString();
