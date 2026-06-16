@@ -8,12 +8,15 @@
    Copyright 2025 Henning Norén <henning.noren@gmail.com>
  */
 
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chrome.ElectronDriver;
+import org.openqa.selenium.chrome.ElectronOptions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariDriverService;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -157,6 +160,7 @@ public class SimpleTester {
 	CHROME,
 	FIREFOX,
 	EDGE,
+	ELECTRON,
 	SAFARI,
 	UNDEFINED;
     }
@@ -1478,6 +1482,9 @@ public class SimpleTester {
 		    driverType= enumDriver.SAFARI;
 		else if(args[argi].equals("edge"))
 		    driverType = enumDriver.EDGE;
+		else if(args[argi].equals("electron")) {
+		    driverType = enumDriver.ELECTRON;
+		}
 		else {
 		    System.out.println("ERROR: Unsupported driver: "+args[argi]);
 		    System.exit(1);
@@ -1776,6 +1783,40 @@ public class SimpleTester {
 		    }
 		    else {
 			curr_driver = new EdgeDriver(options);
+		    }
+		}
+		break;
+	    case ELECTRON:
+		{
+		    if(!binary_p) {
+			System.out.println("ERROR: binary path required with ELECTRON");
+			System.exit(1);
+		    }
+
+		    ElectronOptions options = new ElectronOptions(binary_path.toFile());
+
+		    if(resolution_x > 0 && resolution_y > 0) {
+			options.addArguments("--window-size="+resolution_x+
+					     ","+resolution_y);
+		    }
+		    if(headless) {
+			System.out.println("WARN: headless mode (-h) not supported with ELECTRON");
+		    }
+		    if(dev_mode) {
+			System.out.println("WARN: devel mode (-d) not supported with ELECTRON");
+		    }
+		    if(debug_connect) {
+			options.setExperimentalOption("debuggerAddress", debug_connect_address);
+		    }
+		    if(fake_webcam_p) {
+			System.out.println("WARN: fake webcam (-w) not supported with ELECTRON");
+		    }
+		    if(local_driver_p) {
+			ChromeDriverService service = new ChromeDriverService.Builder().usingDriverExecutable(local_driver_path.toFile()).build();
+			curr_driver = new ElectronDriver(service,options);
+		    }
+		    else {
+			curr_driver = new ElectronDriver(options);
 		    }
 		}
 		break;
