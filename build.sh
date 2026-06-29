@@ -9,8 +9,10 @@ else
   JAVAP="${JAVA_HOME}/bin/jar"
 fi
 
-"${JAVAC}" -cp "slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+cd src
 
-"${JAVAP}" cf SimpleTester.jar SimpleTester*.class
+"${JAVAC}" -cp "../lib/slf4j-nop.jar:../lib/selenium-java-${SELENIUM_VERSION}/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+
+"${JAVAP}" cf "../lib/SimpleTester.jar" SimpleTester*.class
 rm -f SimpleTester*.class
 

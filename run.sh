@@ -7,5 +7,5 @@ else
   JAVAJ="${JAVA_HOME}/bin/java"
 fi
 
-"${JAVAJ}" -cp "SimpleTester.jar:slf4j-nop.jar:selenium-java-${SELENIUM_VERSION}/*" SimpleTester "$@"
+"${JAVAJ}" -cp "lib/SimpleTester.jar:lib/slf4j-nop.jar:lib/selenium-java-${SELENIUM_VERSION}/*" SimpleTester "$@"
 
