@@ -5,7 +5,7 @@
 
    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-   Copyright 2025 Henning Norén <henning.noren@gmail.com>
+   Copyright 2025-2026 Henning Norén <henning.noren@gmail.com>
  */
 
 
@@ -314,13 +314,17 @@ public class SimpleTester {
 			String by_string = curr_line.substring(index1+1, index2);
 			EnumBy ret = by_names.get(by_string);
 			if(ret == null) {
-			    System.out.println("ERROR: \""+by_string+
-					       "\" not a valid Locator");
+			    System.out.println("ERROR: \""+by_string+"\" not a valid Locator");
 			    return false;
 			}
 			index1 = index2+1;
+			if(curr_line.charAt(index1) != '"') {
+			    System.out.println("ERROR: Expected starting '\"'-character!");
+                            return false;
+			}
 			index2 = curr_line.indexOf('"', index1+1);
 			if(index2 == -1) {
+			    System.out.println("ERROR: Expected ending '\"'-character!");
 			    return false;
 			}
 			String selector = curr_line.substring(index1+1, index2);
