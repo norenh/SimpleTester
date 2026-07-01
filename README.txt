@@ -91,11 +91,13 @@ asserttxt - do getText() on element and compare with "text"
 click - click() on element (will try scrolling if element is hidden)
 drawbox - draws a box with the mouse inside the element, "offset" pixels in
 dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
+hover - move mouse over element
 print - print string
 printatr - print result of getAttribute on "attribute" of element
 printcss - print result of getCssValue on "property" of element
 printjs - executes the text-line as js in context and tries to print the returned result
 printpro - print result of getDomProperty on "property" of element
+printsrc - print out source code of current webpage
 printtime - print out a current timestamp
 printtxt - print out value of getText() on element
 refresh - refreshes the page
