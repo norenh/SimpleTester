@@ -120,6 +120,7 @@ public class SimpleTester {
 	DRAWBOX,
 	DWAITFOR,
 	FINISH,
+	HOVER,
 	PRINT,
 	PRINTATR,
 	PRINTCSS,
@@ -179,6 +180,7 @@ public class SimpleTester {
 	    put("clickforce",EnumStmt.CLICKFORCE);
 	    put("drawbox",   EnumStmt.DRAWBOX);
 	    put("dwaitfor",  EnumStmt.DWAITFOR);
+	    put("hover",     EnumStmt.HOVER);
 	    put("print",     EnumStmt.PRINT);
 	    put("printatr",  EnumStmt.PRINTATR);
 	    put("printcss",  EnumStmt.PRINTCSS);
@@ -281,8 +283,10 @@ public class SimpleTester {
 		    continue;
 		}
 		int index1 = curr_line.indexOf(' ');
-		if(index1 == -1)
+		if(index1 == -1) {
+		    System.out.println("ERROR: Unexpected EOL, did you miss a keyword?");
 		    return false;
+		}
 		String statement = curr_line.substring(0,index1);
 		if(statement.equals("DEFINE")) {
 		    int index2 = curr_line.indexOf(' ', index1+1);
@@ -594,7 +598,7 @@ public class SimpleTester {
 	currPos = index2;
 	if(selector.charAt(0) == '!') {
 	    if(selector.length() == 1)
-		throw new ParsingException("No ELEMENTNAME defined!");
+		throw new ParsingException("Expected ELEMENTNAME");
 	    if(!neg)
 		throw new ParsingException("Unexpected Negation!");
 	    notSel = true;
@@ -994,6 +998,24 @@ public class SimpleTester {
 	    case FINISH:
 		script_done = true;
 		return true;
+	    case HOVER:
+		list = readSel(false);
+		if(novalidate)
+		    return true;
+		findElementCached(list);
+		{
+		    if(actionQuirk) {
+			// in case actions are not working
+			// try to just click it instead
+			tryClick();
+			return true;
+		    }
+		    scrollUnlessDisplayed();
+		    Actions act = new Actions(curr_driver);
+
+		    act.moveToElement(curr_element).perform();
+		}
+		return true;
 	    case PRINT:
 		s1 = readString();
 		if(novalidate)
@@ -1038,11 +1060,10 @@ public class SimpleTester {
 		System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
 		return true;
 	    case PRINTSRC:
-		s1 = readString();
 		if(novalidate)
 		    return true;
 		System.out.println("PRINTSRC:"+linenr+": Start of print\n"+curr_driver.getPageSource());
-		System.out.println("PRINTSRC:"+linenr+": End of print\n");
+		System.out.println("PRINTSRC:"+linenr+": End of print");
 		return true;
 	    case PRINTTIME:
 		if(novalidate)

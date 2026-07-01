@@ -54,11 +54,13 @@ asserttxt ELEMENTNAME "text"
 click ELEMENTNAME
 drawbox ELEMENTNAME "offset"
 dwaitfor INTEGER [!]ELEMENTNAME
+hover ELEMENTNAME
 print "text"
-printatr ELEMENTNAME "attribute"
+printatr ELEMENTNAME "attribute" (Warning! use printpro for properties)
 printcss ELEMENTNAME "property"
 printjs "text"
-printpro ELEMENTNAME "property" (Warning! use printpro for properties)
+printpro ELEMENTNAME "property"
+printsrc
 printtime
 printtxt ELEMENTNAME
 refresh
