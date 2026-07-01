@@ -1,0 +1,6 @@
+message id "message"
+textbox name "my-text"
+submitButton cssSelector "button"
+# Invalid string
+dropdown id my-select"
+link id "url"

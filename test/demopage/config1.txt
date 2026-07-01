@@ -1,0 +1,36 @@
+hoverdropdown id "myDropDown"
+textinput id "myTextInput"
+textprefillinput name "preText2"
+textreadonly id "placeholderText"
+mybutton cssSelector "button"
+textparagraph id "pText"
+
+dropdown name "selectName"
+
+hoveroption1 id "dropOption1"
+hoveroption2 cssSelector "#dropOption2"
+hoveroption3 id "dropOption3"
+
+radiobutton1 id "radioButton1"
+radiobutton2 xpath "(//input[@type='radio'])[2]"
+
+checkbox1 className "checkBoxClassA"
+checkbox2 name "checkBoxName2"
+checkbox3 id "myForm" id "myTable" id "tbodyId" id "checkBox3"
+checkbox4 xpath "//*[@id='checkBox4']"
+
+checkbox5 id "checkBox5"
+
+svgimage tagName "svg"
+
+urllink linkText "seleniumbase.com"
+
+headerlink xpath "//html/body/form/table/tbody/tr[1]/td[4]/h3"
+
+nonexisting id "ThisIDShouldNotExist"
+
+DEFINE ButtonTextGreen "Click Me (Green)"
+DEFINE ButtonTextPurple "Click Me (Purple)"
+DEFINE cssgreen %rgba?\(0, 128, 0(, 1)?\)%
+DEFINE csspurple %rgba?\(128, 0, 128(, 1)?\)%
+

@@ -1,0 +1,8 @@
+waitfor mybutton
+
+# String issues
+select dropdown "
+
+assert textinput
+assert textprefillinput
+

@@ -1,0 +1,5 @@
+# Missing integer
+dwaitfor textinput
+
+assert textinput
+

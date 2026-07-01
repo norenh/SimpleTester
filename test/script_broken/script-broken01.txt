@@ -1,0 +1,6 @@
+waitfor mybutton
+
+# Quotation mark missing
+assertatr mybutton "type "button"
+assertcss mybutton "font-size" "20px"
+

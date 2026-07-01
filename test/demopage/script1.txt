@@ -1,0 +1,126 @@
+# Basic test for demo_page.html
+
+print "Basic test start"
+printtime
+
+# Wait until page has loaded
+dwaitfor 3 textinput
+waitfor !nonexisting
+
+# Confirm all elements in config are there
+
+assert textinput
+assert textprefillinput
+assert textreadonly
+assert mybutton
+assert textparagraph
+assert hoverdropdown
+assert radiobutton1
+assert radiobutton2
+assert checkbox1
+assert checkbox2
+assert checkbox3
+assert checkbox4
+assert checkbox5
+assert svgimage
+assert urllink
+assert headerlink
+assert !nonexisting
+
+# Assert testing
+
+assertatr textprefillinput !"style" "-"
+assertatr textprefillinput "value" "Text..."
+assertclk dropdown
+assertclk !hoveroption1
+assertcss mybutton "color" _cssgreen
+assertpro mybutton !"maxlength" "-"
+assertpro textprefillinput "value" "Text..."
+assertsel checkbox1 "false"
+assertsel checkbox5 "true"
+asserttxt mybutton "Click Me (Green)"
+
+# Expand and click on hoverdropdown
+
+assertclk !hoveroption2
+assertclk !hoveroption3
+hover hoverdropdown
+wait 1
+assertclk hoveroption1
+assertclk hoveroption2
+assertclk hoveroption3
+click hoveroption2
+wait 1
+asserttxt headerlink "Link Two Selected"
+
+# Input field type-testing
+
+type textinput "Hallo"
+typeclr textinput "Hello"
+
+typeclr textprefillinput "Hi there!"
+assertpro textprefillinput "value" "Hi there!"
+
+typekey textinput BACKSPACE
+assertpro textinput "value" "Hell"
+
+# Selecting in a dropdown
+select dropdown "Set to 50%"
+
+# Button click, do check that changes happen
+
+assertatr mybutton "style" "color: green;"
+click mybutton
+waitforcss mybutton "color" _csspurple
+assertatr mybutton "style" "color: purple;"
+asserttxt mybutton _ButtonTextPurple
+
+# checkbox toggling 
+
+assertsel checkbox2 "false"
+assertsel checkbox3 "false"
+assertsel checkbox4 "false"
+settoggle checkbox2 "true"
+settoggle checkbox3 "false"
+clickaction checkbox4
+assertsel checkbox2 "true"
+assertsel checkbox3 "false"
+assertsel checkbox4 "true"
+click checkbox4
+assertsel checkbox4 "false"
+
+
+# Check radiobutton toggle
+# Checking one should uncheck the other
+assertsel radiobutton1 "true"
+assertsel radiobutton2 "false"
+settoggle radiobutton2 "true"
+wait 2
+assertsel radiobutton1 "false"
+assertsel radiobutton2 "true"
+
+# Check runcmd and take a screenshot
+runcmd "true"
+screenshot "test.png"
+
+# Refresh and check button reset
+refresh
+waitfortxt mybutton _ButtonTextGreen
+waitforcss mybutton "color" _cssgreen
+
+# print testing
+printatr textprefillinput "value"
+printcss mybutton "color"
+printjs "return 'test-string';"
+printpro textprefillinput "value"
+printtxt mybutton
+printsrc
+printtime
+print "Basic test stop"
+
+# Everything past finish should be ignored
+finish
+
+# This should not be checked
+assert nonexisting
+

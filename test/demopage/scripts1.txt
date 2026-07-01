@@ -1,0 +1,4 @@
+# Test scripts
+test/demopage/scripts/script2.txt
+test/demopage/scripts/script3.txt
+test/demopage/scripts/script4.txt

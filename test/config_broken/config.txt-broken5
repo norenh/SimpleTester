@@ -1,0 +1,6 @@
+message id "message"
+textbox name "my-text"
+submitButton cssSelector "button"
+# No quote at end of string
+dropdown id "my-select
+link id "url"

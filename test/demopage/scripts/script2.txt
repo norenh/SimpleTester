@@ -1,0 +1,8 @@
+# Small test for demo_page.html
+
+print "Script test start"
+printtime
+
+# Wait until page has loaded
+dwaitfor 3 textinput
+

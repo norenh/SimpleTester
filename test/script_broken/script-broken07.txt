@@ -1,0 +1,7 @@
+waitfor textinput
+
+assert textinput
+# Missing element
+asserttxt "Click Me (Green)"
+assert textprefillinput
+

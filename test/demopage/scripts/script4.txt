@@ -1,0 +1,3 @@
+# 
+assert textprefillinput
+print "Script test end"

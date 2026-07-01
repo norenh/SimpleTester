@@ -1,0 +1,8 @@
+waitfor mybutton
+
+# Unexpected negation
+select !dropdown "One"
+
+assert textinput
+assert textprefillinput
+

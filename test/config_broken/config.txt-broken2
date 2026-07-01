@@ -1,0 +1,5 @@
+message id "message"
+textbox name "my-text"
+submitButton cssSelector "button"
+# Invalid XPATH
+dropdown xpath "test]"

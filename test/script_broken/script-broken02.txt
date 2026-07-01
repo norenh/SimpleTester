@@ -1,0 +1,5 @@
+# Missing element
+waitfor ! 
+
+assert textinput
+

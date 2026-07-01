@@ -1,0 +1,8 @@
+waitfor mybutton
+
+# Missing DEFINE
+asserttxt textinput _not_defined_define
+
+assert textinput
+assert textprefillinput
+
