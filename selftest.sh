@@ -60,6 +60,10 @@ echo " ---- They might take some time (minutes not hours) to execute"
 ./run.sh -e ERROR -h test/demopage/config1.txt "https://test.invalid" test/demopage/script1.txt &> "${OUTPUTFILE}";
 test_check "Wrong URL" 3 "^ERROR" "$?" "true"
 
+# Test empty script-file, check for 0 exit value, SUCCESS line in end
+./run.sh -e ERROR -h test/empty.txt file://$(pwd)/test/demopage/demo_page.html test/empty.txt &> "${OUTPUTFILE}";
+test_check "Empty script" 0 "^SUCCESS:" "$?" "true"
+
 # Make sure we have no "test.png" file before we run first test creating it
 rm -f "test.png"
 # Test demopage, check for 0 exit value, SUCCESS line in end and test.png exist from screenshot
