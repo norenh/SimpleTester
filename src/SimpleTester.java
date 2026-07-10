@@ -1861,6 +1861,9 @@ public class SimpleTester {
 	catch(Exception e) {
 	    System.out.println(e.toString());
 	    System.out.println("ERROR: Failed opening '"+url+"'");
+	    if(!stay_open || headless) {
+		curr_driver.quit();
+	    }
 	    System.exit(3);
 	}
 
@@ -1914,6 +1917,9 @@ public class SimpleTester {
 	    System.out.println(e.toString());
 	    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
 			       nr_of_scripts+")"+":"+linenr+":"+curr_line);
+	    if(!stay_open || headless) {
+		curr_driver.quit();
+	    }
 	    System.exit(4);
 	}
 	if(!stay_open || headless) {
