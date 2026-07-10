@@ -1,0 +1,132 @@
+#
+# Basic testing variety of inputfields
+#
+# datepicker tests commented out due to lack general way
+# to work cross-browser.
+# They might be separated out in the future and 
+# checked how we can handle locale
+#
+
+waitfor button
+
+assertclk button
+
+assertpro username "value" ""
+type username "user"
+assertpro username "value" "user"
+typeclr username "foo"
+assertpro username "value" "foo"
+
+assertpro password "value" ""
+type password "password"
+assertpro password "value" "password"
+typeclr password "bar"
+assertpro password "value" "bar"
+
+assertpro hidden "value" "3487"
+
+assertpro fname "value" "John"
+typeclr fname "first"
+assertpro fname "value" "first"
+
+assertpro lname "value" "Doe"
+typeclr lname "second"
+assertpro lname "value" "second"
+
+assertpro radio_html "checked" "false"
+assertpro radio_css "checked" "false"
+assertpro radio_javascript "checked" "false"
+click radio_html
+assertpro radio_html "checked" "true"
+assertpro radio_css "checked" "false"
+assertpro radio_javascript "checked" "false"
+clickaction radio_css
+assertpro radio_html "checked" "false"
+assertpro radio_css "checked" "true"
+assertpro radio_javascript "checked" "false"
+click radio_javascript
+assertpro radio_html "checked" "false"
+assertpro radio_css "checked" "false"
+assertpro radio_javascript "checked" "true"
+
+assertpro checkbox_vehicle1 "checked" "false"
+assertpro checkbox_vehicle2 "checked" "false"
+assertpro checkbox_vehicle3 "checked" "false"
+click checkbox_vehicle1
+clickaction checkbox_vehicle2
+click checkbox_vehicle3
+assertpro checkbox_vehicle1 "checked" "true"
+assertpro checkbox_vehicle2 "checked" "true"
+assertpro checkbox_vehicle3 "checked" "true"
+click checkbox_vehicle2
+assertpro checkbox_vehicle2 "checked" "false"
+
+assertpro date_birthday "value" ""
+#type date_birthday "01021999"   # works in chrome
+#type date_birthday "1999-01-02" # works in firefox
+#assertpro date_birthday "value" "1999-01-02"
+
+assertpro date_max "value" ""
+#type date_max "02031920"       # works in chrome
+#type date_max "1920-02-03"     # works in firefox
+#assertpro date_max "value" "1920-02-03"
+
+assertpro date_min "value" ""
+#type date_min "03042020"       # works in chrome
+#type date_min "2020-03-04"     # works in firefox
+#assertpro date_min "value" "2020-03-04"
+
+assertpro date_local "value" ""
+#type date_local "04052000"
+#typekey date_local TAB         # firefox does not want this, chrome needs it
+#type date_local "1122PM"
+#assertpro date_local "value" "2000-04-05T23:22"
+
+assertpro email "value" ""
+type email "test@example.org"
+assertpro email "value" "test@example.org"
+typeclr email "test@example"
+assertpro email "value" "test@example"
+
+assertpro number1 "value" ""
+type number1 "3"
+assertpro number1 "value" "3"
+typeclr number1 "4"
+assertpro number1 "value" "4"
+
+assertpro number2 "value" "30"
+typeclr number2 ""
+assertpro number2 "value" ""
+type number2 "20"
+assertpro number2 "value" "20"
+
+assertpro range "value" "25"
+typekey range ARROW_RIGHT
+assertpro range "value" "26"
+typekey range ARROW_RIGHT
+assertpro range "value" "27"
+typekey range ARROW_LEFT
+assertpro range "value" "26"
+
+assertpro search "value" ""
+type search "test"
+assertpro search "value" "test"
+typeclr search "I'm feeling lucky!"
+assertpro search "value" "I'm feeling lucky!"
+
+assertpro tel "value" ""
+type tel "123-45-678"
+assertpro tel "value" "123-45-678"
+typeclr tel "999-11-222"
+assertpro tel "value" "999-11-222"
+
+assertpro url "value" ""
+type url "https://www.example.org"
+assertpro url "value" "https://www.example.org"
+typeclr url "http://example.org"
+assertpro url "value" "http://example.org"
+
+assertpro username "value" "foo"
+click reset
+assertpro username "value" ""
+

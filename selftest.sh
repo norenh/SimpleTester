@@ -101,6 +101,30 @@ test_check "Demopage - multiple" 0 "^SUCCESS:.*(3/3)" "$?" "true"
 ./run.sh -e ERROR -h -s test/demopage/scripts1.txt test/demopage/config1.txt file://$(pwd)/test/demopage/demo_page.html &> "${OUTPUTFILE}";
 test_check "Demopage - script" 0 "^SUCCESS:.*(3/3)" "$?" "true"
 
+# Test inputtest with chrome, check for 0 exit value, SUCCESS line in end
+./run.sh -b chrome -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
+test_check "Inputtest - regular (chrome)" 0 "^SUCCESS:" "$?" "true"
+
+# Test inputtest with firefox, check for 0 exit value, SUCCESS line in end
+./run.sh -b firefox -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
+test_check "Inputtest - regular (firefox)" 0 "^SUCCESS:" "$?" "true"
+
+# Test quirk mode 1,2,3,4 with chrome, check for 0 exit value, SUCCESS line in end
+./run.sh -b chrome -q 1,2,3,4 -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
+test_check "Inputtest - quirk 1,2,3,4 (chrome)" 0 "^SUCCESS:" "$?" "true"
+
+# Test quirk mode 1,2,3,4 with firefox, check for 0 exit value, SUCCESS line in end
+./run.sh -b firefox -q 1,2,3,4 -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
+test_check "Inputtest - quirk 1,2,3,4 (firefox)" 0 "^SUCCESS:" "$?" "true"
+
+# Test quirk mode 5 with chrome, check for 0 exit value, SUCCESS line in end
+./run.sh -b chrome -q 5 -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
+test_check "Inputtest - quirk 5 (chrome)" 0 "^SUCCESS:" "$?" "true"
+
+# Test quirk mode 5 with firefox, check for 0 exit value, SUCCESS line in end
+./run.sh -b firefox -q 5 -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
+test_check "Inputtest - quirk 5 (firefox)" 0 "^SUCCESS:" "$?" "true"
+
 # Remove outputfile
 rm "${OUTPUTFILE}"
 
