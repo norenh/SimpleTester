@@ -1459,6 +1459,17 @@ public class SimpleTester {
 	return true;
     }
 
+    public static void exit_and_close_driver(boolean stayOpen, int exitCode) {
+	// Unfortunately there does not seem to be a way to
+	// just quit the webdriver without killing the browser
+	// If stayOpen is used, a longering process will stay around
+	if(!stayOpen) {
+	    curr_driver.quit();
+	}
+
+	System.exit(exitCode);
+    }
+
     public static void main(String[] args) {
 
 	if(args.length < 3) {
@@ -1861,10 +1872,7 @@ public class SimpleTester {
 	catch(Exception e) {
 	    System.out.println(e.toString());
 	    System.out.println("ERROR: Failed opening '"+url+"'");
-	    if(!stay_open || headless) {
-		curr_driver.quit();
-	    }
-	    System.exit(3);
+	    exit_and_close_driver(stay_open, 3);
 	}
 
 	int script_nr = 1;
@@ -1895,10 +1903,7 @@ public class SimpleTester {
 		    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
 				       nr_of_scripts+")"+":"+linenr+":"+curr_line);
 		    script_file.close();
-		    if(!stay_open || headless) {
-			curr_driver.quit();
-		    }
-		    System.exit(4);
+		    exit_and_close_driver(stay_open, 4);
 		}
 		script_file.close();
 		System.out.println("INFO: SUCCESS: "+sfile+" ("+script_nr+
@@ -1917,14 +1922,9 @@ public class SimpleTester {
 	    System.out.println(e.toString());
 	    System.out.println("FAIL: "+sfile+" ("+script_nr+"/"+
 			       nr_of_scripts+")"+":"+linenr+":"+curr_line);
-	    if(!stay_open || headless) {
-		curr_driver.quit();
-	    }
-	    System.exit(4);
+
+	    exit_and_close_driver(stay_open, 4);
 	}
-	if(!stay_open || headless) {
-	    curr_driver.quit();
-	}
-	System.exit(0);
+	exit_and_close_driver(stay_open, 0);
     }
 }
