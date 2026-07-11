@@ -1,0 +1,2 @@
+waitfor textinput
+typeclr nonexisting "Hello there"

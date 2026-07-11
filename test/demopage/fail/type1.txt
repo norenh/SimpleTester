@@ -1,0 +1,2 @@
+waitfor textinput
+type nonexisting "Hello there"

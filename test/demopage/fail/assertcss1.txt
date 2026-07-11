@@ -1,0 +1,2 @@
+waitfor textinput
+assertcss textinput "notacssvalue" "20px"

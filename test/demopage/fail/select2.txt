@@ -1,0 +1,2 @@
+waitfor textinput
+select dropdown "Set to 150%"

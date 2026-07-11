@@ -1,0 +1,3 @@
+waitfor textinput
+settoggle nonexisting "true"
+

@@ -125,6 +125,12 @@ test_check "Inputtest - quirk 5 (chrome)" 0 "^SUCCESS:" "$?" "true"
 ./run.sh -b firefox -q 5 -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
 test_check "Inputtest - quirk 5 (firefox)" 0 "^SUCCESS:" "$?" "true"
 
+# Test failed, check for 4 exit value, FAIL line in the end
+for FILE in $(ls test/demopage/fail/*.txt); do
+        ./run.sh -e ERROR -h "test/demopage/config1.txt" file://$(pwd)/test/demopage/demo_page.html "${FILE}" &> "${OUTPUTFILE}";
+        test_check "${FILE}" 4 "^FAIL:" "$?" "true"
+done
+
 # Remove outputfile
 rm "${OUTPUTFILE}"
 

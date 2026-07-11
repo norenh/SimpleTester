@@ -1,0 +1,2 @@
+waitfor textinput
+assertsel radiobutton1 "false"

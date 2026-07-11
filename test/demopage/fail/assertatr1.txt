@@ -1,0 +1,3 @@
+waitfor textinput
+assertatr textinput "nonexistant" "test"
+
