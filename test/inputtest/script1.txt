@@ -59,31 +59,31 @@ click checkbox_vehicle2
 assertpro checkbox_vehicle2 "checked" "false"
 
 assertpro date_birthday "value" ""
-typedate date_birthday "1999-01-02"
+setvalue date_birthday "1999-01-02"
 assertpro date_birthday "value" "1999-01-02"
 
 assertpro date_max "value" ""
-typedate date_max "1920-02-03"
+setvalue date_max "1920-02-03"
 assertpro date_max "value" "1920-02-03"
 
 assertpro date_min "value" ""
-typedate date_min "2020-03-04"
+setvalue date_min "2020-03-04"
 assertpro date_min "value" "2020-03-04"
 
 assertpro date_local "value" ""
-typedate date_local "2000-04-05T23:22"
+setvalue date_local "2000-04-05T23:22"
 assertpro date_local "value" "2000-04-05T23:22"
 
 assertpro month "value" ""
-typedate month "2010-03"
+setvalue month "2010-03"
 assertpro month "value" "2010-03"
 
 assertpro time "value" ""
-typedate time "13:01"
+setvalue time "13:01"
 assertpro time "value" "13:01"
 
 assertpro week "value" ""
-typedate week "2026-W29"
+setvalue week "2026-W29"
 assertpro week "value" "2026-W29"
 
 assertpro email "value" ""

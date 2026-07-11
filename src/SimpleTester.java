@@ -135,9 +135,9 @@ public class SimpleTester {
 	SCROLLTO,
 	SELECT,
 	SETTOGGLE,
+	SETVALUE,
 	TYPE,
 	TYPECLR,
-	TYPEDATE,
 	TYPEKEY,
 	WAIT,
 	WAITFOR,
@@ -196,9 +196,9 @@ public class SimpleTester {
 	    put("scrollto",  EnumStmt.SCROLLTO);
 	    put("select",    EnumStmt.SELECT);
 	    put("settoggle", EnumStmt.SETTOGGLE);
+	    put("setvalue",  EnumStmt.SETVALUE);
 	    put("type",      EnumStmt.TYPE);
 	    put("typeclr",   EnumStmt.TYPECLR);
-	    put("typedate",  EnumStmt.TYPEDATE);
 	    put("typekey",   EnumStmt.TYPEKEY);
 	    put("wait",      EnumStmt.WAIT);
 	    put("waitfor",   EnumStmt.WAITFOR);
@@ -1144,6 +1144,23 @@ public class SimpleTester {
 		    }
 		}
 		return true;
+	    case SETVALUE:
+		list = readSel(false);
+		s1 = readString();
+		if(novalidate)
+		    return true;
+		findElementCached(list);
+
+		tryClick();
+		sleep(20);
+		{
+		    String tmp = curr_element.getDomProperty("value");
+		    if(tmp != null) {
+			js.executeScript("arguments[0].focus(); arguments[0].value = '"+s1+"'; arguments[0].dispatchEvent(new Event('change'));", curr_element);
+		    }
+		    sleep(20);
+		}
+		return true;
 	    case TYPE:
 		list = readSel(false);
 		s1 = readString();
@@ -1200,32 +1217,6 @@ public class SimpleTester {
 		    break;
 		}
 		tryType(s1);
-		return true;
-	    case TYPEDATE:
-		list = readSel(false);
-		s1 = readString();
-		if(novalidate)
-		    return true;
-		findElementCached(list);
-
-		tryClick();
-		sleep(20);
-		{
-		    String type = curr_element.getDomAttribute("type");
-		    if(!(type.equals("date") ||
-			 type.equals("datetime-local") ||
-			 type.equals("month") ||
-			 type.equals("time") ||
-			 type.equals("week"))) {
-			System.out.println("ERROR: Element "+ curr_element+" is not date-, datetime-local-, month-, week- or time-type");
-			return false;
-		    }
-		    String tmp = curr_element.getDomProperty("value");
-		    if(tmp != null) {
-			js.executeScript("arguments[0].focus(); arguments[0].value = '"+s1+"'; arguments[0].textContent = ''; arguments[0].dispatchEvent(new Event('change'));", curr_element);
-		    }
-		    sleep(20);
-		}
 		return true;
 	    case TYPEKEY:
 		list = readSel(false);
