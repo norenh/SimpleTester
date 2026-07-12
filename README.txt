@@ -37,10 +37,10 @@ Arguments supported are (not all are valid for all browsers):
  -t test run only, only checks config, scripts and some arguments in a dry run
 
 The config-file should have the following structure:
-ELEMENTNAME [[id|name|cssSelector|tagName|className|linkTest|xpath] "string"]+
+ELEMENTNAME [id|name|cssSelector|tagName|className|linkTest|xpath] "string"
 
 The idea is that every element you want to interact with should have a unique 
-name, followed by one or more selectors that each have a type and a text.
+name, followed by one selector that each have a type and a text.
 
 The script supports the following statements for now:
 --

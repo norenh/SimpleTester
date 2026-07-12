@@ -62,7 +62,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 public class SimpleTester {
 
-    private final static HashMap<String, ArrayList<By>> selectors = new HashMap<String, ArrayList<By>>();
+    private final static HashMap<String, By> selectors = new HashMap<String, By>();
     private final static HashMap<String, String> defines = new HashMap<String, String>();
     // RETRY_TIMES*RETRY_INTERVAL=longest wait before giving up
     // Example 200*100 = 20 seconds, trying every 100 ms (10 times per second, 200 times = 20s)
@@ -70,7 +70,6 @@ public class SimpleTester {
     private final static int RETRY_TIMES = 200; // retry 200 times
     private static WebDriver curr_driver;
     private static JavascriptExecutor js;
-    private static ArrayList<By> curr_by_list;
     private static WebElement curr_element;
     private static FileReader config_file;
     private static FileReader script_file;
@@ -91,7 +90,7 @@ public class SimpleTester {
     /** line_history is a ring-list and contains curr_line history.
 	null-entries are not yet populated **/
     private static String line_history[] = new String[8];
-    /** pointer to the current position in the ring-list **/
+    /** current position in the ring-list **/
     private static int line_history_position = 0;
 
     private static boolean sameSelector = false;
@@ -309,76 +308,70 @@ public class SimpleTester {
 			System.out.println("ERROR: Duplicate ELEMENTNAME ("+statement+")");
 			return false;
 		    }
-		    ArrayList<By> l = new ArrayList<By>();
-		    selectors.put(statement,l);
-		    while(true) {
-			int index2 = curr_line.indexOf(' ', index1+1);
-			if(index2 == -1) {
-			    System.out.println("ERROR: Unexpected EOL, did you miss a keyword?");
-			    return false;
-			}
-			String by_string = curr_line.substring(index1+1, index2);
-			EnumBy ret = by_names.get(by_string);
-			if(ret == null) {
-			    System.out.println("ERROR: \""+by_string+"\" not a valid Locator");
-			    return false;
-			}
-			index1 = index2+1;
-			if(curr_line.charAt(index1) != '"') {
-			    System.out.println("ERROR: Expected starting '\"'-character!");
-                            return false;
-			}
-			index2 = curr_line.indexOf('"', index1+1);
-			if(index2 == -1) {
-			    System.out.println("ERROR: Expected ending '\"'-character!");
-			    return false;
-			}
-			String selector = curr_line.substring(index1+1, index2);
-			XPathFactory xpathFactory = XPathFactory.newInstance();
-			By by;
-			switch(ret) {
-			case ID:
-			    by = By.id(selector);
-			    break;
-			case NAME:
-			    by = By.name(selector);
-			    break;
-			case CSSSELECTOR:
-			    by = By.cssSelector(selector);
-			    break;
-			case TAGNAME:
-			    by = By.tagName(selector);
-			    break;
-			case CLASSNAME:
-			    by = By.className(selector);
-			    break;
-			case LINKTEXT:
-			    by = By.linkText(selector);
-			    break;
-			case XPATH:
-			    try {
-				// try to compile it, not really used.
-				// only for validating it is a proper XPath.
-				xpathFactory.newXPath().compile(selector);
-			    }
-			    catch(XPathExpressionException e) {
-				System.out.println("ERROR: Invalid Xpath: "+selector);
-				return false;
-			    }
-			    by = By.xpath(selector);
-			    break;
-			default:
-			    return false;
-			}
-			l.add(by);
 
-			//System.out.println(statement+"' '"+ret.toString()+by_string+"' '"+selector+"' " + index2 + " "+ curr_line.length());
-
-			index1 = index2+1;
-			if(curr_line.length() <= index1)
-			    break;
-			selectors.put(statement,l);
+		    int index2 = curr_line.indexOf(' ', index1+1);
+		    if(index2 == -1) {
+			System.out.println("ERROR: Unexpected EOL, did you miss a keyword?");
+			return false;
 		    }
+		    String by_string = curr_line.substring(index1+1, index2);
+		    EnumBy ret = by_names.get(by_string);
+		    if(ret == null) {
+			System.out.println("ERROR: \""+by_string+"\" not a valid Locator");
+			return false;
+		    }
+		    index1 = index2+1;
+		    if(curr_line.charAt(index1) != '"') {
+			System.out.println("ERROR: Expected starting '\"'-character!");
+			return false;
+		    }
+		    index2 = curr_line.indexOf('"', index1+1);
+		    if(index2 == -1) {
+			System.out.println("ERROR: Expected ending '\"'-character!");
+			return false;
+		    }
+		    String selector = curr_line.substring(index1+1, index2);
+		    XPathFactory xpathFactory = XPathFactory.newInstance();
+		    By by;
+		    switch(ret) {
+		    case ID:
+			by = By.id(selector);
+			break;
+		    case NAME:
+			by = By.name(selector);
+			break;
+		    case CSSSELECTOR:
+			by = By.cssSelector(selector);
+			break;
+		    case TAGNAME:
+			by = By.tagName(selector);
+			break;
+		    case CLASSNAME:
+			by = By.className(selector);
+			break;
+		    case LINKTEXT:
+			by = By.linkText(selector);
+			break;
+		    case XPATH:
+			try {
+			    // try to compile it, not really used.
+			    // only for validating it is a proper XPath.
+			    xpathFactory.newXPath().compile(selector);
+			}
+			catch(XPathExpressionException e) {
+			    System.out.println("ERROR: Invalid Xpath: "+selector);
+			    return false;
+			}
+			by = By.xpath(selector);
+			break;
+		    default:
+			//System.out.println("ERROR: Invalid By-tag");
+			return false;
+		    }
+
+		    //System.out.println(statement+"' '"+ret.toString()+by_string+"' '"+selector+"' " + index2 + " "+ curr_line.length());
+
+		    selectors.put(statement,by);
 		}
 		curr_line = buffer.readLine();
 	    }
@@ -391,18 +384,12 @@ public class SimpleTester {
 	return true;
     }
 
-    private static void findElement(ArrayList<By> s) {
+    private static void findElement(By s) {
 	curr_element = null;  // invalidate curr_element, in case we exit by exception
-	curr_element = curr_driver.findElement(s.get(0));
-	int size = s.size();
-	for (int i = 1; i < size; i++) {
-	    if(curr_element == null)
-		return;
-	    curr_element = curr_element.findElement(s.get(i));
-	}
+	curr_element = curr_driver.findElement(s);
     }
 
-    private static void findElementCached(ArrayList<By> s) {
+    private static void findElementCached(By s) {
 	// We may already have the element if it is the same as before
 	// and curr_element is not null
 	if(sameSelector && !elementCacheOffQuirk && curr_element != null)
@@ -587,7 +574,7 @@ public class SimpleTester {
 	return ret;
     }
 
-    private static ArrayList<By> readSel(boolean neg) throws ParsingException {
+    private static By readSel(boolean neg) throws ParsingException {
 	sameSelector = false;
 	currPos++;
 	if(currPos >= curr_line.length())
@@ -617,11 +604,10 @@ public class SimpleTester {
 	}
 
 	//System.out.println("Selector:"+notSel+":"+selector);
-	ArrayList<By> list = null;
-	list = selectors.get(selector);
-	if(list == null)
+	By b = selectors.get(selector);
+	if(b == null)
 	    throw new ParsingException(selector+" is not a ELEMENTNAME!");
-	return list;
+	return b;
     }
 
     private static String readString() throws ParsingException {
@@ -720,7 +706,7 @@ public class SimpleTester {
     }
 
     private static boolean runStatement(boolean novalidate) {
-	ArrayList<By> list = null;
+	By selector = null;
 	String s1;
 	String s2;
 	String ret;
@@ -734,12 +720,12 @@ public class SimpleTester {
 	    boolean b;
 	    switch(st) {
 	    case ASSERT:
-		list = readSel(true);
+		selector = readSel(true);
 		if(novalidate)
 		    return true;
 
 		try {
-		    findElement(list);
+		    findElement(selector);
 		    if(!notSel)
 			return true;
 		}
@@ -749,12 +735,12 @@ public class SimpleTester {
 		}
 		return false;
 	    case ASSERTATR:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString(true);
 		s2 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		ret = curr_element.getDomAttribute(s1);
 		if(ret == null)
 		    return notStr;
@@ -775,10 +761,10 @@ public class SimpleTester {
 		}
 		return true;
 	    case ASSERTCLK:
-		list = readSel(true);
+		selector = readSel(true);
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 
 		// Element might still be hidden behind other, but this should do for now
 		b = curr_element.isDisplayed() && curr_element.isEnabled();
@@ -788,12 +774,12 @@ public class SimpleTester {
 		else
 		    return !b;
 	    case ASSERTCSS:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		ret = curr_element.getCssValue(s1);
 		if(ret == null)
 		    return false;
@@ -807,12 +793,12 @@ public class SimpleTester {
 		}
 		return true;
 	    case ASSERTPRO:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString(true);
 		s2 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		ret = curr_element.getDomProperty(s1);
 		if(ret == null)
 		    return notStr;
@@ -832,18 +818,18 @@ public class SimpleTester {
 		}
 		return true;
 	    case ASSERTSEL:
-		list = readSel(false);
+		selector = readSel(false);
 		b = readBool();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		return curr_element.isSelected() == b;
 	    case ASSERTTXT:
-		list = readSel(false);
+		selector = readSel(false);
 		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		scrollUnlessDisplayed();
 		ret = curr_element.getText();
 		if(ret == null)
@@ -858,17 +844,17 @@ public class SimpleTester {
 		}
 		return true;
 	    case CLICK:
-		list = readSel(false);
+		selector = readSel(false);
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		//System.out.println(curr_element.toString());
 		return tryClick();
 	    case CLICKACTION:
-		list = readSel(false);
+		selector = readSel(false);
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		{
 		    if(actionQuirk) {
 			// in case actions are not working
@@ -889,15 +875,15 @@ public class SimpleTester {
 		// If we find the state (element exists or not),
 		// return early, but otherwise keep trying to click
 		// until state has been reached or time has run out
-		list = readSel(false);
+		selector = readSel(false);
 		{
-		    ArrayList<By> untilList = readSel(true);
+		    By untilSelector = readSel(true);
 		    if(novalidate)
 			return true;
 
 		    for(int i=0;i<RETRY_TIMES;i++) {
 			try {
-			    findElement(untilList);
+			    findElement(untilSelector);
 			    if(!notSel)
 				return true;
 			}
@@ -908,7 +894,7 @@ public class SimpleTester {
 			try {
 			    // if conditions have not been met
 			    // keep trying until time has run out
-			    findElement(list);
+			    findElement(selector);
 			    tryClick();
 			}
 			catch(StaleElementReferenceException|NoSuchElementException e) {}
@@ -918,10 +904,10 @@ public class SimpleTester {
 		// we failed to find condition, return true anyway
 		return true;
 	    case CLICKFORCE:
-		list = readSel(false);
+		selector = readSel(false);
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 
 		if(tryClick()) {
 		    return true;
@@ -934,13 +920,13 @@ public class SimpleTester {
 		}
 		return false;
 	    case DRAWBOX:
-		list = readSel(false);
+		selector = readSel(false);
 	        x = readInt();
 		if(x < 0)
 		    return false;
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		{
 		    if(actionQuirk) {
 			// in case actions are not working
@@ -980,13 +966,13 @@ public class SimpleTester {
 		if(!novalidate) {
 		    sleep(x*100);
 		}
-		list = readSel(true);
+		selector = readSel(true);
 		if(novalidate)
 		    return true;
 
 		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
-			findElement(list);
+			findElement(selector);
 			if(!notSel)
 			    return true;
 		    }
@@ -1001,10 +987,10 @@ public class SimpleTester {
 		script_done = true;
 		return true;
 	    case HOVER:
-		list = readSel(false);
+		selector = readSel(false);
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		{
 		    if(actionQuirk) {
 			// in case actions are not working
@@ -1025,20 +1011,20 @@ public class SimpleTester {
 		System.out.println("PRINT:"+linenr+":\""+s1+"\"");
 		return true;
 	    case PRINTATR:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		ret = curr_element.getDomAttribute(s1);
 		System.out.println("PRINTATR:"+linenr+":\""+ret+"\"");
 		return true;
 	    case PRINTCSS:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		ret = curr_element.getCssValue(s1);
 		System.out.println("PRINTCSS:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1053,11 +1039,11 @@ public class SimpleTester {
 		System.out.println("PRINTJS:"+linenr+":\""+ret+"\"");
 		return true;
 	    case PRINTPRO:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		ret = curr_element.getDomProperty(s1);
 		System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
 		return true;
@@ -1073,10 +1059,10 @@ public class SimpleTester {
 		System.out.println("PRINTTIME:"+linenr+":"+Instant.now());
 		return true;
 	    case PRINTTXT:
-		list = readSel(false);
+		selector = readSel(false);
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		scrollUnlessDisplayed();
 		ret = curr_element.getText();
 		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
@@ -1110,29 +1096,29 @@ public class SimpleTester {
 		System.out.println("INFO: Screenshot taken \""+s1+"\"");
 		return true;
 	    case SCROLLTO:
-		list = readSel(false);
+		selector = readSel(false);
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		scrollToElement();
 		return true;
 	    case SELECT:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		scrollUnlessDisplayed();
 		Select dropdown = new Select(curr_element);
 		dropdown.selectByVisibleText(s1);
 		return true;
 	    case SETTOGGLE:
 		// should return true if radiobutton/checkbox is set to chosen value
-		list = readSel(false);
+		selector = readSel(false);
 		b = readBool();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		if(curr_element.isSelected() != b && curr_element.isEnabled()) {
 		    try {
 			tryClick();
@@ -1145,11 +1131,11 @@ public class SimpleTester {
 		}
 		return true;
 	    case SETVALUE:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 
 		tryClick();
 		sleep(20);
@@ -1162,20 +1148,20 @@ public class SimpleTester {
 		}
 		return true;
 	    case TYPE:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		scrollUnlessDisplayed();
 		tryType(s1);
 		return true;
 	    case TYPECLR:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 
 		// Chrome and Safari have quirks with cursor position
 		// being updated later than expected, so try click before
@@ -1219,11 +1205,11 @@ public class SimpleTester {
 		tryType(s1);
 		return true;
 	    case TYPEKEY:
-		list = readSel(false);
+		selector = readSel(false);
 		Keys k = readKey();
 		if(novalidate)
 		    return true;
-		findElementCached(list);
+		findElementCached(selector);
 		scrollUnlessDisplayed();
 		// No need for tryType, we only have one char here
 		curr_element.sendKeys(k);
@@ -1235,13 +1221,13 @@ public class SimpleTester {
 		}
 		return true;
 	    case WAITFOR:
-		list = readSel(true);
+		selector = readSel(true);
 		if(novalidate)
 		    return true;
 
 		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
-			findElement(list);
+			findElement(selector);
 			if(!notSel)
 			    return true;
 		    }
@@ -1253,14 +1239,14 @@ public class SimpleTester {
 		}
 		return false;
 	    case WAITFORATR:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		s2 = readString();
 		if(novalidate)
 		    return true;
 		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
-			findElement(list);
+			findElement(selector);
 			ret = curr_element.getDomAttribute(s1);
 			if(ret != null && ret.equals(s2))
 			    return true;
@@ -1272,7 +1258,7 @@ public class SimpleTester {
 		}
 		return false;
 	    case WAITFORCSS:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		sor = new StrOrRegex();
 		if(novalidate)
@@ -1280,7 +1266,7 @@ public class SimpleTester {
 		ret = null; // compiler not smart enough to see it always is initalised
 		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
-			findElement(list);
+			findElement(selector);
 			ret = curr_element.getCssValue(s1);
 			if(ret == null)
 			    continue;
@@ -1302,13 +1288,13 @@ public class SimpleTester {
 		System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 		return false;
 	    case WAITFORENABLED:
-		list = readSel(true);
+		selector = readSel(true);
 		if(novalidate)
 		    return true;
 
 		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
-			findElement(list);
+			findElement(selector);
 			if(curr_element.isEnabled()) {
 			    if(!notSel)
 				return true;
@@ -1326,14 +1312,14 @@ public class SimpleTester {
 		}
 		return false;
 	    case WAITFORPRO:
-		list = readSel(false);
+		selector = readSel(false);
 		s1 = readString();
 		s2 = readString();
 		if(novalidate)
 		    return true;
 		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
-			findElement(list);
+			findElement(selector);
 			ret = curr_element.getDomProperty(s1);
 			if(ret != null && ret.equals(s2))
 			    return true;
@@ -1345,13 +1331,13 @@ public class SimpleTester {
 		}
 		return false;
 	    case WAITFORTXT:
-		list = readSel(false);
+		selector = readSel(false);
 		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
 		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
-			findElement(list);
+			findElement(selector);
 			scrollUnlessDisplayed();
 			ret = curr_element.getText();
 			if(sor.matches(ret)) {
