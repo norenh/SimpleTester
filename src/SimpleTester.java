@@ -83,7 +83,6 @@ public class SimpleTester {
     private static boolean actionQuirk = false;
     private static boolean elementCacheOffQuirk= false;
     private static int linenr = 0;
-    private static int lastDelta = 0;
     private static long totalTimeTaken = 0;
     private static String curr_line = "";
     private static String sfile = "";
@@ -1649,8 +1648,8 @@ public class SimpleTester {
 		scripts.add(args[i]);
 	    }
 	}
-	else if(argi >= args.length-1) {
-	    // No scripts file and we have passed argument length
+	if(argi >= args.length-1) {
+	    // At least a config file and url is still needed
 	    printUsage();
 	    System.exit(1);
 	}
