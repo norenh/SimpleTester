@@ -1615,10 +1615,6 @@ public class SimpleTester {
 		    System.out.println("ERROR: Unable to open file "+e.toString());
 		    System.exit(1);
 		}
-		if(scripts.size() <= 0) {
-		    System.out.println("ERROR: No scripts in "+args[argi]);
-		    System.exit(1);
-		}
 		argi++;
 		break;
 	    case 't':
