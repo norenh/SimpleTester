@@ -32,6 +32,29 @@ if [[ $(head -1  "${OUTPUTFILE}") =~ ^Usage: ]] then
 fi
 test_check "Argument - none" 1 "^$" "$RET" "$PRETEST"
 
+
+# Test invalid argument(s), check for 1 exit value, ERROR line in the end
+./run.sh -b nonexisting -e ERROR -h "${FILE}" file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
+test_check "Argument - wrong browser" 1 "^ERROR" "$RET" "true"
+./run.sh -r 1200-1300 -e ERROR -h "${FILE}" file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
+test_check "Argument - wrong resolution1" 1 "^ERROR" "$RET" "true"
+./run.sh -r 1200xx -e ERROR -h "${FILE}" file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
+test_check "Argument - wrong resolution2" 1 "^ERROR" "$RET" "true"
+./run.sh -q 4,7 -e ERROR -h "${FILE}" file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
+test_check "Argument - wrong quirk1" 1 "^ERROR" "$RET" "true"
+./run.sh -q -e ERROR -h "${FILE}" file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
+test_check "Argument - wrong quirk2" 1 "^ERROR" "$RET" "true"
+./run.sh -@ -e ERROR -h "${FILE}" file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
+test_check "Argument - unknown arg" 1 "^ERROR" "$RET" "true"
+
+# Test missing file
+./run.sh -e ERROR -h "test/demopage/config1.txt" file://$(pwd)/test/demopage/demo_page.html "test/demopage/nonexisting" &> "${OUTPUTFILE}";
+test_check "Argument - missing script" 2 "^ERROR:" "$?" "true"
+./run.sh -e ERROR -h -s "test/demopage/nonexisting" "test/demopage/config1.txt" file://$(pwd)/test/demopage/demo_page.html &> "${OUTPUTFILE}";
+test_check "Argument - missing scripts" 1 "^ERROR:" "$?" "true"
+./run.sh -e ERROR -h "test/demopage/nonexisting" file://$(pwd)/test/demopage/demo_page.html "test/demopage/script1.txt" &> "${OUTPUTFILE}";
+test_check "Argument - missing config" 2 "^ERROR:" "$?" "true"
+
 # Test broken configs, check for 2 exit value, FAIL line in the end
 for FILE in $(ls test/config_broken/config*); do 
 	./run.sh -e ERROR -h "${FILE}" file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}"; 
