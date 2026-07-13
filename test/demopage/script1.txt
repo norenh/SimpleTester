@@ -39,6 +39,8 @@ assertpro textprefillinput "value" "Text..."
 assertsel checkbox1 "false"
 assertsel checkbox5 "true"
 asserttxt mybutton "Click Me (Green)"
+asserturl "demo_page.html"
+asserturl !"inputtest.html"
 
 # Expand and click on hoverdropdown
 
@@ -116,6 +118,7 @@ printpro textprefillinput "value"
 printtxt mybutton
 printsrc
 printtime
+printurl
 print "Basic test stop"
 
 # Everything past finish should be ignored

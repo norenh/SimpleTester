@@ -9,6 +9,7 @@
  */
 
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -28,6 +29,7 @@ import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -104,6 +106,8 @@ public class SimpleTester {
     }
 
     private enum EnumStmt {
+	ALERTACCEPT,
+	ALERTDISMISS,
 	ASSERT,
 	ASSERTATR,
 	ASSERTCLK,
@@ -111,6 +115,7 @@ public class SimpleTester {
 	ASSERTPRO,
 	ASSERTSEL,
 	ASSERTTXT,
+	ASSERTURL,
 	CLICK,
 	CLICKACTION,
 	CLICKFOR,
@@ -127,6 +132,7 @@ public class SimpleTester {
 	PRINTSRC,
 	PRINTTIME,
 	PRINTTXT,
+	PRINTURL,
 	REFRESH,
 	RUNCMD,
 	SCREENSHOT,
@@ -139,6 +145,7 @@ public class SimpleTester {
 	TYPEKEY,
 	WAIT,
 	WAITFOR,
+	WAITFORALERT,
 	WAITFORATR,
 	WAITFORCSS,
 	WAITFORENABLED,
@@ -166,6 +173,8 @@ public class SimpleTester {
     }
 
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
+	    put("alertaccept",EnumStmt.ALERTACCEPT);
+	    put("alertdismiss",EnumStmt.ALERTDISMISS);
 	    put("assert",    EnumStmt.ASSERT);
 	    put("assertatr", EnumStmt.ASSERTATR);
 	    put("assertclk", EnumStmt.ASSERTCLK);
@@ -173,6 +182,7 @@ public class SimpleTester {
 	    put("assertpro", EnumStmt.ASSERTPRO);
 	    put("assertsel", EnumStmt.ASSERTSEL);
 	    put("asserttxt", EnumStmt.ASSERTTXT);
+	    put("asserturl", EnumStmt.ASSERTURL);
 	    put("click",     EnumStmt.CLICK);
 	    put("clickaction",EnumStmt.CLICKACTION);
 	    put("clickfor",  EnumStmt.CLICKFOR);
@@ -188,6 +198,7 @@ public class SimpleTester {
 	    put("printsrc",  EnumStmt.PRINTSRC);
 	    put("printtime", EnumStmt.PRINTTIME);
 	    put("printtxt",  EnumStmt.PRINTTXT);
+	    put("printurl",  EnumStmt.PRINTURL);
 	    put("refresh",   EnumStmt.REFRESH);
 	    put("runcmd",    EnumStmt.RUNCMD);
 	    put("screenshot",EnumStmt.SCREENSHOT);
@@ -200,6 +211,7 @@ public class SimpleTester {
 	    put("typekey",   EnumStmt.TYPEKEY);
 	    put("wait",      EnumStmt.WAIT);
 	    put("waitfor",   EnumStmt.WAITFOR);
+	    put("waitforalert",EnumStmt.WAITFORALERT);
 	    put("waitforatr",EnumStmt.WAITFORATR);
 	    put("waitforcss",EnumStmt.WAITFORCSS);
 	    put("waitforenabled",EnumStmt.WAITFORENABLED);
@@ -671,8 +683,8 @@ public class SimpleTester {
 		throw e;
 	}
 	if(retry_click) {
-	    scrollToElement();
 	    try {
+		scrollToElement();
 		curr_element.click();
 	    }
 	    catch(ElementNotInteractableException e) {
@@ -718,6 +730,28 @@ public class SimpleTester {
 	    int index1 = currPos;
 	    boolean b;
 	    switch(st) {
+	    case ALERTACCEPT:
+		if(novalidate)
+		    return true;
+		try {
+		    Alert alert = curr_driver.switchTo().alert();
+		    alert.accept();
+		}
+		catch (NoAlertPresentException e) {
+		    return false;
+		}
+		return true;
+	    case ALERTDISMISS:
+		if(novalidate)
+		    return true;
+		try {
+		    Alert alert = curr_driver.switchTo().alert();
+		    alert.dismiss();
+		}
+		catch (NoAlertPresentException e) {
+		    return false;
+		}
+		return true;
 	    case ASSERT:
 		selector = readSel(true);
 		if(novalidate)
@@ -842,12 +876,23 @@ public class SimpleTester {
 		    return false;
 		}
 		return true;
+	    case ASSERTURL:
+		s1 = readString(true);
+		if(novalidate)
+		    return true;
+		b = curr_driver.getCurrentUrl().endsWith(s1);
+		if(!notStr)
+		    return b;
+		else
+		    return !b;
 	    case CLICK:
 		selector = readSel(false);
 		if(novalidate)
 		    return true;
 		findElementCached(selector);
 		//System.out.println(curr_element.toString());
+		if(!curr_element.isEnabled())
+		    return false;
 		return tryClick();
 	    case CLICKACTION:
 		selector = readSel(false);
@@ -858,8 +903,7 @@ public class SimpleTester {
 		    if(actionQuirk) {
 			// in case actions are not working
 			// try to just click it instead
-			tryClick();
-			return true;
+			return tryClick();
 		    }
 		    scrollUnlessDisplayed();
 		    Actions act = new Actions(curr_driver);
@@ -930,8 +974,7 @@ public class SimpleTester {
 		    if(actionQuirk) {
 			// in case actions are not working
 			// try to just click it instead
-			tryClick();
-			return true;
+			return tryClick();
 		    }
 		    scrollUnlessDisplayed();
 		    // get dimensions of element
@@ -994,8 +1037,7 @@ public class SimpleTester {
 		    if(actionQuirk) {
 			// in case actions are not working
 			// try to just click it instead
-			tryClick();
-			return true;
+			return tryClick();
 		    }
 		    scrollUnlessDisplayed();
 		    Actions act = new Actions(curr_driver);
@@ -1065,6 +1107,12 @@ public class SimpleTester {
 		scrollUnlessDisplayed();
 		ret = curr_element.getText();
 		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
+		return true;
+	    case PRINTURL:
+		if(novalidate)
+		    return true;
+		ret = curr_driver.getCurrentUrl();
+		System.out.println("PRINTURL:"+linenr+":\""+ret+"\"");
 		return true;
 	    case REFRESH:
 		if(!novalidate)
@@ -1233,6 +1281,20 @@ public class SimpleTester {
 		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			if(notSel)
 			    return true;
+		    }
+		    sleep(RETRY_INTERVAL);
+		}
+		return false;
+	    case WAITFORALERT:
+		if(novalidate)
+		    return true;
+		for(int i=0;i<RETRY_TIMES;i++) {
+		    try{
+			curr_driver.switchTo().alert();
+			return true;
+		    }
+		    catch(NoAlertPresentException e) {
+			// keep on looking...
 		    }
 		    sleep(RETRY_INTERVAL);
 		}
@@ -1733,6 +1795,8 @@ public class SimpleTester {
 		{
 		    FirefoxOptions options = new FirefoxOptions();
 		    options.setCapability("webSocketUrl", true);
+		    // https://github.com/mozilla/geckodriver/issues/2241
+		    options.setCapability("unhandledPromptBehavior", "ignore");
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--width="+resolution_x);
 			options.addArguments("--height="+resolution_y);

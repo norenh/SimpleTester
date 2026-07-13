@@ -6,7 +6,10 @@
 
 waitfor button
 
+asserturl "inputtest.html"
+
 assertclk button
+assertclk !button_disabled
 
 assertpro username "value" ""
 type username "user"
@@ -133,4 +136,11 @@ assertpro url "value" "http://example.org"
 assertpro username "value" "foo"
 click reset
 assertpro username "value" ""
+
+click button
+waitforalert
+alertaccept
+click button
+waitforalert
+alertdismiss
 

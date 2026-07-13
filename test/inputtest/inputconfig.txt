@@ -3,6 +3,8 @@
 #
 
 button id "button"
+button_disabled id "button_disabled"
+input_disabled id "input_disabled"
 username id "username"
 password id "password"
 hidden id "custId"
