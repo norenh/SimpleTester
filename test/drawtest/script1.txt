@@ -1,0 +1,20 @@
+# Primarely a test of drawbox
+
+# Quirkyness when comparing pictures is that
+# the mousepointer needs to be moved away from
+# clear_button to avoid a mouseover-effect
+# Hence the hover
+
+waitfor canvas
+
+assert clear_button
+assert input_range
+assert input_color
+assert canvas
+hover input_color
+screenshot "pic1.png"
+drawbox canvas 30
+screenshot "pic2.png"
+click clear_button
+hover input_color
+#screenshot "pic3.png"

@@ -1,0 +1,5 @@
+clear_button tagName "button"
+input_color cssSelector "input[type='color']"
+input_range cssSelector "input[type='range']"
+canvas className "myCanvas"
+

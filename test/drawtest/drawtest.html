@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <meta description="Canvas test - from https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Client-side_APIs/Drawing_graphics">
+  </head>
+  <style>
+    body {
+	margin: 0;
+	overflow: hidden;
+	background: #cccccc;
+    }
+
+    .toolbar {
+	height: 75px;
+	background: #cccccc;
+	padding: 5px 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+    }
+
+    .toolbar div {
+	margin: 0 20px;
+	flex: 3;
+    }
+
+    input[type="color"],
+    button {
+	flex: 1;
+    }
+
+    input[type="range"] {
+	width: calc(100% - 20px);
+    }
+
+    output {
+	width: 20px;
+    }
+
+    span {
+	position: relative;
+	bottom: 5px;
+    }
+  </style>
+  <body>
+    <div class="toolbar">
+      <input type="color" aria-label="select pen color" value="#ff0000" />
+      <div>
+	<input
+	  type="range"
+	  min="2"
+	  max="50"
+	  value="30"
+	  aria-label="select pen size" /><span class="output">30</span>
+      </div>
+      <button>Clear canvas</button>
+    </div>
+
+    <canvas class="myCanvas">
+      <p>Add suitable fallback here.</p>
+    </canvas>
+
+    <script type="text/javascript">
+      const canvas = document.querySelector(".myCanvas");
+      const width = (canvas.width = window.innerWidth);
+      const height = (canvas.height = window.innerHeight - 85);
+      const ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, width, height);
+
+      const colorPicker = document.querySelector('input[type="color"]');
+      const sizePicker = document.querySelector('input[type="range"]');
+      const output = document.querySelector(".output");
+      const clearBtn = document.querySelector("button");
+
+      // covert degrees to radians
+      function degToRad(degrees) {
+	  return (degrees * Math.PI) / 180;
+      }
+
+      // update sizePicker output value
+
+      sizePicker.addEventListener(
+	  "input",
+	  () => (output.textContent = sizePicker.value),
+      );
+      let curX;
+      let curY;
+      let pressed = false;
+
+      // update mouse pointer coordinates
+      document.addEventListener("mousemove", (e) => {
+	  curX = e.pageX;
+	  curY = e.pageY;
+      });
+
+      canvas.addEventListener("mousedown", () => (pressed = true));
+
+      canvas.addEventListener("mouseup", () => (pressed = false));
+      clearBtn.addEventListener("click", () => {
+	  ctx.fillStyle = "black";
+	  ctx.fillRect(0, 0, width, height);
+      });
+      function draw() {
+	  if (pressed) {
+	      ctx.fillStyle = colorPicker.value;
+	      ctx.beginPath();
+	      ctx.arc(
+		  curX,
+		  curY - 85,
+		  sizePicker.value,
+		  degToRad(0),
+		  degToRad(360),
+		  false,
+	      );
+	      ctx.fill();
+	  }
+
+	  requestAnimationFrame(draw);
+      }
+
+      draw();
+    </script>
+  </body>
+</html>
+

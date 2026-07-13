@@ -13,14 +13,14 @@ function test_check {
 	RET="$4"
 	PRETEST="$5"
 
-        if [[ "${RET}" -eq "${EXPECTED_RET}" ]] && [[ $(tail -1  "${OUTPUTFILE}") =~ $EXPECTED_OUTTAIL ]] && [[ ${PRETEST} == "true" ]]; then
-                echo "PASS - ${TEST_NAME}"
-                TEST_SUCCESS=$(( $TEST_SUCCESS + 1 ))
-                #tail -2 "${OUTPUTFILE}"
-        else
-                echo "FAIL - ${TEST_NAME}"
-        fi
-        NR_TESTS=$(( $NR_TESTS + 1 ))
+	if [[ "${RET}" -eq "${EXPECTED_RET}" ]] && [[ $(tail -1  "${OUTPUTFILE}") =~ $EXPECTED_OUTTAIL ]] && [[ ${PRETEST} == "true" ]]; then
+		echo "PASS - ${TEST_NAME}"
+		TEST_SUCCESS=$(( $TEST_SUCCESS + 1 ))
+		#tail -2 "${OUTPUTFILE}"
+	else
+		echo "FAIL - ${TEST_NAME}"
+	fi
+	NR_TESTS=$(( $NR_TESTS + 1 ))
 	unset PRETEST
 }
 
@@ -29,12 +29,16 @@ function test_check {
 RET=$?
 if [[ $(head -1  "${OUTPUTFILE}") =~ ^Usage: ]] then
 	PRETEST="true";
+else
+	PRETEST="false";
 fi
 test_check "Argument - none" 1 "^$" "$RET" "$PRETEST"
 ./run.sh -e ERROR -h "test/demopage/config1.txt" &> "${OUTPUTFILE}";
 RET=$?
 if [[ $(head -1  "${OUTPUTFILE}") =~ ^Usage: ]] then
-        PRETEST="true";
+	PRETEST="true";
+else
+	PRETEST="false";
 fi
 test_check "Argument - missing arg" 1 "^$" "$RET" "$PRETEST"
 
@@ -108,6 +112,8 @@ rm -f "test.png"
 RET=$?
 if [[ -e "test.png" ]]; then
 	PRETEST="true";
+else
+	PRETEST="false";
 fi
 test_check "Demopage - regular (chrome)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -117,6 +123,8 @@ rm -f "test.png"
 RET=$?
 if [[ -e "test.png" ]]; then
 	PRETEST="true";
+else
+	PRETEST="false";
 fi
 test_check "Demopage - regular (firefox)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -126,6 +134,8 @@ rm -f "test.png"
 RET=$?
 if [[ -e "test.png" ]]; then
 	PRETEST="true";
+else
+	PRETEST="false";
 fi
 test_check "Demopage - regular (edge)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -162,6 +172,36 @@ test_check "Inputtest - quirk 5 (chrome)" 0 "^SUCCESS:" "$?" "true"
 ./run.sh -b firefox -q 5 -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
 test_check "Inputtest - quirk 5 (firefox)" 0 "^SUCCESS:" "$?" "true"
 
+# Test drawbox, make screenshots and compare the images to make sure something
+# was painted/changed. Assumes diffimg is installed
+rm -f "pic1.png" "pic2.png"
+./run.sh -b chrome -h -e ERROR "test/drawtest/config1.txt" file://$(pwd)/test/drawtest/drawtest.html test/drawtest/script1.txt &> "${OUTPUTFILE}";
+RET=$?
+if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v diffimg >/dev/null 2>&1; then
+        if diffimg pic1.png pic2.png &> /dev/null; then
+		PRETEST="false"
+	else
+		PRETEST="true"
+	fi
+else
+        PRETEST="false"
+fi
+test_check "Drawtest - regular (chrome)" 0 "^SUCCESS:" "$RET" "$PRETEST"
+rm -f "pic1.png" "pic2.png"
+./run.sh -b firefox -h -e ERROR "test/drawtest/config1.txt" file://$(pwd)/test/drawtest/drawtest.html test/drawtest/script1.txt &> "${OUTPUTFILE}";
+RET=$?
+if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v diffimg >/dev/null 2>&1; then
+	if diffimg pic1.png pic2.png &> /dev/null; then
+		PRETEST="false"
+	else
+		PRETEST="true"
+	fi
+else
+	PRETEST="false"
+fi
+test_check "Drawtest - regular (firefox)" 0 "^SUCCESS:" "$RET" "$PRETEST"
+rm -f "pic1.png" "pic2.png"
+
 # Test failed, check for 4 exit value, FAIL line in the end, ERROR.png file exist from screenshot
 rm -f "ERROR.png"
 for FILE in $(ls test/demopage/fail/*.txt); do
@@ -169,18 +209,22 @@ for FILE in $(ls test/demopage/fail/*.txt); do
 	RET=$?
 	if [[ -e "ERROR.png" ]]; then
 		PRETEST="true";
-	rm -f "ERROR.png"
+		rm -f "ERROR.png"
+	else
+		PRETEST="false";
 	fi
 	test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
 done
 for FILE in $(ls test/inputtest/fail/*.txt); do
-        ./run.sh -e ERROR -h "test/inputtest/inputconfig.txt" file://$(pwd)/test/inputtest/inputtest.html "${FILE}" &> "${OUTPUTFILE}";
-        RET=$?
-        if [[ -e "ERROR.png" ]]; then
-                PRETEST="true";
-        rm -f "ERROR.png"
-        fi
-        test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
+	./run.sh -e ERROR -h "test/inputtest/inputconfig.txt" file://$(pwd)/test/inputtest/inputtest.html "${FILE}" &> "${OUTPUTFILE}";
+	RET=$?
+	if [[ -e "ERROR.png" ]]; then
+		PRETEST="true";
+		rm -f "ERROR.png"
+	else
+		PRETEST="false";
+	fi
+	test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
 done
 
 # Remove outputfile

@@ -1,0 +1,3 @@
+waitfor input_disabled
+typekey input_disabled TAB
+

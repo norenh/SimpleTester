@@ -1,0 +1,3 @@
+waitfor input_disabled
+typeclr input_disabled "hello"
+
