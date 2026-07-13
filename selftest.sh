@@ -28,7 +28,7 @@ function test_check {
 ./run.sh > "${OUTPUTFILE}"
 RET=$?
 if [[ $(head -1  "${OUTPUTFILE}") =~ ^Usage: ]] then
-  PRETEST="true";
+	PRETEST="true";
 fi
 test_check "Argument - none" 1 "^$" "$RET" "$PRETEST"
 
@@ -40,7 +40,7 @@ done
 
 # Test broken scripts, check for 2 exit value, FAIL line in the end
 for FILE in $(ls test/script_broken/script*); do
-        ./run.sh -e ERROR -h "test/script_broken/config.txt" file://$(pwd)/test/demopage/demo_page.html "${FILE}" &> "${OUTPUTFILE}";
+	./run.sh -e ERROR -h "test/script_broken/config.txt" file://$(pwd)/test/demopage/demo_page.html "${FILE}" &> "${OUTPUTFILE}";
 	test_check "${FILE}" 2 "^FAIL:" "$?" "true"
 done
 
@@ -69,8 +69,8 @@ rm -f "test.png"
 # Test demopage, check for 0 exit value, SUCCESS line in end and test.png exist from screenshot
 ./run.sh -b chrome -e ERROR -h test/demopage/config1.txt file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
 RET=$?
-if [[ -e "test.png"  ]]; then
-  PRETEST="true";
+if [[ -e "test.png" ]]; then
+	PRETEST="true";
 fi
 test_check "Demopage - regular (chrome)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -78,8 +78,8 @@ rm -f "test.png"
 # Test demopage with firefox, check for 0 exit value, SUCCESS line in end and test.png exist from screenshot
 ./run.sh -b firefox -e ERROR -h test/demopage/config1.txt file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
 RET=$?
-if [[ -e "test.png"  ]]; then
-  PRETEST="true";
+if [[ -e "test.png" ]]; then
+	PRETEST="true";
 fi
 test_check "Demopage - regular (firefox)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -87,8 +87,8 @@ rm -f "test.png"
 # Test demopage with edge, check for 0 exit value, SUCCESS line in end and test.png exist from screenshot
 ./run.sh -b edge -e ERROR -h test/demopage/config1.txt file://$(pwd)/test/demopage/demo_page.html test/demopage/script1.txt &> "${OUTPUTFILE}";
 RET=$?
-if [[ -e "test.png"  ]]; then
-  PRETEST="true";
+if [[ -e "test.png" ]]; then
+	PRETEST="true";
 fi
 test_check "Demopage - regular (edge)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -125,10 +125,16 @@ test_check "Inputtest - quirk 5 (chrome)" 0 "^SUCCESS:" "$?" "true"
 ./run.sh -b firefox -q 5 -h -e ERROR test/inputtest/inputconfig.txt file://$(pwd)/test/inputtest/inputtest.html test/inputtest/script1.txt &> "${OUTPUTFILE}";
 test_check "Inputtest - quirk 5 (firefox)" 0 "^SUCCESS:" "$?" "true"
 
-# Test failed, check for 4 exit value, FAIL line in the end
+# Test failed, check for 4 exit value, FAIL line in the end, ERROR.png file exist from screenshot
+rm -f "ERROR.png"
 for FILE in $(ls test/demopage/fail/*.txt); do
-        ./run.sh -e ERROR -h "test/demopage/config1.txt" file://$(pwd)/test/demopage/demo_page.html "${FILE}" &> "${OUTPUTFILE}";
-        test_check "${FILE}" 4 "^FAIL:" "$?" "true"
+	./run.sh -e ERROR -h "test/demopage/config1.txt" file://$(pwd)/test/demopage/demo_page.html "${FILE}" &> "${OUTPUTFILE}";
+	RET=$?
+	if [[ -e "ERROR.png" ]]; then
+		PRETEST="true";
+	rm -f "ERROR.png"
+	fi
+	test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
 done
 
 # Remove outputfile
