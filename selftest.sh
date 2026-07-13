@@ -29,16 +29,12 @@ function test_check {
 RET=$?
 if [[ $(head -1  "${OUTPUTFILE}") =~ ^Usage: ]] then
 	PRETEST="true";
-else
-	PRETEST="false";
 fi
 test_check "Argument - none" 1 "^$" "$RET" "$PRETEST"
 ./run.sh -e ERROR -h "test/demopage/config1.txt" &> "${OUTPUTFILE}";
 RET=$?
 if [[ $(head -1  "${OUTPUTFILE}") =~ ^Usage: ]] then
 	PRETEST="true";
-else
-	PRETEST="false";
 fi
 test_check "Argument - missing arg" 1 "^$" "$RET" "$PRETEST"
 
@@ -112,8 +108,6 @@ rm -f "test.png"
 RET=$?
 if [[ -e "test.png" ]]; then
 	PRETEST="true";
-else
-	PRETEST="false";
 fi
 test_check "Demopage - regular (chrome)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -123,8 +117,6 @@ rm -f "test.png"
 RET=$?
 if [[ -e "test.png" ]]; then
 	PRETEST="true";
-else
-	PRETEST="false";
 fi
 test_check "Demopage - regular (firefox)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -134,8 +126,6 @@ rm -f "test.png"
 RET=$?
 if [[ -e "test.png" ]]; then
 	PRETEST="true";
-else
-	PRETEST="false";
 fi
 test_check "Demopage - regular (edge)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "test.png"
@@ -178,26 +168,18 @@ rm -f "pic1.png" "pic2.png"
 ./run.sh -b chrome -h -e ERROR "test/drawtest/config1.txt" file://$(pwd)/test/drawtest/drawtest.html test/drawtest/script1.txt &> "${OUTPUTFILE}";
 RET=$?
 if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v diffimg >/dev/null 2>&1; then
-        if diffimg pic1.png pic2.png &> /dev/null; then
-		PRETEST="false"
-	else
+        if ! diffimg pic1.png pic2.png &> /dev/null; then
 		PRETEST="true"
 	fi
-else
-        PRETEST="false"
 fi
 test_check "Drawtest - regular (chrome)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "pic1.png" "pic2.png"
 ./run.sh -b firefox -h -e ERROR "test/drawtest/config1.txt" file://$(pwd)/test/drawtest/drawtest.html test/drawtest/script1.txt &> "${OUTPUTFILE}";
 RET=$?
 if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v diffimg >/dev/null 2>&1; then
-	if diffimg pic1.png pic2.png &> /dev/null; then
-		PRETEST="false"
-	else
+	if ! diffimg pic1.png pic2.png &> /dev/null; then
 		PRETEST="true"
 	fi
-else
-	PRETEST="false"
 fi
 test_check "Drawtest - regular (firefox)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "pic1.png" "pic2.png"
@@ -210,8 +192,6 @@ for FILE in $(ls test/demopage/fail/*.txt); do
 	if [[ -e "ERROR.png" ]]; then
 		PRETEST="true";
 		rm -f "ERROR.png"
-	else
-		PRETEST="false";
 	fi
 	test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
 done
@@ -221,8 +201,6 @@ for FILE in $(ls test/inputtest/fail/*.txt); do
 	if [[ -e "ERROR.png" ]]; then
 		PRETEST="true";
 		rm -f "ERROR.png"
-	else
-		PRETEST="false";
 	fi
 	test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
 done
