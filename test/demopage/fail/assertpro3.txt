@@ -1,0 +1,3 @@
+waitfor textprefillinput
+assertpro textprefillinput !"value" "Text..."
+

@@ -1,0 +1,3 @@
+waitfor textprefillinput
+assertatr textprefillinput !"value" "Text..."
+
