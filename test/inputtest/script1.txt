@@ -131,6 +131,15 @@ assertpro email "value" "test@example.org"
 typeclr email "test@example"
 assertpro email "value" "test@example"
 
+assertpro file "value" ""
+filepick file "test/empty.txt"
+# Browsers tend to return "C:\fakepath\empty.txt" here
+# Just check that it ends with the right file
+#printpro file "value"
+assertpro file "value" %.*[/\\]empty.txt%
+filepick file "test/inputtest/script1.txt"
+assertpro file "value" %.*[/\\]script1.txt%
+
 assertpro number1 "value" ""
 type number1 "3"
 assertpro number1 "value" "3"

@@ -1,0 +1,4 @@
+# Non existent file
+waitfor file
+filepick file "test/nonexisting.txt"
+

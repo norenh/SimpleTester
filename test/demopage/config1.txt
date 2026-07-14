@@ -4,8 +4,10 @@ textprefillinput name "preText2"
 textreadonly id "placeholderText"
 mybutton cssSelector "button"
 textparagraph id "pText"
+textarea id "myTextarea"
 
 dropdown name "selectName"
+meterlabel id "meterlabel"
 
 hoveroption1 id "dropOption1"
 hoveroption2 cssSelector "#dropOption2"

@@ -1,0 +1,4 @@
+waitfor textinput
+# Missing ending %
+assertcss textinput "color" %.*
+

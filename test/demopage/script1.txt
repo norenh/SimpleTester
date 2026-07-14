@@ -14,6 +14,7 @@ assert textprefillinput
 assert textreadonly
 assert mybutton
 assert textparagraph
+assert textarea
 assert hoverdropdown
 assert radiobutton1
 assert radiobutton2
@@ -25,6 +26,8 @@ assert checkbox5
 assert svgimage
 assert urllink
 assert headerlink
+assert dropdown
+assert meterlabel
 assert !nonexisting
 
 # Assert testing
@@ -70,16 +73,33 @@ asserttxt headerlink "Link Two Selected"
 # Input field type-testing
 
 type textinput "Hallo"
+type textinput " there!"
+assertpro textinput "value" "Hallo there!"
+typeclr textinput ""
+assertpro textinput "value" ""
 typeclr textinput "Hello"
+assertpro textinput "value" "Hello"
 
 typeclr textprefillinput "Hi there!"
 assertpro textprefillinput "value" "Hi there!"
 
 typekey textinput BACKSPACE
 assertpro textinput "value" "Hell"
+typekey textinput ENTER
+assertpro textinput "value" "Hell"
+type textinput "o"
+assertpro textinput "value" "Hello"
+
+type textarea "first line"
+typekey textarea ENTER
+type textarea "second line"
+assertpro textarea "value" %first line\nsecond line%
+typeclr textarea ""
+assertpro textarea "value" ""
 
 # Selecting in a dropdown
 select dropdown "Set to 50%"
+asserttxt meterlabel "HTML Meter: (50%)"
 
 # Button click, do check that changes happen
 
@@ -126,6 +146,8 @@ waitforcss mybutton "color" _cssgreen
 printatr textprefillinput "value"
 printcss mybutton "color"
 printjs "return 'test-string';"
+printjs "return 1;"
+printjs "return null;"
 printpro textprefillinput "value"
 printtxt mybutton
 printsrc

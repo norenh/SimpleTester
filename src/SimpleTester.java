@@ -122,6 +122,7 @@ public class SimpleTester {
 	CLICKFORCE,
 	DRAWBOX,
 	DWAITFOR,
+	FILEPICK,
 	FINISH,
 	HOVER,
 	PRINT,
@@ -189,6 +190,7 @@ public class SimpleTester {
 	    put("clickforce",EnumStmt.CLICKFORCE);
 	    put("drawbox",   EnumStmt.DRAWBOX);
 	    put("dwaitfor",  EnumStmt.DWAITFOR);
+	    put("filepick",  EnumStmt.FILEPICK);
 	    put("hover",     EnumStmt.HOVER);
 	    put("print",     EnumStmt.PRINT);
 	    put("printatr",  EnumStmt.PRINTATR);
@@ -481,7 +483,7 @@ public class SimpleTester {
 		}
 	    }
 	    else {
-		throw new ParsingException("Expected starting '\"'-character!");
+		throw new ParsingException("Expected starting '\"' or '%' character!");
 	    }
 	    String s = curr_line.substring(currPos, index2);
 	    if(s == null) {
@@ -1045,6 +1047,23 @@ public class SimpleTester {
 		    sleep(RETRY_INTERVAL);
 		}
 		return false;
+	    case FILEPICK:
+		selector = readSel(false);
+		s1 = readString();
+		{
+		    File f = new File(s1);
+		    s1 = f.getAbsolutePath();
+		}
+		//System.out.println("File path: "+s1);
+		if(novalidate)
+		    return true;
+		findElementCached(selector);
+		scrollUnlessDisplayed();
+		// tryType does not work here since it might
+		// use workarounds/quirks that are incompatible
+		// with file inputs
+		curr_element.sendKeys(s1);
+		return true;
 	    case FINISH:
 		script_done = true;
 		return true;
