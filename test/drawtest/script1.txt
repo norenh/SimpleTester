@@ -11,10 +11,20 @@ assert clear_button
 assert input_range
 assert input_color
 assert canvas
+hover clear_button
+hover input_range
 hover input_color
 screenshot "pic1.png"
 drawbox canvas 30
+hover clear_button
+hover input_range
+hover input_color
 screenshot "pic2.png"
 click clear_button
+hover clear_button
+hover input_range
 hover input_color
+# reference, to compare with pic1
+# to check that comparison works
 #screenshot "pic3.png"
+

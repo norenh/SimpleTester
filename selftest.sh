@@ -3,6 +3,11 @@
 NR_TESTS=0
 TEST_SUCCESS=0
 
+if ! command -v magick >/dev/null; then
+	echo " --- Missing command \"magick\" (from ImageMagick)"
+	echo " --- Some tests will fail due to this"
+fi
+
 # Temporary output file, will be removed in the end
 OUTPUTFILE="$(mktemp)"
 
@@ -167,8 +172,8 @@ test_check "Inputtest - quirk 5 (firefox)" 0 "^SUCCESS:" "$?" "true"
 rm -f "pic1.png" "pic2.png"
 ./run.sh -b chrome -h -e ERROR "test/drawtest/config1.txt" file://$(pwd)/test/drawtest/drawtest.html test/drawtest/script1.txt &> "${OUTPUTFILE}";
 RET=$?
-if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v diffimg >/dev/null 2>&1; then
-        if ! diffimg pic1.png pic2.png &> /dev/null; then
+if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v magick >/dev/null 2>&1; then
+        if ! magick compare pic1.png pic2.png null: &> /dev/null; then
 		PRETEST="true"
 	fi
 fi
@@ -176,8 +181,8 @@ test_check "Drawtest - regular (chrome)" 0 "^SUCCESS:" "$RET" "$PRETEST"
 rm -f "pic1.png" "pic2.png"
 ./run.sh -b firefox -h -e ERROR "test/drawtest/config1.txt" file://$(pwd)/test/drawtest/drawtest.html test/drawtest/script1.txt &> "${OUTPUTFILE}";
 RET=$?
-if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v diffimg >/dev/null 2>&1; then
-	if ! diffimg pic1.png pic2.png &> /dev/null; then
+if [[ -f "pic1.png" ]] && [[ -f "pic2.png" ]] && command -v magick >/dev/null 2>&1; then
+	if ! magick compare pic1.png pic2.png null: &> /dev/null; then
 		PRETEST="true"
 	fi
 fi
