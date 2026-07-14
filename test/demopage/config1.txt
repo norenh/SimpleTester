@@ -29,6 +29,11 @@ urllink linkText "seleniumbase.com"
 
 headerlink xpath "//html/body/form/table/tbody/tr[1]/td[4]/h3"
 
+iframe1 id "myFrame1"
+iframe1_img tagName "img"
+iframe2 className "frameClass2"
+iframe2_header tagName "h4"
+
 nonexisting id "ThisIDShouldNotExist"
 
 DEFINE ButtonTextGreen "Click Me (Green)"

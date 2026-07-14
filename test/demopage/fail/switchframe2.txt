@@ -1,0 +1,5 @@
+waitfor iframe1
+# trying to switch to a iframe from different context
+switchframe iframe1
+switchframe iframe2
+

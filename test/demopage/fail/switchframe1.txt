@@ -1,0 +1,4 @@
+waitfor urllink
+# trying to switch to a element that is not a iframe
+switchframe urllink
+

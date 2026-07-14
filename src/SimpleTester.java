@@ -141,6 +141,7 @@ public class SimpleTester {
 	SELECT,
 	SETTOGGLE,
 	SETVALUE,
+	SWITCHFRAME,
 	TYPE,
 	TYPECLR,
 	TYPEKEY,
@@ -208,6 +209,7 @@ public class SimpleTester {
 	    put("select",    EnumStmt.SELECT);
 	    put("settoggle", EnumStmt.SETTOGGLE);
 	    put("setvalue",  EnumStmt.SETVALUE);
+	    put("switchframe",EnumStmt.SWITCHFRAME);
 	    put("type",      EnumStmt.TYPE);
 	    put("typeclr",   EnumStmt.TYPECLR);
 	    put("typekey",   EnumStmt.TYPEKEY);
@@ -1228,6 +1230,20 @@ public class SimpleTester {
 			js.executeScript("arguments[0].focus(); arguments[0].value = '"+s1+"'; arguments[0].dispatchEvent(new Event('change'));", curr_element);
 		    }
 		    sleep(20);
+		}
+		return true;
+	    case SWITCHFRAME:
+		selector = readSel(true);
+
+		if(novalidate)
+		    return true;
+		// use empty string to switch back to defaultcontent
+		if(notSel) {
+		     curr_driver.switchTo().defaultContent();
+		}
+		else {
+		    findElementCached(selector);
+		    curr_driver.switchTo().frame(curr_element);
 		}
 		return true;
 	    case TYPE:

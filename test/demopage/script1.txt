@@ -28,6 +28,8 @@ assert urllink
 assert headerlink
 assert dropdown
 assert meterlabel
+assert iframe1
+assert iframe2
 assert !nonexisting
 
 # Assert testing
@@ -141,6 +143,19 @@ screenshot "test.png"
 refresh
 waitfortxt mybutton _ButtonTextGreen
 waitforcss mybutton "color" _cssgreen
+
+# iframe testing
+switchframe iframe1
+assert !iframe2_header
+assert !textinput
+assert iframe1_img
+switchframe !iframe1
+switchframe iframe2
+asserttxt iframe2_header "iFrame Text"
+assert !textinput
+assert !iframe1_img
+switchframe !iframe2
+assert textinput
 
 # print testing
 printatr textprefillinput "value"
