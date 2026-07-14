@@ -12,7 +12,7 @@ radiobutton2 xpath "(//input[@type='radio'])[2]"
 
 checkbox1 className "checkBoxClassA"
 checkbox2 name "checkBoxName2"
-checkbox3 id "myForm" id "myTable" id "tbodyId" id "checkBox3"
+checkbox3 id "checkBox3"
 checkbox4 xpath "//*[@id='checkBox4']"
 
 checkbox5 id "checkBox5"

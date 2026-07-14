@@ -567,6 +567,13 @@ public class SimpleTester {
 	return tmp.intValue();
     }
 
+    private static int readPositiveInt() throws ParsingException {
+	int x = readInt();
+	if(x < 0)
+	    throw new ParsingException("Expected positive INTEGER");
+	return x;
+    }
+
     private static Keys readKey() throws ParsingException {
 	currPos++;
 	if(currPos >= curr_line.length())
@@ -828,7 +835,7 @@ public class SimpleTester {
 	    case ASSERTPRO:
 		selector = readSel(false);
 		s1 = readString(true);
-		s2 = readString();
+		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
 		findElementCached(selector);
@@ -837,16 +844,16 @@ public class SimpleTester {
 		    return notStr;
 		else if(notStr)
 		    return false;
-		if(!ret.equals(s2)) {
-		    if(ret.equals(s2.strip())) {
-			System.out.println("WARN: ASSERTPRO got \""+ret+"\", expected \""+s2+"\"");
+		if(!sor.matches(ret)) {
+		    if(sor.matches(ret.strip())) {
+			System.out.println("WARN: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
 			return true;
 		    }
 		    // Workaround for Safari returning true for properties with a empty value
-		    if(driverType == enumDriver.SAFARI && s2.equals("") && ret.equals("true"))
+		    if(driverType == enumDriver.SAFARI && sor.matches("") && ret.equals("true"))
 			return true;
 
-		    System.out.println("INFO: ASSERTPRO got \""+ret+"\", expected \""+s2+"\"");
+		    System.out.println("INFO: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
 		    return false;
 		}
 		return true;
@@ -964,9 +971,7 @@ public class SimpleTester {
 		return false;
 	    case DRAWBOX:
 		selector = readSel(false);
-	        x = readInt();
-		if(x < 0)
-		    return false;
+	        x = readPositiveInt();
 		if(novalidate)
 		    return true;
 		findElementCached(selector);
@@ -999,12 +1004,27 @@ public class SimpleTester {
 			.moveByOffset(-width+x,0)
 			.moveByOffset(0,-height+x)
 			.moveByOffset(width-x,height-x)
+			/** half speed variant, not sure if wanted
+			    it seems only firefox manages a decent rectangle
+			    with a linethrough so might be something to start
+			    using
+			.moveByOffset((width-x)/2,0)
+			.moveByOffset((width-x)/2,0)
+			.moveByOffset(0,(height-x)/2)
+			.moveByOffset(0,(height-x)/2)
+			.moveByOffset((-width+x)/2,0)
+			.moveByOffset((-width+x)/2,0)
+			.moveByOffset(0,(-height+x)/2)
+			.moveByOffset(0,(-height+x)/2)
+			.moveByOffset((width-x)/2,(height-x)/2)
+			.moveByOffset((width-x)/2,(height-x)/2)
+			*/
 			.release()
 			.perform();
 		}
 		return true;
 	    case DWAITFOR:
-		x = readInt();
+		x = readPositiveInt();
 		if(!novalidate) {
 		    sleep(x*100);
 		}
@@ -1183,9 +1203,6 @@ public class SimpleTester {
 		if(novalidate)
 		    return true;
 		findElementCached(selector);
-
-		tryClick();
-		sleep(20);
 		{
 		    String tmp = curr_element.getDomProperty("value");
 		    if(tmp != null) {
@@ -1262,7 +1279,7 @@ public class SimpleTester {
 		curr_element.sendKeys(k);
 		return true;
 	    case WAIT:
-		x = readInt();
+		x = readPositiveInt();
 		if(!novalidate) {
 		    sleep(x*100);
 		}
@@ -1375,14 +1392,14 @@ public class SimpleTester {
 	    case WAITFORPRO:
 		selector = readSel(false);
 		s1 = readString();
-		s2 = readString();
+		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
 		for(int i=0;i<RETRY_TIMES;i++) {
 		    try {
 			findElement(selector);
 			ret = curr_element.getDomProperty(s1);
-			if(ret != null && ret.equals(s2))
+			if(ret != null && sor.matches(ret))
 			    return true;
 		    }
 		    catch(StaleElementReferenceException|NoSuchElementException e) {

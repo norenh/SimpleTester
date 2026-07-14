@@ -1,0 +1,4 @@
+waitfor textinput
+# Invalid regexp
+assertcss textinput "color" %*%
+

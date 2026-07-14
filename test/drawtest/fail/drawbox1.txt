@@ -1,0 +1,5 @@
+
+waitfor canvas
+# hopefully the box will be smaller than this
+drawbox canvas 10000
+

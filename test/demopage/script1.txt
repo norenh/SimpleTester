@@ -36,11 +36,23 @@ assertclk !hoveroption1
 assertcss mybutton "color" _cssgreen
 assertpro mybutton !"maxlength" "-"
 assertpro textprefillinput "value" "Text..."
+assertpro textprefillinput "value" %Text\.+%
 assertsel checkbox1 "false"
 assertsel checkbox5 "true"
 asserttxt mybutton "Click Me (Green)"
+asserttxt mybutton %.*\(Green\)%
 asserturl "demo_page.html"
 asserturl !"inputtest.html"
+
+# waitfor testing
+
+waitfor textinput
+waitforatr textprefillinput "value" "Text..."
+waitforcss mybutton "color" _cssgreen
+waitforpro textprefillinput "value" "Text..."
+waitforpro textprefillinput "value" %Text\.+%
+waitfortxt mybutton "Click Me (Green)"
+waitfortxt mybutton %.*\(Green\)%
 
 # Expand and click on hoverdropdown
 

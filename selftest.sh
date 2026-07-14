@@ -209,6 +209,16 @@ for FILE in $(ls test/inputtest/fail/*.txt); do
 	fi
 	test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
 done
+for FILE in $(ls test/drawtest/fail/*.txt); do
+        ./run.sh -e ERROR -h "test/drawtest/config1.txt" file://$(pwd)/test/drawtest/drawtest.html "${FILE}" &> "${OUTPUTFILE}";
+        RET=$?
+        if [[ -e "ERROR.png" ]]; then
+                PRETEST="true";
+                rm -f "ERROR.png"
+        fi
+        test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
+done
+
 
 # Remove outputfile
 rm "${OUTPUTFILE}"

@@ -1,0 +1,4 @@
+waitfor svgimage
+# Negative drawbox offset
+drawbox svgimage -5
+

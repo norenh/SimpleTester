@@ -1,0 +1,5 @@
+waitfor mybutton
+
+# Unexpected negation
+print !"test"
+

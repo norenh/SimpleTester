@@ -1,0 +1,3 @@
+# Negative integer when positive expected
+wait -7
+

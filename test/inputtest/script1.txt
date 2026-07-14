@@ -6,6 +6,38 @@
 
 waitfor button
 
+assert button
+assert button_disabled
+assert input_disabled
+assert username
+assert password
+assert hidden
+assert fname
+assert lname
+assert reset
+assert radio_html
+assert radio_css
+assert radio_javascript
+assert checkbox_vehicle1
+assert checkbox_vehicle2
+assert checkbox_vehicle3
+assert color
+assert date_birthday
+assert date_max
+assert date_min
+assert date_local
+assert email
+assert file
+assert month
+assert number1
+assert number2
+assert range
+assert search
+assert tel
+assert time
+assert url
+assert week
+
 asserturl "inputtest.html"
 
 assertclk button
@@ -60,6 +92,10 @@ assertpro checkbox_vehicle2 "checked" "true"
 assertpro checkbox_vehicle3 "checked" "true"
 click checkbox_vehicle2
 assertpro checkbox_vehicle2 "checked" "false"
+
+assertpro color "value" "#000000"
+setvalue color "#aabbcc"
+assertpro color "value" "#aabbcc"
 
 assertpro date_birthday "value" ""
 setvalue date_birthday "1999-01-02"

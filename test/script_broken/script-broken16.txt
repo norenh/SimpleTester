@@ -1,0 +1,4 @@
+waitfor checkbox2
+# Invalid boolean
+settoggle checkbox2 0
+
