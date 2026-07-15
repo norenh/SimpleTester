@@ -4,7 +4,7 @@ source stenv.cfg
 LIBDIR="selenium-java-${SELENIUM_VERSION}"
 
 mkdir -p lib
-cd lib
+cd lib || exit
 
 if [ -d "${LIBDIR}" ]; then
   echo "You already got ${LIBDIR}!"

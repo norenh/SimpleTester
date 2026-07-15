@@ -9,7 +9,7 @@ else
   JAVAP="${JAVA_HOME}/bin/jar"
 fi
 
-cd src
+cd src || exit
 
 "${JAVAC}" -cp "../lib/slf4j-nop.jar:../lib/selenium-java-${SELENIUM_VERSION}/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
 
