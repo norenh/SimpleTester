@@ -44,6 +44,8 @@ name, followed by one selector that each have a type and a text.
 
 The script supports the following statements for now:
 --
+alertaccept
+alertdismiss
 assert [!]ELEMENTNAME
 assertatr ELEMENTNAME [!]"attribute" "value" (Warning! use assertpro for properties)
 assertclk [!]ELEMENTNAME
@@ -51,9 +53,15 @@ assertcss ELEMENTNAME "property" "value"
 assertpro ELEMENTNAME [!]"property" "value"
 assertsel ELEMENTNAME "boolean"
 asserttxt ELEMENTNAME "text"
+asserturl "text"
 click ELEMENTNAME
+clickaction ELEMENTNAME
+clickfor ELEMENT1 ELEMENT2
+clickforce ELEMENT
 drawbox ELEMENTNAME "offset"
 dwaitfor INTEGER [!]ELEMENTNAME
+filepick ELEMENT "text"
+finish
 hover ELEMENTNAME
 print "text"
 printatr ELEMENTNAME "attribute" (Warning! use printpro for properties)
@@ -63,24 +71,31 @@ printpro ELEMENTNAME "property"
 printsrc
 printtime
 printtxt ELEMENTNAME
+printurl
 refresh
+runcmd
 screenshot "text"
 scrollto ELEMENTNAME
 select ELEMENTNAME "dropdownoption"
 settoggle ELEMENTNAME "boolean"
+setvalue ELEMENTNAME "text"
+switchframe [!]ELEMENTNAME
 type ELEMENTNAME "text"
 typeclr ELEMENTNAME "text"
+typekey ELEMENTNAME KEY
+waitforalert
 waitforatr ELEMENTNAME "attribute" "value" (Warning! use waitforpro for properties)
 waitforenabled ELEMENTNAME
 waitforpro ELEMENTNAME "property" "value"
 waitfortxt ELEMENTNAME "text"
 waitfor [!]ELEMENTNAME
 wait INTEGER
-finish
 --
 
 Statements in script does the following:
 
+alertaccept - switch to alert and accept it
+alertdismiss - switch to alert and dismiss it
 assert - returns true if element is found
 assertatr  - do getAttribute on "attribute" of element compare with "value"
 assertclk - do isVisible() & isEnabled() of element
@@ -88,9 +103,15 @@ assertcss - do getCssValue on "property" of element compare with "value"
 assertpro  - do getDomProperty on "property" of element compare with "value"
 assertsel - do isSelected() and compare with boolean
 asserttxt - do getText() on element and compare with "text"
+asserturl - do getCurrentUrl() and check if ends with "text"
 click - click() on element (will try scrolling if element is hidden)
+clickaction - Action.click() on element (will try scrolling as above)
+clickfor - click() on ELEMENT1 until ELEMENT2 is present
+clickforce - click() on ELEMENT until it succeeds (not receiving a error)
 drawbox - draws a box with the mouse inside the element, "offset" pixels in
 dwaitfor - same as waitfor, but delayed with INTEGER*0.1s
+filepick - for input fields of type file. Takes "text" as relative file path and types it into ELEMENT
+finish - closes the driver and the browser
 hover - move mouse over element
 print - print string
 printatr - print result of getAttribute on "attribute" of element
@@ -100,20 +121,25 @@ printpro - print result of getDomProperty on "property" of element
 printsrc - print out source code of current webpage
 printtime - print out a current timestamp
 printtxt - print out value of getText() on element
+printurl - print out current URL
 refresh - refreshes the page
+runcmd - runs the command line tool from "text", fails if return code is not zero
 screenshot - takes a screenshot, saves it with filename "text"
 scrollto - scroll so element is visible
 select - selects a element in a dropdown
 settoggle - sets a checkbox/radiobutton to checked if true, unchecked if false
+setvalue - sets the property "value" to "text" in element and sends change event
+switchframe - switch frame to ELEMENT, switch back to default with !ELEMENT
 type -  sendKeys("text") on element
 typeclr - Sends CTRL+a+DEL before sendKeys("text")
+typekey - Sends KEY to element (example keys RETURN, TAB, BACKSPACE)
+waitforalert - wait until an ALERT is present (also switches to it)
 waitforatr - wait until element is found and has "attribute" set to "value"
 waitforenabled - wait until element is enabled
 waitforpro - wait until element is found and has "property" set to "value"
 waitfortxt - wait until element is found and has text set to "text"
 waitfor - wait until element is found for up to 20s
 wait - just sleeps INTEGER*0.1s
-finish - closes the driver and the browser
 
 Both files ignores lines without content or lines starting with '#'.
 
