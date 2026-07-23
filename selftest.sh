@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# shellcheck disable=SC2329
+function sigabort {
+  echo "Received SIGINT - Aborting"
+  exit 255
+}
+trap sigabort SIGINT
+
 NR_TESTS=0
 TEST_SUCCESS=0
 
@@ -79,8 +86,12 @@ for FILE in test/script_broken/script*; do
 done
 
 # Test missing browser with safari, check for 1 exit value, ERROR line in end
-./run.sh -b safari -e ERROR -h test/demopage/config1.txt "file://$(pwd)/test/demopage/demo_page.html" test/demopage/script1.txt &> "${OUTPUTFILE}";
-test_check "Missing browser (safari)" 1 "^ERROR:" "$?" "true"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	echo "SKIP - Missing browser (MacOS detected, safari probably present)"
+else
+	./run.sh -b safari -e ERROR -h test/demopage/config1.txt "file://$(pwd)/test/demopage/demo_page.html" test/demopage/script1.txt &> "${OUTPUTFILE}";
+	test_check "Missing browser (safari)" 1 "^ERROR:" "$?" "true"
+fi
 
 # Test dryrun of demopage, check for 0 exit value, SUCCESS line in end
 ./run.sh -t -e ERROR -h test/demopage/config1.txt "file://$(pwd)/test/demopage/demo_page.html" test/demopage/script1.txt &> "${OUTPUTFILE}";
@@ -90,9 +101,13 @@ test_check "Demopage - dryrun" 0 "^SUCCESS:" "$?" "true"
 echo " ---- The following tests are actual browser tests"
 echo " ---- They might take some time (minutes not hours) to execute"
 
-# Test wrong URL, check for 3 exit value, ERROR line in end
-./run.sh -e ERROR -h test/demopage/config1.txt "https://test.invalid" test/demopage/script1.txt &> "${OUTPUTFILE}";
-test_check "Wrong URL" 3 "^ERROR" "$?" "true"
+if ping -c3 test.invalid &> /dev/null; then
+	echo "SKIP - Wrong URL ('test.invalid' is valid here)"
+else
+  # Test wrong URL, check for 3 exit value, ERROR line in end
+  ./run.sh -e ERROR -h test/demopage/config1.txt "https://test.invalid" test/demopage/script1.txt &> "${OUTPUTFILE}";
+  test_check "Wrong URL" 3 "^ERROR" "$?" "true"
+fi
 
 # Test empty script-file, check for 0 exit value, SUCCESS line in end
 ./run.sh -e ERROR -h test/empty.txt "file://$(pwd)/test/demopage/demo_page.html" test/empty.txt &> "${OUTPUTFILE}";
@@ -229,4 +244,8 @@ rm "${OUTPUTFILE}"
 
 echo
 echo "$TEST_SUCCESS out of $NR_TESTS tests succeeded!"
+
+# If this ever gets more than 255 (or somehow get negative) we have
+# a problem, but that is something for future me
+exit $(( NR_TESTS - TEST_SUCCESS ))
 
