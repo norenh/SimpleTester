@@ -16,3 +16,5 @@ cd src || exit
 "${JAVAP}" cf "../lib/SimpleTester.jar" SimpleTester*.class
 rm -f SimpleTester*.class
 
+cd ..
+

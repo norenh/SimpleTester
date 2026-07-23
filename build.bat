@@ -16,3 +16,5 @@ cd src
 "%JAVAP%" cf "..\lib\SimpleTester.jar" SimpleTester*.class
 del *.class
 
+cd ..
+
