@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# shellcheck disable=SC2329
+# shellcheck disable=SC2317,SC2329
 function sigabort {
   echo "Received SIGINT - Aborting"
   exit 255
