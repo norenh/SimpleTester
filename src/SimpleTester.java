@@ -42,7 +42,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.Dimension;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +57,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 // for validation only
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -268,7 +266,7 @@ public class SimpleTester {
 	    put("TAB",          Keys.TAB);
 	}};
 
-    private static void takeScreenshot(String pathname) {
+    private static void takeScreenshot(final String pathname) {
 	try {
 	    File src = ((TakesScreenshot) curr_driver).getScreenshotAs(OutputType.FILE);
 	    Files.move(src.toPath(), new File(pathname).toPath(),StandardCopyOption.REPLACE_EXISTING);
@@ -279,7 +277,7 @@ public class SimpleTester {
 	}
     }
 
-    private static void sleep(int x) {
+    private static void sleep(final int x) {
 	try {
 	    Thread.sleep(x);
 	} catch(InterruptedException e) {}
@@ -399,12 +397,12 @@ public class SimpleTester {
 	return true;
     }
 
-    private static void findElement(By s) {
+    private static void findElement(final By s) {
 	curr_element = null;  // invalidate curr_element, in case we exit by exception
 	curr_element = curr_driver.findElement(s);
     }
 
-    private static void findElementCached(By s) {
+    private static void findElementCached(final By s) {
 	// We may already have the element if it is the same as before
 	// and curr_element is not null
 	if(sameSelector && !elementCacheOffQuirk && curr_element != null)
@@ -416,9 +414,9 @@ public class SimpleTester {
     private static boolean notSel = false;
     private static boolean notStr = false;
 
-    private static class ParsingException extends Exception {
+    private static final class ParsingException extends Exception {
 	private static final long serialVersionUID = 1L;
-	public ParsingException(String message) {
+	public ParsingException(final String message) {
 	    super(message);
 	}
     }
@@ -435,12 +433,13 @@ public class SimpleTester {
 
        Yes, it is a mess. Should rewrite one day
      */
-    private static String readStrGen(char expectChar) throws ParsingException {
+    private static String readStrGen(final char expectChar) throws ParsingException {
 	int index2;
 	boolean isDef = false;
 
 	// the compiler is not smart enough to realise they will be initialized
-	int tmpPos = 0, endIndex = 0;
+	int tmpPos = 0;
+	int endIndex = 0;
 	String tmpLine = "";
 
 	// If this is a DEFINE, read it first and replace curr_line with it.
@@ -530,7 +529,7 @@ public class SimpleTester {
 	    }
 	    //System.out.println("String: "+s);
 	}
-	public boolean matches(String s) {
+	public boolean matches(final String s) {
 	    if(type)
 		return str.equals(s);
 	    else {
@@ -596,7 +595,7 @@ public class SimpleTester {
 	return ret;
     }
 
-    private static By readSel(boolean neg) throws ParsingException {
+    private static By readSel(final boolean neg) throws ParsingException {
 	sameSelector = false;
 	currPos++;
 	if(currPos >= curr_line.length())
@@ -640,7 +639,7 @@ public class SimpleTester {
 	return readStrGen('"');
     }
 
-    private static String readString(boolean neg) throws ParsingException {
+    private static String readString(final boolean neg) throws ParsingException {
 	currPos++;
 	if(currPos >= curr_line.length())
 	    throw new ParsingException("Expected String");
@@ -716,7 +715,7 @@ public class SimpleTester {
 	return true;
     }
 
-    private static void tryType(String str) {
+    private static void tryType(final String str) {
 	if(!inputQuirk) {
 	    curr_element.sendKeys(str);
 	}
@@ -727,7 +726,7 @@ public class SimpleTester {
 	}
     }
 
-    private static boolean runStatement(boolean novalidate) {
+    private static boolean runStatement(final boolean novalidate) {
 	By selector = null;
 	String s1;
 	String s2;
@@ -1462,7 +1461,7 @@ public class SimpleTester {
     }
 
     
-    private static boolean parseScript(boolean novalidate) {
+    private static boolean parseScript(final boolean novalidate) {
 	long startTimeStamp = System.currentTimeMillis();
 	long stopTimeStamp = 0;
 	boolean ret = true;
@@ -1538,7 +1537,7 @@ public class SimpleTester {
 	System.out.println("");
     }
 
-    private static boolean setQuirk(int i) {
+    private static boolean setQuirk(final int i) {
 	switch(i) {
 	case 1:
 	    clearMode = EnumClear.QUIRK_BS_FALLBACK;
@@ -1561,7 +1560,7 @@ public class SimpleTester {
 	return true;
     }
 
-    public static void exit_and_close_driver(boolean stayOpen, int exitCode) {
+    public static void exit_and_close_driver(final boolean stayOpen, final int exitCode) {
 	// Unfortunately there does not seem to be a way to
 	// just quit the webdriver without killing the browser
 	// If stayOpen is used, a longering process will stay around
@@ -1572,7 +1571,7 @@ public class SimpleTester {
 	System.exit(exitCode);
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
 	if(args.length < 3) {
 	    printUsage();
