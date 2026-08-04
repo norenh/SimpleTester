@@ -1027,28 +1027,6 @@ public class SimpleTester {
 			.perform();
 		}
 		return true;
-	    case DWAITFOR:
-		x = readPositiveInt();
-		if(!novalidate) {
-		    sleep(x*100);
-		}
-		selector = readSel(true);
-		if(novalidate)
-		    return true;
-
-		for(int i=0; i<RETRY_TIMES; i++) {
-		    try {
-			findElement(selector);
-			if(!notSel)
-			    return true;
-		    }
-		    catch(StaleElementReferenceException|NoSuchElementException e) {
-			if(notSel)
-			    return true;
-		    }
-		    sleep(RETRY_INTERVAL);
-		}
-		return false;
 	    case FILEPICK:
 		selector = readSel(false);
 		s1 = readString();
@@ -1319,6 +1297,12 @@ public class SimpleTester {
 		    sleep(x*100);
 		}
 		return true;
+	    case DWAITFOR:
+		x = readPositiveInt();
+		if(!novalidate) {
+		    sleep(x*100);
+		}
+		/** fallthrough */
 	    case WAITFOR:
 		selector = readSel(true);
 		if(novalidate)
