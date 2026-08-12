@@ -736,7 +736,7 @@ public class SimpleTester {
 	notSel = false;
 	notStr = false;
 	try {
-	    EnumStmt st = readStmt();
+	    final EnumStmt st = readStmt();
 	    int index1 = currPos;
 	    boolean b;
 	    switch(st) {
@@ -1460,8 +1460,7 @@ public class SimpleTester {
 
     
     private static boolean parseScript(final boolean novalidate) {
-	long startTimeStamp = System.currentTimeMillis();
-	long stopTimeStamp = 0;
+	final long startTimeStamp = System.currentTimeMillis();
 	boolean ret = true;
 	script_done = false;
 	BufferedReader buffer = new BufferedReader(script_file);
@@ -1499,7 +1498,7 @@ public class SimpleTester {
 	    ret = false;
 	}
 	if(printTime && !novalidate) {
-	    stopTimeStamp = System.currentTimeMillis();
+	    long stopTimeStamp = System.currentTimeMillis();
 	    long tmp = stopTimeStamp - startTimeStamp;
 	    totalTimeTaken += tmp;
 	    long secondsTaken = Math.round(tmp / 1000.0);
