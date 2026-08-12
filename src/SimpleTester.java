@@ -1359,7 +1359,6 @@ public class SimpleTester {
 		sor = new StrOrRegex();
 		if(novalidate)
 		    return true;
-		ret = null; // compiler not smart enough to see it always is initalised
 		for(int i=0; i<RETRY_TIMES; i++) {
 		    try {
 			findElement(selector);
@@ -1381,7 +1380,6 @@ public class SimpleTester {
 		    }
 		    sleep(RETRY_INTERVAL);
 		}
-		System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 		return false;
 	    case WAITFORENABLED:
 		selector = readSel(true);
