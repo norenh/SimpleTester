@@ -737,7 +737,6 @@ public class SimpleTester {
 	notStr = false;
 	try {
 	    final EnumStmt st = readStmt();
-	    int index1 = currPos;
 	    boolean b;
 	    switch(st) {
 	    case ALERTACCEPT:
