@@ -733,217 +733,217 @@ public class SimpleTester {
 	    switch(readStmt()) {
 	    case ALERTACCEPT:
 		{
-		if(novalidate)
+		    if(novalidate)
+			return true;
+		    try {
+			Alert alert = curr_driver.switchTo().alert();
+			alert.accept();
+		    }
+		    catch (NoAlertPresentException e) {
+			return false;
+		    }
 		    return true;
-		try {
-		    Alert alert = curr_driver.switchTo().alert();
-		    alert.accept();
-		}
-		catch (NoAlertPresentException e) {
-		    return false;
-		}
-		return true;
 		}
 	    case ALERTDISMISS:
 		{
-		if(novalidate)
+		    if(novalidate)
+			return true;
+		    try {
+			Alert alert = curr_driver.switchTo().alert();
+			alert.dismiss();
+		    }
+		    catch (NoAlertPresentException e) {
+			return false;
+		    }
 		    return true;
-		try {
-		    Alert alert = curr_driver.switchTo().alert();
-		    alert.dismiss();
-		}
-		catch (NoAlertPresentException e) {
-		    return false;
-		}
-		return true;
 		}
 	    case ASSERT:
 		{
-		By selector = readSel(true);
-		if(novalidate)
-		    return true;
+		    By selector = readSel(true);
+		    if(novalidate)
+			return true;
 
-		try {
-		    findElement(selector);
-		    if(!notSel)
-			return true;
-		}
-		catch(StaleElementReferenceException|NoSuchElementException e) {
-		    if(notSel)
-			return true;
-		}
-		return false;
+		    try {
+			findElement(selector);
+			if(!notSel)
+			    return true;
+		    }
+		    catch(StaleElementReferenceException|NoSuchElementException e) {
+			if(notSel)
+			    return true;
+		    }
+		    return false;
 		}
 	    case ASSERTATR:
 		{
-		By selector = readSel(false);
-		String s1 = readString(true);
-		String s2 = readString();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		String ret = curr_element.getDomAttribute(s1);
-		if(ret == null)
-		    return notStr;
-		else if(notStr)
-		    return false;
-
-		if(!ret.equals(s2)) {
-		    if(ret.equals(s2.strip())) {
-			System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+		    By selector = readSel(false);
+		    String s1 = readString(true);
+		    String s2 = readString();
+		    if(novalidate)
 			return true;
+		    findElementCached(selector);
+		    String ret = curr_element.getDomAttribute(s1);
+		    if(ret == null)
+			return notStr;
+		    else if(notStr)
+			return false;
+
+		    if(!ret.equals(s2)) {
+			if(ret.equals(s2.strip())) {
+			    System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			    return true;
+			}
+			// Workaround for Safari returning true for attributes with a empty value
+			if(driverType == enumDriver.SAFARI && s2.equals("") && ret.equals("true"))
+			    return true;
+
+			System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			return false;
 		    }
-		    // Workaround for Safari returning true for attributes with a empty value
-		    if(driverType == enumDriver.SAFARI && s2.equals("") && ret.equals("true"))
-			return true;
-
-		    System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
-		    return false;
-		}
-		return true;
+		    return true;
 		}
 	    case ASSERTCLK:
 		{
-		By selector = readSel(true);
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
+		    By selector = readSel(true);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
 
-		// Element might still be hidden behind other, but this should do for now
-		boolean b = curr_element.isDisplayed() && curr_element.isEnabled();
+		    // Element might still be hidden behind other, but this should do for now
+		    boolean b = curr_element.isDisplayed() && curr_element.isEnabled();
 
-		if(!notSel)
-		    return b;
-		else
-		    return !b;
+		    if(!notSel)
+			return b;
+		    else
+			return !b;
 		}
 	    case ASSERTCSS:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		StrOrRegex sor = new StrOrRegex();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		String ret = curr_element.getCssValue(s1);
-		if(ret == null)
-		    return false;
-		if(!sor.matches(ret)) {
-		    if(sor.matches(ret.strip())) {
-			System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    StrOrRegex sor = new StrOrRegex();
+		    if(novalidate)
 			return true;
+		    findElementCached(selector);
+		    String ret = curr_element.getCssValue(s1);
+		    if(ret == null)
+			return false;
+		    if(!sor.matches(ret)) {
+			if(sor.matches(ret.strip())) {
+			    System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    return true;
+			}
+			System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+			return false;
 		    }
-		    System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
-		    return false;
-		}
-		return true;
+		    return true;
 		}
 	    case ASSERTPRO:
 		{
-		By selector = readSel(false);
-		String s1 = readString(true);
-		StrOrRegex sor = new StrOrRegex();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		String ret = curr_element.getDomProperty(s1);
-		if(ret == null)
-		    return notStr;
-		else if(notStr)
-		    return false;
-		if(!sor.matches(ret)) {
-		    if(sor.matches(ret.strip())) {
-			System.out.println("WARN: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
+		    By selector = readSel(false);
+		    String s1 = readString(true);
+		    StrOrRegex sor = new StrOrRegex();
+		    if(novalidate)
 			return true;
-		    }
-		    // Workaround for Safari returning true for properties with a empty value
-		    if(driverType == enumDriver.SAFARI && sor.matches("") && ret.equals("true"))
-			return true;
+		    findElementCached(selector);
+		    String ret = curr_element.getDomProperty(s1);
+		    if(ret == null)
+			return notStr;
+		    else if(notStr)
+			return false;
+		    if(!sor.matches(ret)) {
+			if(sor.matches(ret.strip())) {
+			    System.out.println("WARN: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    return true;
+			}
+			// Workaround for Safari returning true for properties with a empty value
+			if(driverType == enumDriver.SAFARI && sor.matches("") && ret.equals("true"))
+			    return true;
 
-		    System.out.println("INFO: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
-		    return false;
-		}
-		return true;
+			System.out.println("INFO: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
+			return false;
+		    }
+		    return true;
 		}
 	    case ASSERTSEL:
 		{
-		By selector = readSel(false);
-		boolean b = readBool();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		return curr_element.isSelected() == b;
+		    By selector = readSel(false);
+		    boolean b = readBool();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    return curr_element.isSelected() == b;
 		}
 	    case ASSERTTXT:
 		{
-		By selector = readSel(false);
-		StrOrRegex sor = new StrOrRegex();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		scrollUnlessDisplayed();
-		String ret = curr_element.getText();
-		if(ret == null)
-		    return false;
-		if(!sor.matches(ret)) {
-		    if(sor.matches(ret.strip())) {
-			System.out.println("WARN: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+		    By selector = readSel(false);
+		    StrOrRegex sor = new StrOrRegex();
+		    if(novalidate)
 			return true;
+		    findElementCached(selector);
+		    scrollUnlessDisplayed();
+		    String ret = curr_element.getText();
+		    if(ret == null)
+			return false;
+		    if(!sor.matches(ret)) {
+			if(sor.matches(ret.strip())) {
+			    System.out.println("WARN: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    return true;
+			}
+			System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			return false;
 		    }
-		    System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
-		    return false;
-		}
-		return true;
+		    return true;
 		}
 	    case ASSERTURL:
 		{
-		String s1 = readString(true);
-		if(novalidate)
-		    return true;
-		boolean b = curr_driver.getCurrentUrl().endsWith(s1);
-		if(!notStr)
-		    return b;
-		else
-		    return !b;
+		    String s1 = readString(true);
+		    if(novalidate)
+			return true;
+		    boolean b = curr_driver.getCurrentUrl().endsWith(s1);
+		    if(!notStr)
+			return b;
+		    else
+			return !b;
 		}
 	    case CLICK:
 		{
-		By selector = readSel(false);
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		//System.out.println(curr_element.toString());
-		if(!curr_element.isEnabled())
-		    return false;
-		return tryClick();
+		    By selector = readSel(false);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    //System.out.println(curr_element.toString());
+		    if(!curr_element.isEnabled())
+			return false;
+		    return tryClick();
 		}
 	    case CLICKACTION:
 		{
-		By selector = readSel(false);
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		{
-		    if(actionQuirk) {
-			// in case actions are not working
-			// try to just click it instead
-			return tryClick();
-		    }
-		    scrollUnlessDisplayed();
-		    Actions act = new Actions(curr_driver);
+		    By selector = readSel(false);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    {
+			if(actionQuirk) {
+			    // in case actions are not working
+			    // try to just click it instead
+			    return tryClick();
+			}
+			scrollUnlessDisplayed();
+			Actions act = new Actions(curr_driver);
 
-		    act.click(curr_element).perform();
-		}
-		return true;
+			act.click(curr_element).perform();
+		    }
+		    return true;
 		}
 	    case CLICKFOR:
 		{
-		// This is a tricky one, but used for special cases
-		// Takes two elements, the last one can be negated and
-		// is the state we aim for...
-		// If we find the state (element exists or not),
-		// return early, but otherwise keep trying to click
-		// until state has been reached or time has run out
+		    // This is a tricky one, but used for special cases
+		    // Takes two elements, the last one can be negated and
+		    // is the state we aim for...
+		    // If we find the state (element exists or not),
+		    // return early, but otherwise keep trying to click
+		    // until state has been reached or time has run out
 		    By selector = readSel(false);
 		    By untilSelector = readSel(true);
 		    if(novalidate)
@@ -968,569 +968,569 @@ public class SimpleTester {
 			catch(StaleElementReferenceException|NoSuchElementException e) {}
 			sleep(RETRY_INTERVAL);
 		    }
-		// we failed to find condition, return true anyway
-		return true;
+		    // we failed to find condition, return true anyway
+		    return true;
 		}
 	    case CLICKFORCE:
 		{
-		By selector = readSel(false);
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
+		    By selector = readSel(false);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
 
-		if(tryClick()) {
-		    return true;
-		}
-		for(int i=0;i<RETRY_TIMES;i++) {
-		    sleep(RETRY_INTERVAL);
 		    if(tryClick()) {
 			return true;
 		    }
-		}
-		return false;
+		    for(int i=0;i<RETRY_TIMES;i++) {
+			sleep(RETRY_INTERVAL);
+			if(tryClick()) {
+			    return true;
+			}
+		    }
+		    return false;
 		}
 	    case DRAWBOX:
 		{
-		By selector = readSel(false);
-	        int x = readPositiveInt();
-		if(novalidate)
+		    By selector = readSel(false);
+		    int x = readPositiveInt();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    {
+			if(actionQuirk) {
+			    // in case actions are not working
+			    // try to just click it instead
+			    return tryClick();
+			}
+			scrollUnlessDisplayed();
+			// get dimensions of element
+			Rectangle rect = curr_element.getRect();
+			int topLeftX = rect.getX();
+			int topLeftY = rect.getY();
+			int height = rect.getHeight()-(x*2);
+			int width = rect.getWidth()-(x*2);
+			if(height < 1 || width < 1) {
+			    System.out.println("INFO: Offset*2 > width or height");
+			    return false;
+			}
+			//System.out.println("X: "+topLeftX+" Y: "+topLeftY);
+			//System.out.println("height: "+height+" width: "+width);
+
+			Actions painter = new Actions(curr_driver);
+
+			painter.moveToLocation(topLeftX+x, topLeftY+x)
+			    .clickAndHold()
+			    .moveByOffset(width-x,0)
+			    .moveByOffset(0,height-x)
+			    .moveByOffset(-width+x,0)
+			    .moveByOffset(0,-height+x)
+			    .moveByOffset(width-x,height-x)
+			    /** half speed variant, not sure if wanted
+				it seems only firefox manages a decent rectangle
+				with a linethrough so might be something to start
+				using
+				.moveByOffset((width-x)/2,0)
+				.moveByOffset((width-x)/2,0)
+				.moveByOffset(0,(height-x)/2)
+				.moveByOffset(0,(height-x)/2)
+				.moveByOffset((-width+x)/2,0)
+				.moveByOffset((-width+x)/2,0)
+				.moveByOffset(0,(-height+x)/2)
+				.moveByOffset(0,(-height+x)/2)
+				.moveByOffset((width-x)/2,(height-x)/2)
+				.moveByOffset((width-x)/2,(height-x)/2)
+			    */
+			    .release()
+			    .perform();
+		    }
 		    return true;
-		findElementCached(selector);
-		{
-		    if(actionQuirk) {
-			// in case actions are not working
-			// try to just click it instead
-			return tryClick();
-		    }
-		    scrollUnlessDisplayed();
-		    // get dimensions of element
-		    Rectangle rect = curr_element.getRect();
-		    int topLeftX = rect.getX();
-		    int topLeftY = rect.getY();
-		    int height = rect.getHeight()-(x*2);
-		    int width = rect.getWidth()-(x*2);
-		    if(height < 1 || width < 1) {
-			System.out.println("INFO: Offset*2 > width or height");
-			return false;
-		    }
-		    //System.out.println("X: "+topLeftX+" Y: "+topLeftY);
-		    //System.out.println("height: "+height+" width: "+width);
-
-		    Actions painter = new Actions(curr_driver);
-
-		    painter.moveToLocation(topLeftX+x, topLeftY+x)
-			.clickAndHold()
-			.moveByOffset(width-x,0)
-			.moveByOffset(0,height-x)
-			.moveByOffset(-width+x,0)
-			.moveByOffset(0,-height+x)
-			.moveByOffset(width-x,height-x)
-			/** half speed variant, not sure if wanted
-			    it seems only firefox manages a decent rectangle
-			    with a linethrough so might be something to start
-			    using
-			.moveByOffset((width-x)/2,0)
-			.moveByOffset((width-x)/2,0)
-			.moveByOffset(0,(height-x)/2)
-			.moveByOffset(0,(height-x)/2)
-			.moveByOffset((-width+x)/2,0)
-			.moveByOffset((-width+x)/2,0)
-			.moveByOffset(0,(-height+x)/2)
-			.moveByOffset(0,(-height+x)/2)
-			.moveByOffset((width-x)/2,(height-x)/2)
-			.moveByOffset((width-x)/2,(height-x)/2)
-			*/
-			.release()
-			.perform();
-		}
-		return true;
 		}
 	    case FILEPICK:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		{
-		    File f = new File(s1);
-		    s1 = f.getAbsolutePath();
-		}
-		//System.out.println("File path: "+s1);
-		if(novalidate)
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    {
+			File f = new File(s1);
+			s1 = f.getAbsolutePath();
+		    }
+		    //System.out.println("File path: "+s1);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    scrollUnlessDisplayed();
+		    // tryType does not work here since it might
+		    // use workarounds/quirks that are incompatible
+		    // with file inputs
+		    curr_element.sendKeys(s1);
 		    return true;
-		findElementCached(selector);
-		scrollUnlessDisplayed();
-		// tryType does not work here since it might
-		// use workarounds/quirks that are incompatible
-		// with file inputs
-		curr_element.sendKeys(s1);
-		return true;
 		}
 	    case FINISH:
 		{
-		script_done = true;
-		return true;
+		    script_done = true;
+		    return true;
 		}
 	    case HOVER:
 		{
-		By selector = readSel(false);
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		{
-		    if(actionQuirk) {
-			// in case actions are not working
-			// try to just click it instead
-			return tryClick();
-		    }
-		    scrollUnlessDisplayed();
-		    Actions act = new Actions(curr_driver);
+		    By selector = readSel(false);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    {
+			if(actionQuirk) {
+			    // in case actions are not working
+			    // try to just click it instead
+			    return tryClick();
+			}
+			scrollUnlessDisplayed();
+			Actions act = new Actions(curr_driver);
 
-		    act.moveToElement(curr_element).perform();
-		}
-		return true;
+			act.moveToElement(curr_element).perform();
+		    }
+		    return true;
 		}
 	    case PRINT:
 		{
-		String s1 = readString();
-		if(novalidate)
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    System.out.println("PRINT:"+linenr+":\""+s1+"\"");
 		    return true;
-		System.out.println("PRINT:"+linenr+":\""+s1+"\"");
-		return true;
 		}
 	    case PRINTATR:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		if(novalidate)
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    String ret = curr_element.getDomAttribute(s1);
+		    System.out.println("PRINTATR:"+linenr+":\""+ret+"\"");
 		    return true;
-		findElementCached(selector);
-		String ret = curr_element.getDomAttribute(s1);
-		System.out.println("PRINTATR:"+linenr+":\""+ret+"\"");
-		return true;
 		}
 	    case PRINTCSS:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		if(novalidate)
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    String ret = curr_element.getCssValue(s1);
+		    System.out.println("PRINTCSS:"+linenr+":\""+ret+"\"");
 		    return true;
-		findElementCached(selector);
-		String ret = curr_element.getCssValue(s1);
-		System.out.println("PRINTCSS:"+linenr+":\""+ret+"\"");
-		return true;
 		}
 	    case PRINTJS:
 		{
-		String s1 = readString();
-		if(novalidate)
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    Object o = js.executeScript(s1);
+		    String ret;
+		    if(String.class.isInstance(o))       { ret = (String)o; }
+		    else if(o == null)                   { ret = "NULL"; }
+		    else                                 { ret = o.toString(); }
+		    System.out.println("PRINTJS:"+linenr+":\""+ret+"\"");
 		    return true;
-		Object o = js.executeScript(s1);
-		String ret;
-		if(String.class.isInstance(o))       { ret = (String)o; }
-		else if(o == null)                   { ret = "NULL"; }
-		else                                 { ret = o.toString(); }
-		System.out.println("PRINTJS:"+linenr+":\""+ret+"\"");
-		return true;
 		}
 	    case PRINTPRO:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		if(novalidate)
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    String ret = curr_element.getDomProperty(s1);
+		    System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
 		    return true;
-		findElementCached(selector);
-		String ret = curr_element.getDomProperty(s1);
-		System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
-		return true;
 		}
 	    case PRINTSRC:
 		{
-		if(novalidate)
+		    if(novalidate)
+			return true;
+		    System.out.println("PRINTSRC:"+linenr+": Start of print\n"+curr_driver.getPageSource());
+		    System.out.println("PRINTSRC:"+linenr+": End of print");
 		    return true;
-		System.out.println("PRINTSRC:"+linenr+": Start of print\n"+curr_driver.getPageSource());
-		System.out.println("PRINTSRC:"+linenr+": End of print");
-		return true;
 		}
 	    case PRINTTIME:
 		{
-		if(novalidate)
+		    if(novalidate)
+			return true;
+		    System.out.println("PRINTTIME:"+linenr+":"+Instant.now());
 		    return true;
-		System.out.println("PRINTTIME:"+linenr+":"+Instant.now());
-		return true;
 		}
 	    case PRINTTXT:
 		{
-		By selector = readSel(false);
-		if(novalidate)
+		    By selector = readSel(false);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    scrollUnlessDisplayed();
+		    String ret = curr_element.getText();
+		    System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
 		    return true;
-		findElementCached(selector);
-		scrollUnlessDisplayed();
-		String ret = curr_element.getText();
-		System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
-		return true;
 		}
 	    case PRINTURL:
 		{
-		if(novalidate)
+		    if(novalidate)
+			return true;
+		    String ret = curr_driver.getCurrentUrl();
+		    System.out.println("PRINTURL:"+linenr+":\""+ret+"\"");
 		    return true;
-		String ret = curr_driver.getCurrentUrl();
-		System.out.println("PRINTURL:"+linenr+":\""+ret+"\"");
-		return true;
 		}
 	    case REFRESH:
 		{
-		if(!novalidate)
-		    curr_driver.navigate().refresh();
-		return true;
+		    if(!novalidate)
+			curr_driver.navigate().refresh();
+		    return true;
 		}
 	    case RUNCMD:
 		{
-		String s1 = readString();
-		if(novalidate)
-		    return true;
-		try {
-		    // Basically the same as deprecated exec-method
-		    // Splits args on just space, need fix if better tokenizer
-		    // is needed
-		    Runtime rt = Runtime.getRuntime();
-		    Process proc = rt.exec(s1.split(" "));
-		    if(proc.waitFor() != 0)
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    try {
+			// Basically the same as deprecated exec-method
+			// Splits args on just space, need fix if better tokenizer
+			// is needed
+			Runtime rt = Runtime.getRuntime();
+			Process proc = rt.exec(s1.split(" "));
+			if(proc.waitFor() != 0)
+			    return false;
+		    } catch(Exception e) {
+			System.out.println(e.toString());
 			return false;
-		} catch(Exception e) {
-		    System.out.println(e.toString());
-		    return false;
-		}
-		return true;
+		    }
+		    return true;
 		}
 	    case SCREENSHOT:
 		{
-		String s1 = readString();
-		if(novalidate)
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    takeScreenshot(s1);
+		    System.out.println("INFO: Screenshot taken \""+s1+"\"");
 		    return true;
-		takeScreenshot(s1);
-		System.out.println("INFO: Screenshot taken \""+s1+"\"");
-		return true;
 		}
 	    case SCROLLTO:
 		{
-		By selector = readSel(false);
-		if(novalidate)
+		    By selector = readSel(false);
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    scrollToElement();
 		    return true;
-		findElementCached(selector);
-		scrollToElement();
-		return true;
 		}
 	    case SELECT:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		if(novalidate)
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    scrollUnlessDisplayed();
+		    Select dropdown = new Select(curr_element);
+		    dropdown.selectByVisibleText(s1);
 		    return true;
-		findElementCached(selector);
-		scrollUnlessDisplayed();
-		Select dropdown = new Select(curr_element);
-		dropdown.selectByVisibleText(s1);
-		return true;
 		}
 	    case SETTOGGLE:
 		{
-		// should return true if radiobutton/checkbox is set to chosen value
-		By selector = readSel(false);
-		boolean b = readBool();
-		if(novalidate)
+		    // should return true if radiobutton/checkbox is set to chosen value
+		    By selector = readSel(false);
+		    boolean b = readBool();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    if(curr_element.isSelected() != b && curr_element.isEnabled()) {
+			try {
+			    tryClick();
+			}
+			catch(ElementNotInteractableException e) {
+			    System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
+			    System.out.println("ERROR: "+e.getMessage());
+			    return false;
+			}
+		    }
 		    return true;
-		findElementCached(selector);
-		if(curr_element.isSelected() != b && curr_element.isEnabled()) {
-		    try {
-			tryClick();
-		    }
-		    catch(ElementNotInteractableException e) {
-			System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
-			System.out.println("ERROR: "+e.getMessage());
-			return false;
-		    }
-		}
-		return true;
 		}
 	    case SETVALUE:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		{
-		    String tmp = curr_element.getDomProperty("value");
-		    if(tmp != null) {
-			js.executeScript("arguments[0].focus(); arguments[0].value = '"+s1+"'; arguments[0].dispatchEvent(new Event('change'));", curr_element);
-		    }
-		    sleep(20);
-		}
-		return true;
-		}
-	    case SWITCHFRAME:
-		{
-		By selector = readSel(true);
-
-		if(novalidate)
-		    return true;
-		// use empty string to switch back to defaultcontent
-		if(notSel) {
-		     curr_driver.switchTo().defaultContent();
-		}
-		else {
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
 		    findElementCached(selector);
-		    curr_driver.switchTo().frame(curr_element);
-		}
-		return true;
-		}
-	    case TYPE:
-		{
-		By selector = readSel(false);
-		String s1 = readString();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-		scrollUnlessDisplayed();
-		tryType(s1);
-		return true;
-		}
-	    case TYPECLR:
-		{
-		By selector = readSel(false);
-		String s1 = readString();
-		if(novalidate)
-		    return true;
-		findElementCached(selector);
-
-		// Chrome and Safari have quirks with cursor position
-		// being updated later than expected, so try click before
-		// we do anything else. With tryClick, no extra scrolling is needed
-
-		//scrollUnlessDisplayed();
-		tryClick();
-		// Wait for one frame (50hz screen) after clicking
-		sleep(20);
-
-		switch(clearMode) {
-		case DEFAULT:
-		    curr_element.sendKeys(Keys.CONTROL + "a");
-		    curr_element.sendKeys(Keys.DELETE);
-		    break;
-		case MAC:
-		    curr_element.sendKeys(Keys.COMMAND + "a");
-		    curr_element.sendKeys(Keys.BACK_SPACE);
-		    break;
-		case QUIRK_BS_FALLBACK:
 		    {
-			curr_element.clear();
 			String tmp = curr_element.getDomProperty("value");
 			if(tmp != null) {
-			    int l=tmp.length();
-			    for(int i=0;i<l;i++)
-				curr_element.sendKeys(Keys.BACK_SPACE);
-			}
-		    }
-		    break;
-		case QUIRK_JS_RAW:
-		    {
-			String tmp = curr_element.getDomProperty("value");
-			if(tmp != null && tmp.length() > 0) {
-			    js.executeScript("arguments[0].focus(); arguments[0].value = ''; arguments[0].textContent = ''; arguments[0].dispatchEvent(new Event('change'));", curr_element);
+			    js.executeScript("arguments[0].focus(); arguments[0].value = '"+s1+"'; arguments[0].dispatchEvent(new Event('change'));", curr_element);
 			}
 			sleep(20);
 		    }
-		    break;
+		    return true;
 		}
-		tryType(s1);
-		return true;
+	    case SWITCHFRAME:
+		{
+		    By selector = readSel(true);
+
+		    if(novalidate)
+			return true;
+		    // use empty string to switch back to defaultcontent
+		    if(notSel) {
+			curr_driver.switchTo().defaultContent();
+		    }
+		    else {
+			findElementCached(selector);
+			curr_driver.switchTo().frame(curr_element);
+		    }
+		    return true;
+		}
+	    case TYPE:
+		{
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    scrollUnlessDisplayed();
+		    tryType(s1);
+		    return true;
+		}
+	    case TYPECLR:
+		{
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+
+		    // Chrome and Safari have quirks with cursor position
+		    // being updated later than expected, so try click before
+		    // we do anything else. With tryClick, no extra scrolling is needed
+
+		    //scrollUnlessDisplayed();
+		    tryClick();
+		    // Wait for one frame (50hz screen) after clicking
+		    sleep(20);
+
+		    switch(clearMode) {
+		    case DEFAULT:
+			curr_element.sendKeys(Keys.CONTROL + "a");
+			curr_element.sendKeys(Keys.DELETE);
+			break;
+		    case MAC:
+			curr_element.sendKeys(Keys.COMMAND + "a");
+			curr_element.sendKeys(Keys.BACK_SPACE);
+			break;
+		    case QUIRK_BS_FALLBACK:
+			{
+			    curr_element.clear();
+			    String tmp = curr_element.getDomProperty("value");
+			    if(tmp != null) {
+				int l=tmp.length();
+				for(int i=0;i<l;i++)
+				    curr_element.sendKeys(Keys.BACK_SPACE);
+			    }
+			}
+			break;
+		    case QUIRK_JS_RAW:
+			{
+			    String tmp = curr_element.getDomProperty("value");
+			    if(tmp != null && tmp.length() > 0) {
+				js.executeScript("arguments[0].focus(); arguments[0].value = ''; arguments[0].textContent = ''; arguments[0].dispatchEvent(new Event('change'));", curr_element);
+			    }
+			    sleep(20);
+			}
+			break;
+		    }
+		    tryType(s1);
+		    return true;
 		}
 	    case TYPEKEY:
 		{
-		By selector = readSel(false);
-		Keys k = readKey();
-		if(novalidate)
+		    By selector = readSel(false);
+		    Keys k = readKey();
+		    if(novalidate)
+			return true;
+		    findElementCached(selector);
+		    scrollUnlessDisplayed();
+		    // No need for tryType, we only have one char here
+		    curr_element.sendKeys(k);
 		    return true;
-		findElementCached(selector);
-		scrollUnlessDisplayed();
-		// No need for tryType, we only have one char here
-		curr_element.sendKeys(k);
-		return true;
 		}
 	    case WAIT:
 		{
-		int x = readPositiveInt();
-		if(!novalidate) {
-		    sleep(x*100);
-		}
-		return true;
+		    int x = readPositiveInt();
+		    if(!novalidate) {
+			sleep(x*100);
+		    }
+		    return true;
 		}
 	    case DWAITFOR:
 		{
-		int x = readPositiveInt();
-		if(!novalidate) {
-		    sleep(x*100);
-		}
+		    int x = readPositiveInt();
+		    if(!novalidate) {
+			sleep(x*100);
+		    }
 		}
 		/** fallthrough */
 	    case WAITFOR:
 		{
-		By selector = readSel(true);
-		if(novalidate)
-		    return true;
-
-		for(int i=0; i<RETRY_TIMES; i++) {
-		    try {
-			findElement(selector);
-			if(!notSel)
-			    return true;
-		    }
-		    catch(StaleElementReferenceException|NoSuchElementException e) {
-			if(notSel)
-			    return true;
-		    }
-		    sleep(RETRY_INTERVAL);
-		}
-		return false;
-		}
-	    case WAITFORALERT:
-		{
-		if(novalidate)
-		    return true;
-		for(int i=0;i<RETRY_TIMES;i++) {
-		    try{
-			curr_driver.switchTo().alert();
+		    By selector = readSel(true);
+		    if(novalidate)
 			return true;
-		    }
-		    catch(NoAlertPresentException e) {
-			// keep on looking...
-		    }
-		    sleep(RETRY_INTERVAL);
-		}
-		return false;
-		}
-	    case WAITFORATR:
-		{
-		By selector = readSel(false);
-		String s1 = readString();
-		String s2 = readString();
-		if(novalidate)
-		    return true;
-		for(int i=0;i<RETRY_TIMES;i++) {
-		    try {
-			findElement(selector);
-			String ret = curr_element.getDomAttribute(s1);
-			if(ret != null && ret.equals(s2))
-			    return true;
-		    }
-		    catch(StaleElementReferenceException|NoSuchElementException e) {
-			// keep on looking...
-		    }
-		    sleep(RETRY_INTERVAL);
-		}
-		return false;
-		}
-	    case WAITFORCSS:
-		{
-		By selector = readSel(false);
-		String s1 = readString();
-		StrOrRegex sor = new StrOrRegex();
-		if(novalidate)
-		    return true;
-		for(int i=0; i<RETRY_TIMES; i++) {
-		    try {
-			findElement(selector);
-			String ret = curr_element.getCssValue(s1);
-			if(ret == null)
-			    continue;
-			if(!sor.matches(ret)) {
-			    if(sor.matches(ret.strip())) {
-				System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
-				return true;
-			    }
-			}
-			else {
-			    return true;
-			}
-		    }
-		    catch(StaleElementReferenceException|NoSuchElementException e) {
-			// keep on looking...
-		    }
-		    sleep(RETRY_INTERVAL);
-		}
-		return false;
-		}
-	    case WAITFORENABLED:
-		{
-		By selector = readSel(true);
-		if(novalidate)
-		    return true;
 
-		for(int i=0; i<RETRY_TIMES; i++) {
-		    try {
-			findElement(selector);
-			if(curr_element.isEnabled()) {
+		    for(int i=0; i<RETRY_TIMES; i++) {
+			try {
+			    findElement(selector);
 			    if(!notSel)
 				return true;
 			}
-			else {
+			catch(StaleElementReferenceException|NoSuchElementException e) {
 			    if(notSel)
 				return true;
 			}
+			sleep(RETRY_INTERVAL);
 		    }
-		    catch(StaleElementReferenceException|NoSuchElementException e) {
-			if(notSel)
-			    return true;
-		    }
-		    sleep(RETRY_INTERVAL);
+		    return false;
 		}
-		return false;
+	    case WAITFORALERT:
+		{
+		    if(novalidate)
+			return true;
+		    for(int i=0;i<RETRY_TIMES;i++) {
+			try{
+			    curr_driver.switchTo().alert();
+			    return true;
+			}
+			catch(NoAlertPresentException e) {
+			    // keep on looking...
+			}
+			sleep(RETRY_INTERVAL);
+		    }
+		    return false;
+		}
+	    case WAITFORATR:
+		{
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    String s2 = readString();
+		    if(novalidate)
+			return true;
+		    for(int i=0;i<RETRY_TIMES;i++) {
+			try {
+			    findElement(selector);
+			    String ret = curr_element.getDomAttribute(s1);
+			    if(ret != null && ret.equals(s2))
+				return true;
+			}
+			catch(StaleElementReferenceException|NoSuchElementException e) {
+			    // keep on looking...
+			}
+			sleep(RETRY_INTERVAL);
+		    }
+		    return false;
+		}
+	    case WAITFORCSS:
+		{
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    StrOrRegex sor = new StrOrRegex();
+		    if(novalidate)
+			return true;
+		    for(int i=0; i<RETRY_TIMES; i++) {
+			try {
+			    findElement(selector);
+			    String ret = curr_element.getCssValue(s1);
+			    if(ret == null)
+				continue;
+			    if(!sor.matches(ret)) {
+				if(sor.matches(ret.strip())) {
+				    System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+				    return true;
+				}
+			    }
+			    else {
+				return true;
+			    }
+			}
+			catch(StaleElementReferenceException|NoSuchElementException e) {
+			    // keep on looking...
+			}
+			sleep(RETRY_INTERVAL);
+		    }
+		    return false;
+		}
+	    case WAITFORENABLED:
+		{
+		    By selector = readSel(true);
+		    if(novalidate)
+			return true;
+
+		    for(int i=0; i<RETRY_TIMES; i++) {
+			try {
+			    findElement(selector);
+			    if(curr_element.isEnabled()) {
+				if(!notSel)
+				    return true;
+			    }
+			    else {
+				if(notSel)
+				    return true;
+			    }
+			}
+			catch(StaleElementReferenceException|NoSuchElementException e) {
+			    if(notSel)
+				return true;
+			}
+			sleep(RETRY_INTERVAL);
+		    }
+		    return false;
 		}
 	    case WAITFORPRO:
 		{
-		By selector = readSel(false);
-		String s1 = readString();
-		StrOrRegex sor = new StrOrRegex();
-		if(novalidate)
-		    return true;
-		for(int i=0;i<RETRY_TIMES;i++) {
-		    try {
-			findElement(selector);
-			String ret = curr_element.getDomProperty(s1);
-			if(ret != null && sor.matches(ret))
-			    return true;
+		    By selector = readSel(false);
+		    String s1 = readString();
+		    StrOrRegex sor = new StrOrRegex();
+		    if(novalidate)
+			return true;
+		    for(int i=0;i<RETRY_TIMES;i++) {
+			try {
+			    findElement(selector);
+			    String ret = curr_element.getDomProperty(s1);
+			    if(ret != null && sor.matches(ret))
+				return true;
+			}
+			catch(StaleElementReferenceException|NoSuchElementException e) {
+			    // keep on looking...
+			}
+			sleep(RETRY_INTERVAL);
 		    }
-		    catch(StaleElementReferenceException|NoSuchElementException e) {
-			// keep on looking...
-		    }
-		    sleep(RETRY_INTERVAL);
-		}
-		return false;
+		    return false;
 		}
 	    case WAITFORTXT:
 		{
-		By selector = readSel(false);
-		StrOrRegex sor = new StrOrRegex();
-		if(novalidate)
-		    return true;
-		for(int i=0;i<RETRY_TIMES;i++) {
-		    try {
-			findElement(selector);
-			scrollUnlessDisplayed();
-			String ret = curr_element.getText();
-			if(sor.matches(ret)) {
-			    return true;
+		    By selector = readSel(false);
+		    StrOrRegex sor = new StrOrRegex();
+		    if(novalidate)
+			return true;
+		    for(int i=0;i<RETRY_TIMES;i++) {
+			try {
+			    findElement(selector);
+			    scrollUnlessDisplayed();
+			    String ret = curr_element.getText();
+			    if(sor.matches(ret)) {
+				return true;
+			    }
+			    else if(sor.matches(ret.strip())) {
+				System.out.println("WARN: WAITFORTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+				return true;
+			    }
 			}
-			else if(sor.matches(ret.strip())) {
-			    System.out.println("WARN: WAITFORTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
-			    return true;
+			catch(StaleElementReferenceException|NoSuchElementException e) {
+			    // keep on looking...
 			}
+			sleep(RETRY_INTERVAL);
 		    }
-		    catch(StaleElementReferenceException|NoSuchElementException e) {
-			// keep on looking...
-		    }
-		    sleep(RETRY_INTERVAL);
-		}
-		return false;
+		    return false;
 		}
 	    default:
 		break;
