@@ -110,6 +110,7 @@ public class SimpleTester {
 	ASSERTATR,
 	ASSERTCLK,
 	ASSERTCSS,
+	ASSERTENABLED,
 	ASSERTPRO,
 	ASSERTSEL,
 	ASSERTTXT,
@@ -173,53 +174,54 @@ public class SimpleTester {
     }
 
     private final static HashMap<String, EnumStmt> statements = new HashMap<String, EnumStmt>() {{
-	    put("alertaccept",EnumStmt.ALERTACCEPT);
-	    put("alertdismiss",EnumStmt.ALERTDISMISS);
-	    put("assert",    EnumStmt.ASSERT);
-	    put("assertatr", EnumStmt.ASSERTATR);
-	    put("assertclk", EnumStmt.ASSERTCLK);
-	    put("assertcss", EnumStmt.ASSERTCSS);
-	    put("assertpro", EnumStmt.ASSERTPRO);
-	    put("assertsel", EnumStmt.ASSERTSEL);
-	    put("asserttxt", EnumStmt.ASSERTTXT);
-	    put("asserturl", EnumStmt.ASSERTURL);
-	    put("click",     EnumStmt.CLICK);
-	    put("clickaction",EnumStmt.CLICKACTION);
-	    put("clickfor",  EnumStmt.CLICKFOR);
-	    put("clickforce",EnumStmt.CLICKFORCE);
-	    put("drawbox",   EnumStmt.DRAWBOX);
-	    put("dwaitfor",  EnumStmt.DWAITFOR);
-	    put("filepick",  EnumStmt.FILEPICK);
-	    put("hover",     EnumStmt.HOVER);
-	    put("print",     EnumStmt.PRINT);
-	    put("printatr",  EnumStmt.PRINTATR);
-	    put("printcss",  EnumStmt.PRINTCSS);
-	    put("printjs",   EnumStmt.PRINTJS);
-	    put("printpro",  EnumStmt.PRINTPRO);
-	    put("printsrc",  EnumStmt.PRINTSRC);
-	    put("printtime", EnumStmt.PRINTTIME);
-	    put("printtxt",  EnumStmt.PRINTTXT);
-	    put("printurl",  EnumStmt.PRINTURL);
-	    put("refresh",   EnumStmt.REFRESH);
-	    put("runcmd",    EnumStmt.RUNCMD);
-	    put("screenshot",EnumStmt.SCREENSHOT);
-	    put("scrollto",  EnumStmt.SCROLLTO);
-	    put("select",    EnumStmt.SELECT);
-	    put("settoggle", EnumStmt.SETTOGGLE);
-	    put("setvalue",  EnumStmt.SETVALUE);
-	    put("switchframe",EnumStmt.SWITCHFRAME);
-	    put("type",      EnumStmt.TYPE);
-	    put("typeclr",   EnumStmt.TYPECLR);
-	    put("typekey",   EnumStmt.TYPEKEY);
-	    put("wait",      EnumStmt.WAIT);
-	    put("waitfor",   EnumStmt.WAITFOR);
-	    put("waitforalert",EnumStmt.WAITFORALERT);
-	    put("waitforatr",EnumStmt.WAITFORATR);
-	    put("waitforcss",EnumStmt.WAITFORCSS);
+	    put("alertaccept",   EnumStmt.ALERTACCEPT);
+	    put("alertdismiss",  EnumStmt.ALERTDISMISS);
+	    put("assert",        EnumStmt.ASSERT);
+	    put("assertatr",     EnumStmt.ASSERTATR);
+	    put("assertclk",     EnumStmt.ASSERTCLK);
+	    put("assertcss",     EnumStmt.ASSERTCSS);
+	    put("assertenabled", EnumStmt.ASSERTENABLED);
+	    put("assertpro",     EnumStmt.ASSERTPRO);
+	    put("assertsel",     EnumStmt.ASSERTSEL);
+	    put("asserttxt",     EnumStmt.ASSERTTXT);
+	    put("asserturl",     EnumStmt.ASSERTURL);
+	    put("click",         EnumStmt.CLICK);
+	    put("clickaction",   EnumStmt.CLICKACTION);
+	    put("clickfor",      EnumStmt.CLICKFOR);
+	    put("clickforce",    EnumStmt.CLICKFORCE);
+	    put("drawbox",       EnumStmt.DRAWBOX);
+	    put("dwaitfor",      EnumStmt.DWAITFOR);
+	    put("filepick",      EnumStmt.FILEPICK);
+	    put("hover",         EnumStmt.HOVER);
+	    put("print",         EnumStmt.PRINT);
+	    put("printatr",      EnumStmt.PRINTATR);
+	    put("printcss",      EnumStmt.PRINTCSS);
+	    put("printjs",       EnumStmt.PRINTJS);
+	    put("printpro",      EnumStmt.PRINTPRO);
+	    put("printsrc",      EnumStmt.PRINTSRC);
+	    put("printtime",     EnumStmt.PRINTTIME);
+	    put("printtxt",      EnumStmt.PRINTTXT);
+	    put("printurl",      EnumStmt.PRINTURL);
+	    put("refresh",       EnumStmt.REFRESH);
+	    put("runcmd",        EnumStmt.RUNCMD);
+	    put("screenshot",    EnumStmt.SCREENSHOT);
+	    put("scrollto",      EnumStmt.SCROLLTO);
+	    put("select",        EnumStmt.SELECT);
+	    put("settoggle",     EnumStmt.SETTOGGLE);
+	    put("setvalue",      EnumStmt.SETVALUE);
+	    put("switchframe",   EnumStmt.SWITCHFRAME);
+	    put("type",          EnumStmt.TYPE);
+	    put("typeclr",       EnumStmt.TYPECLR);
+	    put("typekey",       EnumStmt.TYPEKEY);
+	    put("wait",          EnumStmt.WAIT);
+	    put("waitfor",       EnumStmt.WAITFOR);
+	    put("waitforalert",  EnumStmt.WAITFORALERT);
+	    put("waitforatr",    EnumStmt.WAITFORATR);
+	    put("waitforcss",    EnumStmt.WAITFORCSS);
 	    put("waitforenabled",EnumStmt.WAITFORENABLED);
-	    put("waitforpro",EnumStmt.WAITFORPRO);
-	    put("waitfortxt",EnumStmt.WAITFORTXT);
-	    put("finish",    EnumStmt.FINISH);
+	    put("waitforpro",    EnumStmt.WAITFORPRO);
+	    put("waitfortxt",    EnumStmt.WAITFORTXT);
+	    put("finish",        EnumStmt.FINISH);
 	}};
 
     private final static HashMap<String, EnumBy> by_names = new HashMap<String, EnumBy>() {{
@@ -837,6 +839,23 @@ public class SimpleTester {
 			return false;
 		    }
 		    return true;
+		}
+	    case ASSERTENABLED:
+		{
+		    By selector = readSel(true);
+		    if(novalidate)
+			return true;
+
+		    findElement(selector);
+		    if(curr_element.isEnabled()) {
+			if(!notSel)
+			    return true;
+		    }
+		    else {
+			if(notSel)
+			    return true;
+		    }
+		    return false;
 		}
 	    case ASSERTPRO:
 		{

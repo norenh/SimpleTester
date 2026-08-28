@@ -43,6 +43,9 @@ asserturl "inputtest.html"
 assertclk button
 assertclk !button_disabled
 
+assertenabled button
+assertenabled !button_disabled
+
 assertpro username "value" ""
 type username "user"
 assertpro username "value" "user"

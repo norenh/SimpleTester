@@ -1,0 +1,3 @@
+waitforenabled mybutton
+assertenabled !mybutton
+

@@ -50,6 +50,7 @@ assert [!]ELEMENTNAME
 assertatr ELEMENTNAME [!]"attribute" "value" (Warning! use assertpro for properties)
 assertclk [!]ELEMENTNAME
 assertcss ELEMENTNAME "property" "value"
+assertenabled [!]ELEMENTNAME
 assertpro ELEMENTNAME [!]"property" "value"
 assertsel ELEMENTNAME "boolean"
 asserttxt ELEMENTNAME "text"
@@ -100,6 +101,7 @@ assert - returns true if element is found
 assertatr  - do getAttribute on "attribute" of element compare with "value"
 assertclk - do isVisible() & isEnabled() of element
 assertcss - do getCssValue on "property" of element compare with "value"
+assertenabled - assert element is enabled
 assertpro  - do getDomProperty on "property" of element compare with "value"
 assertsel - do isSelected() and compare with boolean
 asserttxt - do getText() on element and compare with "text"
