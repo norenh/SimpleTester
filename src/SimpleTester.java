@@ -810,7 +810,7 @@ public class SimpleTester {
 		    if(novalidate)
 			return true;
 		    findElementCached(selector);
-
+		    scrollUnlessDisplayed();
 		    // Element might still be hidden behind other, but this should do for now
 		    boolean b = curr_element.isDisplayed() && curr_element.isEnabled();
 
