@@ -718,6 +718,9 @@ public class SimpleTester {
     }
 
     private static void tryType(final String str) {
+	if(str.length() == 0)
+	    return;
+
 	if(!inputQuirk) {
 	    curr_element.sendKeys(str);
 	}
