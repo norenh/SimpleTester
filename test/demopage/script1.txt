@@ -124,7 +124,8 @@ assertsel checkbox3 "false"
 assertsel checkbox4 "true"
 click checkbox4
 assertsel checkbox4 "false"
-
+clickforce checkbox3
+assertsel checkbox3 "true"
 
 # Check radiobutton toggle
 # Checking one should uncheck the other
