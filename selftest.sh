@@ -228,6 +228,10 @@ for FILE in test/inputtest/fail/*.txt; do
 	fi
 	test_check "${FILE}" 4 "^FAIL:" "$RET" "$PRETEST"
 done
+for FILE in test/inputtest/failnopng/*.txt; do
+	./run.sh -e ERROR -h "test/inputtest/inputconfig.txt" "file://$(pwd)/test/inputtest/inputtest.html" "${FILE}" &> "${OUTPUTFILE}";
+	test_check "${FILE}" 4 "^FAIL:" "$?" "true"
+done
 for FILE in test/drawtest/fail/*.txt; do
         ./run.sh -e ERROR -h "test/drawtest/config1.txt" "file://$(pwd)/test/drawtest/drawtest.html" "${FILE}" &> "${OUTPUTFILE}";
         RET=$?

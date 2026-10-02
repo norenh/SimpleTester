@@ -190,5 +190,6 @@ waitforalert
 alertaccept
 click button
 waitforalert
+assertalert "Hello World!"
 alertdismiss
 

@@ -107,6 +107,7 @@ public class SimpleTester {
 	ALERTACCEPT,
 	ALERTDISMISS,
 	ASSERT,
+	ASSERTALERT,
 	ASSERTATR,
 	ASSERTCLK,
 	ASSERTCSS,
@@ -177,6 +178,7 @@ public class SimpleTester {
 	    put("alertaccept",   EnumStmt.ALERTACCEPT);
 	    put("alertdismiss",  EnumStmt.ALERTDISMISS);
 	    put("assert",        EnumStmt.ASSERT);
+	    put("assertalert",   EnumStmt.ASSERTALERT);
 	    put("assertatr",     EnumStmt.ASSERTATR);
 	    put("assertclk",     EnumStmt.ASSERTCLK);
 	    put("assertcss",     EnumStmt.ASSERTCSS);
@@ -269,6 +271,8 @@ public class SimpleTester {
 	}};
 
     private static void takeScreenshot(final String pathname) {
+	// If an alert is present, we will fail taking screenshot and print out a ugly exception
+	// but it should be pretty obvious
 	try {
 	    File src = ((TakesScreenshot) curr_driver).getScreenshotAs(OutputType.FILE);
 	    Files.move(src.toPath(), new File(pathname).toPath(),StandardCopyOption.REPLACE_EXISTING);
@@ -776,6 +780,24 @@ public class SimpleTester {
 		    catch(StaleElementReferenceException|NoSuchElementException e) {
 			if(notSel)
 			    return true;
+		    }
+		    return false;
+		}
+	    case ASSERTALERT:
+		{
+		    String s1 = readString(false);
+		    if(novalidate)
+			return true;
+		    try {
+			Alert alert = curr_driver.switchTo().alert();
+			String ret = alert.getText();
+			if(s1.equals(ret)) {
+			    return true;
+			}
+			System.out.println("WARN: ASSERTALERT got \""+ret+"\", expected \""+s1+"\"");
+		    }
+		    catch (NoAlertPresentException e) {
+			// return false;
 		    }
 		    return false;
 		}
