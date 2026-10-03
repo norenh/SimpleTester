@@ -191,5 +191,6 @@ alertaccept
 click button
 waitforalert
 assertalert "Hello World!"
+assertalert %.*lo Wo.*%
 alertdismiss
 

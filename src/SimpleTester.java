@@ -785,16 +785,16 @@ public class SimpleTester {
 		}
 	    case ASSERTALERT:
 		{
-		    String s1 = readString(false);
+		    StrOrRegex sor = new StrOrRegex();
 		    if(novalidate)
 			return true;
 		    try {
 			Alert alert = curr_driver.switchTo().alert();
 			String ret = alert.getText();
-			if(s1.equals(ret)) {
+			if(sor.matches(ret)) {
 			    return true;
 			}
-			System.out.println("WARN: ASSERTALERT got \""+ret+"\", expected \""+s1+"\"");
+			System.out.println("WARN: ASSERTALERT got \""+ret+"\", expected \""+sor.toString()+"\"");
 		    }
 		    catch (NoAlertPresentException e) {
 			// return false;
