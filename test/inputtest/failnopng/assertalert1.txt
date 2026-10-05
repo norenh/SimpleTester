@@ -1,0 +1,5 @@
+waitfor button
+click button
+waitforalert
+assertalert "Hello World"
+
