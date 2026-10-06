@@ -11,7 +11,7 @@ fi
 
 cd src || exit
 
-"${JAVAC}" -cp "../lib/slf4j-nop.jar:../lib/selenium-java-${SELENIUM_VERSION}/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+"${JAVAC}" -encoding UTF-8 -cp "../lib/slf4j-nop.jar:../lib/selenium-java-${SELENIUM_VERSION}/*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
 
 "${JAVAP}" cf "../lib/SimpleTester.jar" SimpleTester*.class
 rm -f SimpleTester*.class
