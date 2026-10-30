@@ -11,7 +11,7 @@ IF DEFINED JAVA_HOME (
 
 cd src
 
-"%JAVAC%" -cp "..\lib\slf4j-nop.jar;..\lib\selenium-java-%SELENIUM_VERSION%\*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
+"%JAVAC%" -cp "..\lib\slf4j-nop.jar;..\lib\selenium-java-%SELENIUM_VERSION%\*;..\lib\selenium-java-%SELENIUM_VERSION%\lib\*" -Xlint:unchecked -Xlint:deprecation SimpleTester.java
 
 "%JAVAP%" cf "..\lib\SimpleTester.jar" SimpleTester*.class
 del *.class
