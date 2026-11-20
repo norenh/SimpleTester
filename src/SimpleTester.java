@@ -683,6 +683,10 @@ public class SimpleTester {
 	}
     }
 
+    private static void logWithLineNr(String status, String str) {
+	System.out.println(status+":"+linenr+":"+str);
+    }
+
     private static boolean tryClick() {
 	boolean retry_click = false;
 	try {
@@ -704,14 +708,12 @@ public class SimpleTester {
 		curr_element.click();
 	    }
 	    catch(ElementNotInteractableException e) {
-		//System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
-		//System.out.println("ERROR: "+e.getMessage());
-		System.out.println("WARN: Click failed with "+e.getClass().getCanonicalName());
+		logWithLineNr("WARN", "Click failed with "+e.getClass().getCanonicalName());
 		return false;
 	    }
 	    catch(WebDriverException e) {
 		if(driverType == enumDriver.SAFARI) {
-		    System.out.println("WARN: Click failed with "+e.getClass().getCanonicalName());
+		    logWithLineNr("WARN", "Click failed with "+e.getClass().getCanonicalName());
 		    return false;
 		}
 		else
@@ -794,7 +796,7 @@ public class SimpleTester {
 			if(sor.matches(ret)) {
 			    return true;
 			}
-			System.out.println("WARN: ASSERTALERT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			logWithLineNr("WARN", "ASSERTALERT got \""+ret+"\", expected \""+sor.toString()+"\"");
 		    }
 		    catch (NoAlertPresentException e) {
 			// return false;
@@ -817,14 +819,13 @@ public class SimpleTester {
 
 		    if(!ret.equals(s2)) {
 			if(ret.equals(s2.strip())) {
-			    System.out.println("WARN: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			    logWithLineNr("WARN", "ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
 			    return true;
 			}
 			// Workaround for Safari returning true for attributes with a empty value
 			if(driverType == enumDriver.SAFARI && s2.equals("") && ret.equals("true"))
 			    return true;
-
-			System.out.println("INFO: ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
+			logWithLineNr("INFO", "ASSERTATR got \""+ret+"\", expected \""+s2+"\"");
 			return false;
 		    }
 		    return true;
@@ -857,10 +858,10 @@ public class SimpleTester {
 			return false;
 		    if(!sor.matches(ret)) {
 			if(sor.matches(ret.strip())) {
-			    System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    logWithLineNr("WARN", "ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 			    return true;
 			}
-			System.out.println("INFO: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+			logWithLineNr("INFO", "ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 			return false;
 		    }
 		    return true;
@@ -897,14 +898,14 @@ public class SimpleTester {
 			return false;
 		    if(!sor.matches(ret)) {
 			if(sor.matches(ret.strip())) {
-			    System.out.println("WARN: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    logWithLineNr("WARN", "ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
 			    return true;
 			}
 			// Workaround for Safari returning true for properties with a empty value
 			if(driverType == enumDriver.SAFARI && sor.matches("") && ret.equals("true"))
 			    return true;
 
-			System.out.println("INFO: ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
+			logWithLineNr("INFO", "ASSERTPRO got \""+ret+"\", expected \""+sor.toString()+"\"");
 			return false;
 		    }
 		    return true;
@@ -931,10 +932,10 @@ public class SimpleTester {
 			return false;
 		    if(!sor.matches(ret)) {
 			if(sor.matches(ret.strip())) {
-			    System.out.println("WARN: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			    logWithLineNr("WARN", "ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
 			    return true;
 			}
-			System.out.println("INFO: ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+			logWithLineNr("INFO", "ASSERTTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
 			return false;
 		    }
 		    return true;
@@ -1054,7 +1055,7 @@ public class SimpleTester {
 			int height = rect.getHeight()-(x*2);
 			int width = rect.getWidth()-(x*2);
 			if(height < 1 || width < 1) {
-			    System.out.println("INFO: Offset*2 > width or height");
+			    logWithLineNr("INFO", "Offset*2 > width or height");
 			    return false;
 			}
 			//System.out.println("X: "+topLeftX+" Y: "+topLeftY);
@@ -1137,7 +1138,7 @@ public class SimpleTester {
 		    String s1 = readString();
 		    if(novalidate)
 			return true;
-		    System.out.println("PRINT:"+linenr+":\""+s1+"\"");
+		    logWithLineNr("PRINT","\""+s1+"\"");
 		    return true;
 		}
 	    case PRINTATR:
@@ -1148,7 +1149,7 @@ public class SimpleTester {
 			return true;
 		    findElementCached(selector);
 		    String ret = curr_element.getDomAttribute(s1);
-		    System.out.println("PRINTATR:"+linenr+":\""+ret+"\"");
+		    logWithLineNr("PRINTATR","\""+ret+"\"");
 		    return true;
 		}
 	    case PRINTCSS:
@@ -1159,7 +1160,7 @@ public class SimpleTester {
 			return true;
 		    findElementCached(selector);
 		    String ret = curr_element.getCssValue(s1);
-		    System.out.println("PRINTCSS:"+linenr+":\""+ret+"\"");
+		    logWithLineNr("PRINTCSS","\""+ret+"\"");
 		    return true;
 		}
 	    case PRINTJS:
@@ -1172,7 +1173,7 @@ public class SimpleTester {
 		    if(String.class.isInstance(o))       { ret = (String)o; }
 		    else if(o == null)                   { ret = "NULL"; }
 		    else                                 { ret = o.toString(); }
-		    System.out.println("PRINTJS:"+linenr+":\""+ret+"\"");
+		    logWithLineNr("PRINTJS","\""+ret+"\"");
 		    return true;
 		}
 	    case PRINTPRO:
@@ -1183,22 +1184,22 @@ public class SimpleTester {
 			return true;
 		    findElementCached(selector);
 		    String ret = curr_element.getDomProperty(s1);
-		    System.out.println("PRINTPRO:"+linenr+":\""+ret+"\"");
+		    logWithLineNr("PRINTPRO","\""+ret+"\"");
 		    return true;
 		}
 	    case PRINTSRC:
 		{
 		    if(novalidate)
 			return true;
-		    System.out.println("PRINTSRC:"+linenr+": Start of print\n"+curr_driver.getPageSource());
-		    System.out.println("PRINTSRC:"+linenr+": End of print");
+		    logWithLineNr("PRINTSRC","Start of print\n"+curr_driver.getPageSource());
+		    logWithLineNr("PRINTSRC","End of print");
 		    return true;
 		}
 	    case PRINTTIME:
 		{
 		    if(novalidate)
 			return true;
-		    System.out.println("PRINTTIME:"+linenr+":"+Instant.now());
+		    logWithLineNr("PRINTTIME",""+Instant.now());
 		    return true;
 		}
 	    case PRINTTXT:
@@ -1209,7 +1210,7 @@ public class SimpleTester {
 		    findElementCached(selector);
 		    scrollUnlessDisplayed();
 		    String ret = curr_element.getText();
-		    System.out.println("PRINTTXT:"+linenr+":\""+ret+"\"");
+		    logWithLineNr("PRINTTXT","\""+ret+"\"");
 		    return true;
 		}
 	    case PRINTURL:
@@ -1217,7 +1218,7 @@ public class SimpleTester {
 		    if(novalidate)
 			return true;
 		    String ret = curr_driver.getCurrentUrl();
-		    System.out.println("PRINTURL:"+linenr+":\""+ret+"\"");
+		    logWithLineNr("PRINTURL","\""+ret+"\"");
 		    return true;
 		}
 	    case REFRESH:
@@ -1251,7 +1252,7 @@ public class SimpleTester {
 		    if(novalidate)
 			return true;
 		    takeScreenshot(s1);
-		    System.out.println("INFO: Screenshot taken \""+s1+"\"");
+		    logWithLineNr("INFO","Screenshot taken \""+s1+"\"");
 		    return true;
 		}
 	    case SCROLLTO:
@@ -1288,8 +1289,8 @@ public class SimpleTester {
 			    tryClick();
 			}
 			catch(ElementNotInteractableException e) {
-			    System.out.println("ERROR: Element "+ curr_element+" probably hidden by other element!");
-			    System.out.println("ERROR: "+e.getMessage());
+			    logWithLineNr("ERROR", "Element "+ curr_element+" probably hidden by other element!");
+			    logWithLineNr("ERROR", e.getMessage());
 			    return false;
 			}
 		    }
@@ -1334,7 +1335,10 @@ public class SimpleTester {
 		    if(novalidate)
 			return true;
 		    findElementCached(selector);
-		    scrollUnlessDisplayed();
+		    // Safari may eat first character if we do not click before
+		    //scrollUnlessDisplayed();
+		    tryClick();
+		    sleep(20);
 		    tryType(s1);
 		    return true;
 		}
@@ -1488,7 +1492,7 @@ public class SimpleTester {
 				continue;
 			    if(!sor.matches(ret)) {
 				if(sor.matches(ret.strip())) {
-				    System.out.println("WARN: ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
+				    logWithLineNr("WARN", "ASSERTCSS got \""+ret+"\", expected \""+sor.toString()+"\"");
 				    return true;
 				}
 			    }
@@ -1565,7 +1569,7 @@ public class SimpleTester {
 				return true;
 			    }
 			    else if(sor.matches(ret.strip())) {
-				System.out.println("WARN: WAITFORTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
+				logWithLineNr("WARN", "WAITFORTXT got \""+ret+"\", expected \""+sor.toString()+"\"");
 				return true;
 			    }
 			}
@@ -1581,7 +1585,7 @@ public class SimpleTester {
 	    }
 	}
 	catch(ParsingException e) {
-	    System.out.println("ERROR: "+e.toString());
+	    logWithLineNr("ERROR", e.toString());
 	}
 	return false;
     }
