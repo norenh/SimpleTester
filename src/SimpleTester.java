@@ -1335,10 +1335,7 @@ public class SimpleTester {
 		    if(novalidate)
 			return true;
 		    findElementCached(selector);
-		    // Safari may eat first character if we do not click before
-		    //scrollUnlessDisplayed();
-		    tryClick();
-		    sleep(20);
+		    scrollUnlessDisplayed();
 		    tryType(s1);
 		    return true;
 		}
@@ -1585,7 +1582,7 @@ public class SimpleTester {
 	    }
 	}
 	catch(ParsingException e) {
-	    logWithLineNr("ERROR", e.toString());
+	    System.out.println("ERROR: "+e.toString());
 	}
 	return false;
     }
