@@ -44,6 +44,7 @@ import org.openqa.selenium.Dimension;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -1922,6 +1923,14 @@ public class SimpleTester {
 	    case CHROME:
 		{
 		    ChromeOptions options = new ChromeOptions();
+
+		    final Map<String, Object> chromePrefs = new HashMap<>();
+		    chromePrefs.put("credentials_enable_service", false);
+		    chromePrefs.put("profile.password_manager_enabled", false);
+		    chromePrefs.put("profile.password_manager_leak_detection", false);
+
+		    options.setExperimentalOption("prefs", chromePrefs);
+
 		    if(resolution_x > 0 && resolution_y > 0) {
 			options.addArguments("--window-size="+resolution_x+
 					     ","+resolution_y);
